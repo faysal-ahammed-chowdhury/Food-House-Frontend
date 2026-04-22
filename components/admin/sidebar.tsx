@@ -1,10 +1,10 @@
 "use client";
-import { Bike, List, Shield, User, Users, Utensils } from "lucide-react";
+import { Bike, List, PieChart, Shield, Users, Utensils } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { href: "/admin", label: "Overview", icon: User },
+  { href: "/admin", label: "Overview", icon: PieChart },
   { href: "/admin/restaurants", label: "Restaurants", icon: Utensils },
   { href: "/admin/riders", label: "Riders", icon: Bike },
   { href: "/admin/customers", label: "Customers", icon: Users },

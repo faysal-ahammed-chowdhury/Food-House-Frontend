@@ -1,3 +1,103 @@
-export default function Restaurants() {
-  return <h1>This is res</h1>;
+"use client";
+import AddRestaurantForm from "@/components/admin/add-restaurant-form";
+import MyModal from "@/components/admin/my-modal";
+import RestaurantTableItem from "@/components/admin/restaurant-table-item";
+import TableHeader from "@/components/admin/table-header";
+import { Restaurant } from "@/types/admin/Restaurant";
+import axios from "axios";
+import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+
+export default function RestaurantsPage() {
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [showAddModal, setShowAddModal] = useState<boolean>(true);
+
+  const fetchRestaurants = async () => {
+    const res = await axios.get("http://localhost:5000/admin/restaurants");
+    setRestaurants(res.data.data);
+  };
+
+  useEffect(() => {
+    fetchRestaurants();
+  }, []);
+
+  useEffect(() => {
+    console.log(restaurants);
+  }, [restaurants]);
+
+  const closeAddModal = () => {
+    setShowAddModal(false);
+  };
+
+  return (
+    <>
+      <MyModal
+        title="Add New Restaurant"
+        open={showAddModal}
+        onClose={closeAddModal}
+      >
+        <AddRestaurantForm
+          onSuccess={() => {
+            fetchRestaurants();
+            closeAddModal();
+          }}
+        />
+      </MyModal>
+      <div className="flex justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Manage Restaurants</h1>
+          <p className="text-gray-500 text-lg">
+            Add, edit or remove restaurant partners
+          </p>
+        </div>
+        <div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg flex items-center gap-1"
+          >
+            <Plus size={18}></Plus>
+            <span>Add Restaurant</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="my-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-gray-50 bg-slate-50/50">
+                <TableHeader
+                  allHeader={[
+                    "Restaurant",
+                    "Address",
+                    "Commission",
+                    "Delivery Fee",
+                    "Total Earning",
+                    "Status",
+                    "Actions",
+                  ]}
+                />
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-gray-50">
+              {restaurants.length > 0 ? (
+                restaurants.map((r: Restaurant) => (
+                  <RestaurantTableItem key={r.restaurantId} restaurant={r} />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7}>
+                    <p className="text-center py-10 text-lg text-gray-400">
+                      No restaurants found
+                    </p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
 }

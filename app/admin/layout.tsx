@@ -1,7 +1,7 @@
+import Sidebar from "@/components/admin/sidebar";
 import { LogOut, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import Sidebar from "./components/Sidebar";
 
 export default function AdminLayout({
   children,
@@ -10,7 +10,9 @@ export default function AdminLayout({
     <>
       <header className="flex justify-between items-center px-10 py-3 border-b border-gray-100">
         <div className="logo">
-          <Image src="/logo.jpeg" height={10} width={180} alt="Logo" />
+          <Link href="/admin">
+            <Image src="/logo.jpeg" height={10} width={180} alt="Logo" />
+          </Link>
         </div>
         <div className="right flex items-center">
           <Link
