@@ -18,8 +18,13 @@ export default function RestaurantTableItem({
   return (
     <tr className="hover:bg-slate-50/50 transition-colors">
       <td className="px-6 py-5">
+        <p className="font-medium text-slate-500">{restaurantId}</p>
+      </td>
+      <td className="px-6 py-5">
         <p className="font-bold text-slate-900">{user?.name}</p>
-        <p className="text-[12px] text-slate-400 mt-0.5">ID: {restaurantId}</p>
+      </td>
+      <td className="px-6 py-5">
+        <p className="text-slate-900">{user?.email}</p>
       </td>
       <td className="px-6 py-5">
         <p className="text-slate-900">{address}</p>

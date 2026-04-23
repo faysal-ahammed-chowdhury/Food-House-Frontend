@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleX } from "lucide-react";
+import { useEffect } from "react";
 
 export default function MyModal({
   children,
@@ -13,6 +14,14 @@ export default function MyModal({
   open: boolean;
   title: string;
 }>) {
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+  }, [open]);
+
   return (
     <div
       onClick={onClose}

@@ -10,11 +10,18 @@ import { useEffect, useState } from "react";
 
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [showAddModal, setShowAddModal] = useState<boolean>(true);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchRestaurants = async () => {
-    const res = await axios.get("http://localhost:5000/admin/restaurants");
-    setRestaurants(res.data.data);
+    try {
+      const res = await axios.get("http://localhost:5000/admin/restaurants");
+      setRestaurants(res.data.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -68,7 +75,9 @@ export default function RestaurantsPage() {
               <tr className="border-b border-gray-50 bg-slate-50/50">
                 <TableHeader
                   allHeader={[
+                    "ID",
                     "Restaurant",
+                    "Email",
                     "Address",
                     "Commission",
                     "Delivery Fee",
@@ -87,9 +96,9 @@ export default function RestaurantsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7}>
+                  <td colSpan={9}>
                     <p className="text-center py-10 text-lg text-gray-400">
-                      No restaurants found
+                      {loading ? "Loading.." : "No restaurants found"}
                     </p>
                   </td>
                 </tr>
