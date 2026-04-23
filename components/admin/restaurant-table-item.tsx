@@ -22,6 +22,12 @@ export default function RestaurantTableItem({
   }: Restaurant = restaurant;
 
   const handleDelete = async () => {
+    const ok = window.confirm(
+      "Are you sure you want to delete this restaurant?",
+    );
+
+    if (!ok) return;
+
     try {
       const res = await axios.delete(
         `http://localhost:5000/admin/restaurants/${restaurantId}`,
