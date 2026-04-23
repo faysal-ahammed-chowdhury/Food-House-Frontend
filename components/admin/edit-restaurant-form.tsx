@@ -1,7 +1,7 @@
 "use client";
 import { Restaurant } from "@/types/admin/Restaurant";
 import axios from "axios";
-import { CircleX, Info } from "lucide-react";
+import { CheckCircle, CircleX, Info } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import * as z from "zod";
 
@@ -78,6 +78,7 @@ export default function EditResturantForm({
   const [isRestaurantOpen, setIsRestaurantOpen] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState<boolean>(false);
+  const [successMsg, setSuccessMsg] = useState<string>("");
 
   useEffect(() => {
     setName(restaurant.user.name);
@@ -94,6 +95,7 @@ export default function EditResturantForm({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrors({});
+    setSuccessMsg("");
 
     const result = editRestaurantSchema.safeParse({
       name,
@@ -130,6 +132,7 @@ export default function EditResturantForm({
       );
 
       onSuccess();
+      setSuccessMsg(`${name} Updated Successfully`);
       console.log(res.data);
     } catch (error: any) {
       const messages = error.response?.data?.message;
@@ -150,19 +153,29 @@ export default function EditResturantForm({
         <Info size={14} />
         <span>Leave blank/same to keep the current value.</span>
       </p>
-      {errors?.server?.length > 0 && (
-        <ul className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 space-y-2">
-          {errors?.server.map((msg, i) => (
-            <li
-              key={i}
-              className="flex items-center gap-2 text-sm text-red-600"
-            >
-              <CircleX size={16} />
-              <p>{msg}</p>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div>
+        {errors?.server?.length > 0 && (
+          <ul className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 space-y-2">
+            {errors?.server.map((msg, i) => (
+              <li
+                key={i}
+                className="flex items-center gap-2 text-sm text-red-600"
+              >
+                <CircleX size={16} />
+                <p>{msg}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+        {successMsg?.length > 0 && (
+          <div className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+            <div className="flex items-center gap-2 text-emerald-700">
+              <CheckCircle size={18} className="shrink-0" />
+              <p className="text-sm font-medium">{successMsg}</p>
+            </div>
+          </div>
+        )}
+      </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="w-full">
           <label className="block font-medium text-gray-700 mb-1">

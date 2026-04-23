@@ -1,5 +1,6 @@
 "use client";
 import AddRestaurantForm from "@/components/admin/add-restaurant-form";
+import EditResturantForm from "@/components/admin/edit-restaurant-form";
 import MyModal from "@/components/admin/my-modal";
 import RestaurantTableItem from "@/components/admin/restaurant-table-item";
 import TableHeader from "@/components/admin/table-header";
@@ -11,6 +12,8 @@ import { useEffect, useState } from "react";
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [selectedEditRestaurant, setSelectedEditRestaurant] =
+    useState<Restaurant | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchRestaurants = async () => {
@@ -32,6 +35,10 @@ export default function RestaurantsPage() {
     setShowAddModal(false);
   };
 
+  const closeEditModal = () => {
+    setSelectedEditRestaurant(null);
+  };
+
   return (
     <>
       <MyModal
@@ -46,6 +53,19 @@ export default function RestaurantsPage() {
           }}
         />
       </MyModal>
+
+      {selectedEditRestaurant && (
+        <MyModal
+          title="Edit Restaurant"
+          open={Boolean(selectedEditRestaurant)}
+          onClose={closeEditModal}
+        >
+          <EditResturantForm
+            onSuccess={fetchRestaurants}
+            restaurant={selectedEditRestaurant}
+          />
+        </MyModal>
+      )}
 
       <div className="flex justify-between">
         <div>
@@ -95,6 +115,7 @@ export default function RestaurantsPage() {
                     onSuccess={() => {
                       fetchRestaurants();
                     }}
+                    onEdit={setSelectedEditRestaurant}
                   />
                 ))
               ) : (

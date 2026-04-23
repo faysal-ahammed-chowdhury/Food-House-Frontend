@@ -1,19 +1,16 @@
 import { Restaurant } from "@/types/admin/Restaurant";
 import axios from "axios";
 import { Pencil, Trash2, Utensils } from "lucide-react";
-import { useState } from "react";
-import EditResturantForm from "./edit-restaurant-form";
-import MyModal from "./my-modal";
 
 export default function RestaurantTableItem({
   restaurant,
   onSuccess,
+  onEdit,
 }: {
   restaurant: Restaurant;
   onSuccess: () => void;
+  onEdit: (restaurant: Restaurant) => void;
 }) {
-  const [showEditModal, setShowEditModal] = useState<boolean>(false);
-
   const {
     user,
     restaurantId,
@@ -33,10 +30,6 @@ export default function RestaurantTableItem({
     } catch (err) {
       console.log(err);
     }
-  };
-
-  const closeEditModal = () => {
-    setShowEditModal(false);
   };
 
   return (
@@ -64,18 +57,6 @@ export default function RestaurantTableItem({
           <p className="text-slate-900">{totalEarning} TK</p>
         </td>
         <td className="px-6 py-5">
-          {showEditModal && (
-            <MyModal
-              title="Edit Restaurant"
-              open={showEditModal}
-              onClose={closeEditModal}
-            >
-              <EditResturantForm
-                onSuccess={onSuccess}
-                restaurant={restaurant}
-              />
-            </MyModal>
-          )}
           <p className="text-slate-900">
             <span
               className={`px-2.5 py-0.5 rounded-full text-sm font-bold ${
@@ -95,7 +76,9 @@ export default function RestaurantTableItem({
               <Utensils size={16} />
             </button>
             <button
-              onClick={() => setShowEditModal(true)}
+              onClick={() => {
+                onEdit(restaurant);
+              }}
               className="cursor-pointer"
             >
               <Pencil size={16} />
