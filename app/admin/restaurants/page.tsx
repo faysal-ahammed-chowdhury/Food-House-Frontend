@@ -28,10 +28,6 @@ export default function RestaurantsPage() {
     fetchRestaurants();
   }, []);
 
-  useEffect(() => {
-    console.log(restaurants);
-  }, [restaurants]);
-
   const closeAddModal = () => {
     setShowAddModal(false);
   };
@@ -50,6 +46,7 @@ export default function RestaurantsPage() {
           }}
         />
       </MyModal>
+
       <div className="flex justify-between">
         <div>
           <h1 className="text-3xl font-bold">Manage Restaurants</h1>
@@ -92,13 +89,19 @@ export default function RestaurantsPage() {
             <tbody className="divide-y divide-gray-50">
               {restaurants.length > 0 ? (
                 restaurants.map((r: Restaurant) => (
-                  <RestaurantTableItem key={r.restaurantId} restaurant={r} />
+                  <RestaurantTableItem
+                    key={r.restaurantId}
+                    restaurant={r}
+                    onSuccess={() => {
+                      fetchRestaurants();
+                    }}
+                  />
                 ))
               ) : (
                 <tr>
                   <td colSpan={9}>
                     <p className="text-center py-10 text-lg text-gray-400">
-                      {loading ? "Loading.." : "No restaurants found"}
+                      {loading ? "Loading..." : "No restaurants found"}
                     </p>
                   </td>
                 </tr>

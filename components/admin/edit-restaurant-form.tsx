@@ -1,50 +1,44 @@
 "use client";
+import { Restaurant } from "@/types/admin/Restaurant";
 import axios from "axios";
 import { CircleX, Info } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import * as z from "zod";
 
-export const createRestaurantSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Restaurant name is required")
-    .max(100, "Max 100 characters allowed"),
+export const editRestaurantSchema = z.object({
+  name: z.preprocess((val) => {
+    if (String(val).trim() === "") return undefined;
+    return val;
+  }, z.string().min(1, "Restaurant name is required").max(100, "Max 100 characters allowed").optional()),
 
-  email: z
-    .email("Invalid email address")
-    .max(100, "Max 100 characters allowed"),
+  password: z.preprocess((val) => {
+    if (String(val).trim() === "") return undefined;
+    return val;
+  }, z.string().min(6, "Min 6 characters required").max(32, "Max 32 characters allowed").optional()),
 
-  password: z
-    .string()
-    .min(6, "Min 6 characters required")
-    .max(32, "Max 32 characters allowed"),
+  address: z.preprocess((val) => {
+    if (String(val).trim() === "") return undefined;
+    return val;
+  }, z.string().min(1, "Address is required").max(100, "Max 100 characters allowed").optional()),
 
-  address: z
-    .string()
-    .min(1, "Address is required")
-    .max(100, "Max 100 characters allowed"),
-
-  description: z.string().max(500, "Max 500 characters allowed"),
+  description: z.preprocess((val) => {
+    if (String(val).trim() === "") return undefined;
+    return val;
+  }, z.string().max(500, "Max 500 characters allowed").optional()),
 
   isOpen: z.preprocess((val) => val === "true" || val === true, z.boolean()),
 
-  currentCommissionPercent: z.preprocess(
-    (val) => {
-      if (val === "" || val == null) return undefined;
-      if (Number.isNaN(Number(val))) return undefined;
-      return Number(val);
-    },
-    z.number("Invalid commission").min(0, "Min 0%").max(100, "Max 100%"),
-  ),
+  currentCommissionPercent: z.preprocess((val) => {
+    if (val === "" || val == null) return undefined;
+    if (Number.isNaN(Number(val))) return undefined;
+    return Number(val);
+  }, z.number("Invalid commission").min(0, "Min 0%").max(100, "Max 100%").optional()),
 
-  currentDeliveryFee: z.preprocess(
-    (val) => {
-      if (val === "" || val == null) return undefined;
-      if (Number.isNaN(Number(val))) return undefined;
-      return Number(val);
-    },
-    z.number("Invalid fee").min(0, "Cannot be negative"),
-  ),
+  currentDeliveryFee: z.preprocess((val) => {
+    if (val === "" || val == null) return undefined;
+    if (Number.isNaN(Number(val))) return undefined;
+    return Number(val);
+  }, z.number("Invalid fee").min(0, "Cannot be negative").optional()),
 
   bkashAccount: z.preprocess(
     (val) => {
@@ -65,9 +59,11 @@ export const createRestaurantSchema = z.object({
   }, z.string().min(10, "Min 10 digits").max(20, "Max 20 digits").optional()),
 });
 
-export default function AddRestaurantForm({
+export default function EditResturantForm({
+  restaurant,
   onSuccess,
 }: {
+  restaurant: Restaurant;
   onSuccess: () => void;
 }) {
   const [name, setName] = useState<string>("");
@@ -79,16 +75,28 @@ export default function AddRestaurantForm({
   const [deliveryFee, setDeliveryFee] = useState<string>("");
   const [bankAccount, setBankAccount] = useState<string>("");
   const [bkash, setBkash] = useState<string>("");
+  const [isRestaurantOpen, setIsRestaurantOpen] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setName(restaurant.user.name);
+    setEmail(restaurant.user.email);
+    setAddress(restaurant.address);
+    setDeliveryFee(String(restaurant.currentDeliveryFee));
+    setCommissionPercent(String(restaurant.currentCommissionPercent));
+    setBankAccount(restaurant.bankAccount ?? "");
+    setBkash(restaurant.bkashAccount ?? "");
+    setDescription(restaurant.description);
+    setIsRestaurantOpen(restaurant.isOpen);
+  }, [restaurant]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrors({});
 
-    const result = createRestaurantSchema.safeParse({
+    const result = editRestaurantSchema.safeParse({
       name,
-      email,
       password,
       address,
       description: description,
@@ -96,7 +104,7 @@ export default function AddRestaurantForm({
       currentDeliveryFee: deliveryFee,
       bkashAccount: bkash,
       bankAccount: bankAccount,
-      isOpen: true,
+      isOpen: isRestaurantOpen,
     });
 
     if (!result.success) {
@@ -112,27 +120,17 @@ export default function AddRestaurantForm({
     }
 
     // console.log(result.data);
+    // return;
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/admin/restaurants",
+      const res = await axios.put(
+        `http://localhost:5000/admin/restaurants/${restaurant.restaurantId}`,
         result.data,
       );
 
-      //   console.log(res.data);
-
-      setName("");
-      setEmail("");
-      setPassword("");
-      setAddress("");
-      setDescription("");
-      setCommissionPercent("0");
-      setDeliveryFee("0");
-      setBkash("");
-      setBankAccount("");
-
       onSuccess();
+      console.log(res.data);
     } catch (error: any) {
       const messages = error.response?.data?.message;
 
@@ -148,6 +146,10 @@ export default function AddRestaurantForm({
 
   return (
     <div className="w-[500px] ">
+      <p className="mb-5 text-xs text-slate-500 flex items-center gap-2 text-red-600">
+        <Info size={14} />
+        <span>Leave blank/same to keep the current value.</span>
+      </p>
       {errors?.server?.length > 0 && (
         <ul className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 space-y-2">
           {errors?.server.map((msg, i) => (
@@ -164,7 +166,7 @@ export default function AddRestaurantForm({
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="w-full">
           <label className="block font-medium text-gray-700 mb-1">
-            <span>Restaurant Name</span> <span className="text-red-500">*</span>
+            <span>Restaurant Name</span>
           </label>
           <input
             value={name}
@@ -182,13 +184,17 @@ export default function AddRestaurantForm({
         <div className="flex justify-between gap-4">
           <div className="w-full">
             <label className="block font-medium text-gray-700 mb-1">
-              <span>Email</span> <span className="text-red-500">*</span>
+              <span>Email</span>
             </label>
             <input
+              disabled={true}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
               type="text"
-              className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
+              className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none disabled:bg-gray-50 
+           disabled:text-gray-500 
+           disabled:border-gray-200 
+           disabled:shadow-none
+           disabled:cursor-not-allowed"
             />
             {errors.email && (
               <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
@@ -199,7 +205,7 @@ export default function AddRestaurantForm({
           </div>
           <div className="w-full">
             <label className="block font-medium text-gray-700 mb-1">
-              <span>Password</span> <span className="text-red-500">*</span>
+              <span>Password</span>
             </label>
             <input
               value={password}
@@ -217,7 +223,7 @@ export default function AddRestaurantForm({
         </div>
         <div className="w-full">
           <label className="block font-medium text-gray-700 mb-1">
-            <span>Address</span> <span className="text-red-500">*</span>
+            <span>Address</span>
           </label>
           <input
             value={address}
@@ -253,7 +259,6 @@ export default function AddRestaurantForm({
           <div className="w-full">
             <label className="block font-medium text-gray-700 mb-1">
               <span>Commission Percent</span>{" "}
-              <span className="text-red-500">*</span>
             </label>
             <input
               value={commissionPercent}
@@ -270,7 +275,7 @@ export default function AddRestaurantForm({
           </div>
           <div className="w-full">
             <label className="block font-medium text-gray-700 mb-1">
-              <span>Delivery Fee</span> <span className="text-red-500">*</span>
+              <span>Delivery Fee</span>
             </label>
             <input
               value={deliveryFee}
@@ -322,13 +327,30 @@ export default function AddRestaurantForm({
             )}
           </div>
         </div>
+        <div className="full">
+          <div className="flex gap-2 font-medium">
+            <input
+              checked={isRestaurantOpen}
+              onChange={() => setIsRestaurantOpen(!isRestaurantOpen)}
+              id={String(restaurant.restaurantId)}
+              type="checkbox"
+              className="cursor-pointer"
+            />
+            <label
+              htmlFor={String(restaurant.restaurantId)}
+              className="cursor-pointer"
+            >
+              Is Open
+            </label>
+          </div>
+        </div>
         <div className="w-full">
           <button
             disabled={loading}
             type="submit"
             className="w-full mt-5 font-bold bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg"
           >
-            {loading ? "Creating Restaurant..." : "Create Restaurant Account"}
+            {loading ? "Updating Restaurant..." : "Update Restaurant"}
           </button>
         </div>
       </form>
