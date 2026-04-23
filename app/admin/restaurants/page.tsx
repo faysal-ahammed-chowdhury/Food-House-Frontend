@@ -6,7 +6,7 @@ import RestaurantTableItem from "@/components/admin/restaurant-table-item";
 import TableHeader from "@/components/admin/table-header";
 import { Restaurant } from "@/types/admin/Restaurant";
 import axios from "axios";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function RestaurantsPage() {
@@ -15,10 +15,14 @@ export default function RestaurantsPage() {
   const [selectedEditRestaurant, setSelectedEditRestaurant] =
     useState<Restaurant | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [searchTxt, setSearchTxt] = useState<string>("");
 
   const fetchRestaurants = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/admin/restaurants");
+      const res = await axios.get("http://localhost:5000/admin/restaurants", {
+        params: { search: searchTxt },
+      });
       setRestaurants(res.data.data);
     } catch (err) {
       console.error(err);
@@ -29,7 +33,7 @@ export default function RestaurantsPage() {
 
   useEffect(() => {
     fetchRestaurants();
-  }, []);
+  }, [searchTxt]);
 
   const closeAddModal = () => {
     setShowAddModal(false);
@@ -50,6 +54,7 @@ export default function RestaurantsPage() {
           onSuccess={() => {
             fetchRestaurants();
             closeAddModal();
+            setSearchTxt("");
           }}
         />
       </MyModal>
@@ -85,6 +90,19 @@ export default function RestaurantsPage() {
         </div>
       </div>
 
+      <div className="mt-5 bg-white p-5 rounded-lg">
+        <div className="flex items-center border rounded-lg font-semibold border-gray-300 px-5 py-3 bg-white gap-3">
+          <Search size={18} />
+          <input
+            value={searchTxt}
+            onChange={(e) => setSearchTxt(e.target.value)}
+            type="text"
+            placeholder="Search by Restaurant ID, Name or Email"
+            className="block w-full focus:outline-none"
+          />
+        </div>
+      </div>
+
       <div className="my-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -107,7 +125,15 @@ export default function RestaurantsPage() {
             </thead>
 
             <tbody className="divide-y divide-gray-50">
-              {restaurants.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={9}>
+                    <p className="text-center py-10 text-lg text-gray-400">
+                      Loading...
+                    </p>
+                  </td>
+                </tr>
+              ) : restaurants.length > 0 ? (
                 restaurants.map((r: Restaurant) => (
                   <RestaurantTableItem
                     key={r.restaurantId}
@@ -122,7 +148,7 @@ export default function RestaurantsPage() {
                 <tr>
                   <td colSpan={9}>
                     <p className="text-center py-10 text-lg text-gray-400">
-                      {loading ? "Loading..." : "No restaurants found"}
+                      No restaurants found
                     </p>
                   </td>
                 </tr>
