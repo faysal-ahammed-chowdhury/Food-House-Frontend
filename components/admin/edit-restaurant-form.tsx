@@ -11,13 +11,10 @@ export const editRestaurantSchema = z.object({
     return val;
   }, z.string().min(1, "Restaurant name is required").max(100, "Max 100 characters allowed").optional()),
 
-  email: z.preprocess(
-    (val) => {
-      if (String(val).trim() === "") return undefined;
-      return val;
-    },
-    z.email("Invalid email address").max(100, "Max 100 characters allowed"),
-  ),
+  email: z.preprocess((val) => {
+    if (String(val).trim() === "") return undefined;
+    return val;
+  }, z.email("Invalid email address").max(100, "Max 100 characters allowed").optional()),
 
   password: z.preprocess((val) => {
     if (String(val).trim() === "") return undefined;
