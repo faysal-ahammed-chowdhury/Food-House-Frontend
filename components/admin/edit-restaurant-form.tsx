@@ -11,6 +11,14 @@ export const editRestaurantSchema = z.object({
     return val;
   }, z.string().min(1, "Restaurant name is required").max(100, "Max 100 characters allowed").optional()),
 
+  email: z.preprocess(
+    (val) => {
+      if (String(val).trim() === "") return undefined;
+      return val;
+    },
+    z.email("Invalid email address").max(100, "Max 100 characters allowed"),
+  ),
+
   password: z.preprocess((val) => {
     if (String(val).trim() === "") return undefined;
     return val;
@@ -99,6 +107,7 @@ export default function EditResturantForm({
 
     const result = editRestaurantSchema.safeParse({
       name,
+      email,
       password,
       address,
       description: description,
@@ -200,14 +209,10 @@ export default function EditResturantForm({
               <span>Email</span>
             </label>
             <input
-              disabled={true}
               value={email}
+              onChange={(e) => setEmail(e.target.value)}
               type="text"
-              className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none disabled:bg-gray-50 
-           disabled:text-gray-500 
-           disabled:border-gray-200 
-           disabled:shadow-none
-           disabled:cursor-not-allowed"
+              className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
             />
             {errors.email && (
               <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
