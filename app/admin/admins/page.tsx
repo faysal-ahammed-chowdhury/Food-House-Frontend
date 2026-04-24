@@ -1,29 +1,30 @@
 "use client";
-import AddRestaurantForm from "@/components/admin/add-restaurant-form";
-import EditResturantForm from "@/components/admin/edit-restaurant-form";
+import AddAdminForm from "@/components/admin/add-admin-form";
+import AdminTableItem from "@/components/admin/admin-table-item";
+import EditAdminForm from "@/components/admin/edit-admin-form";
 import MyModal from "@/components/admin/my-modal";
-import RestaurantTableItem from "@/components/admin/restaurant-table-item";
 import TableHeader from "@/components/admin/table-header";
-import { Restaurant } from "@/types/admin/Restaurant";
+import { Admin } from "@/types/admin/Admin";
 import axios from "axios";
 import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export default function RestaurantsPage() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+export default function AdminsPage() {
+  const [admins, setAdmins] = useState<Admin[]>([]);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
-  const [selectedEditRestaurant, setSelectedEditRestaurant] =
-    useState<Restaurant | null>(null);
+  const [selectedEditAdmin, setSelectedEditAdmin] = useState<Admin | null>(
+    null,
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTxt, setSearchTxt] = useState<string>("");
 
-  const fetchRestaurants = async () => {
+  const fetchAdmins = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/admin/restaurants", {
+      const res = await axios.get("http://localhost:5000/admin/admins", {
         params: { search: searchTxt },
       });
-      setRestaurants(res.data.data);
+      setAdmins(res.data.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -32,7 +33,7 @@ export default function RestaurantsPage() {
   };
 
   useEffect(() => {
-    fetchRestaurants();
+    fetchAdmins();
   }, [searchTxt]);
 
   const closeAddModal = () => {
@@ -40,44 +41,39 @@ export default function RestaurantsPage() {
   };
 
   const closeEditModal = () => {
-    setSelectedEditRestaurant(null);
+    setSelectedEditAdmin(null);
   };
 
   return (
     <>
       <MyModal
-        title="Add New Restaurant"
+        title="Add New Admin"
         open={showAddModal}
         onClose={closeAddModal}
       >
-        <AddRestaurantForm
+        <AddAdminForm
           onSuccess={() => {
-            fetchRestaurants();
+            fetchAdmins();
             closeAddModal();
             setSearchTxt("");
           }}
         />
       </MyModal>
 
-      {selectedEditRestaurant && (
+      {selectedEditAdmin && (
         <MyModal
-          title="Edit Restaurant"
-          open={Boolean(selectedEditRestaurant)}
+          title="Edit Admin"
+          open={Boolean(selectedEditAdmin)}
           onClose={closeEditModal}
         >
-          <EditResturantForm
-            onSuccess={fetchRestaurants}
-            restaurant={selectedEditRestaurant}
-          />
+          <EditAdminForm onSuccess={fetchAdmins} admin={selectedEditAdmin} />
         </MyModal>
       )}
 
       <div className="flex justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Manage Restaurants</h1>
-          <p className="text-gray-500 text-lg">
-            Add, edit or remove restaurant partners
-          </p>
+          <h1 className="text-3xl font-bold">Manage Admins</h1>
+          <p className="text-gray-500 text-lg">Add, edit or remove admin</p>
         </div>
         <div>
           <button
@@ -85,7 +81,7 @@ export default function RestaurantsPage() {
             className="bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg flex items-center gap-1"
           >
             <Plus size={18}></Plus>
-            <span>Add Restaurant</span>
+            <span>Add Admin</span>
           </button>
         </div>
       </div>
@@ -97,7 +93,7 @@ export default function RestaurantsPage() {
             value={searchTxt}
             onChange={(e) => setSearchTxt(e.target.value)}
             type="text"
-            placeholder="Search by Restaurant ID, Name or Email"
+            placeholder="Search by Admin ID, Name or Email"
             className="block w-full focus:outline-none"
           />
         </div>
@@ -108,19 +104,7 @@ export default function RestaurantsPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-gray-50 bg-slate-50/50">
-                <TableHeader
-                  allHeader={[
-                    "ID",
-                    "Restaurant",
-                    "Email",
-                    "Address",
-                    "Commission",
-                    "Delivery Fee",
-                    "Total Earning",
-                    "Status",
-                    "Actions",
-                  ]}
-                />
+                <TableHeader allHeader={["ID", "Name", "Email", "Actions"]} />
               </tr>
             </thead>
 
@@ -133,22 +117,22 @@ export default function RestaurantsPage() {
                     </p>
                   </td>
                 </tr>
-              ) : restaurants.length > 0 ? (
-                restaurants.map((r: Restaurant) => (
-                  <RestaurantTableItem
-                    key={r.restaurantId}
-                    restaurant={r}
+              ) : admins.length > 0 ? (
+                admins.map((admin: Admin) => (
+                  <AdminTableItem
+                    key={admin.userId}
+                    admin={admin}
                     onSuccess={() => {
-                      fetchRestaurants();
+                      fetchAdmins();
                     }}
-                    onEdit={setSelectedEditRestaurant}
+                    onEdit={setSelectedEditAdmin}
                   />
                 ))
               ) : (
                 <tr>
                   <td colSpan={9}>
                     <p className="text-center py-10 text-lg text-gray-400">
-                      No restaurants found
+                      No admins found
                     </p>
                   </td>
                 </tr>
