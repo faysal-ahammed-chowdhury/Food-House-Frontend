@@ -41,7 +41,7 @@ export default function AdminTableItem({
           <p className="text-slate-900">{email}</p>
         </td>
 
-        <td>
+        <td className="px-6 py-5">
           <div className="flex gap-3 text-gray-500">
             <button
               onClick={() => {

@@ -1,15 +1,15 @@
 "use client";
-import { Restaurant } from "@/types/admin/Restaurant";
+import { Rider } from "@/types/admin/Rider";
 import axios from "axios";
 import { CheckCircle, CircleX, Info } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import * as z from "zod";
 
-export const editRestaurantSchema = z.object({
+export const editRiderSchema = z.object({
   name: z.preprocess((val) => {
     if (String(val).trim() === "") return undefined;
     return val;
-  }, z.string().min(1, "Restaurant name is required").max(100, "Max 100 characters allowed").optional()),
+  }, z.string().min(1, "Rider name is required").max(100, "Max 100 characters allowed").optional()),
 
   email: z.preprocess((val) => {
     if (String(val).trim() === "") return undefined;
@@ -21,29 +21,19 @@ export const editRestaurantSchema = z.object({
     return val;
   }, z.string().min(6, "Min 6 characters required").max(32, "Max 32 characters allowed").optional()),
 
-  address: z.preprocess((val) => {
-    if (String(val).trim() === "") return undefined;
-    return val;
-  }, z.string().min(1, "Address is required").max(100, "Max 100 characters allowed").optional()),
+  phone: z.preprocess(
+    (val) => {
+      if (typeof val !== "string") return undefined;
+      const v = val.trim();
+      return v === "" ? undefined : v;
+    },
+    z
+      .string()
+      .regex(/^(?:\+88)?01[0-9]{9}$/, "Invalid phone number")
+      .optional(),
+  ),
 
-  description: z.preprocess((val) => {
-    if (String(val).trim() === "") return undefined;
-    return val;
-  }, z.string().max(500, "Max 500 characters allowed").optional()),
-
-  isOpen: z.preprocess((val) => val === "true" || val === true, z.boolean()),
-
-  currentCommissionPercent: z.preprocess((val) => {
-    if (val === "" || val == null) return undefined;
-    if (Number.isNaN(Number(val))) return undefined;
-    return Number(val);
-  }, z.number("Invalid commission").min(0, "Min 0%").max(100, "Max 100%").optional()),
-
-  currentDeliveryFee: z.preprocess((val) => {
-    if (val === "" || val == null) return undefined;
-    if (Number.isNaN(Number(val))) return undefined;
-    return Number(val);
-  }, z.number("Invalid fee").min(0, "Cannot be negative").optional()),
+  isOnline: z.preprocess((val) => val === "true" || val === true, z.boolean()),
 
   bkashAccount: z.preprocess(
     (val) => {
@@ -64,55 +54,46 @@ export const editRestaurantSchema = z.object({
   }, z.string().min(10, "Min 10 digits").max(20, "Max 20 digits").optional()),
 });
 
-export default function EditResturantForm({
-  restaurant,
+export default function EditRiderForm({
+  rider,
   onSuccess,
 }: {
-  restaurant: Restaurant;
+  rider: Rider;
   onSuccess: () => void;
 }) {
   const [name, setName] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [commissionPercent, setCommissionPercent] = useState<string>("");
-  const [deliveryFee, setDeliveryFee] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
   const [bankAccount, setBankAccount] = useState<string>("");
   const [bkash, setBkash] = useState<string>("");
-  const [isRestaurantOpen, setIsRestaurantOpen] = useState<boolean>(false);
+  const [isRiderOnline, setIsRiderOnline] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<string>("");
 
   useEffect(() => {
-    setName(restaurant.user.name);
-    setEmail(restaurant.user.email);
-    setAddress(restaurant.address);
-    setDeliveryFee(String(restaurant.currentDeliveryFee));
-    setCommissionPercent(String(restaurant.currentCommissionPercent));
-    setBankAccount(restaurant.bankAccount ?? "");
-    setBkash(restaurant.bkashAccount ?? "");
-    setDescription(restaurant.description);
-    setIsRestaurantOpen(restaurant.isOpen);
-  }, [restaurant]);
+    setName(rider.user.name);
+    setEmail(rider.user.email);
+    setPhone(rider.phone);
+    setBankAccount(rider.bankAccount ?? "");
+    setBkash(rider.bkashAccount ?? "");
+    setIsRiderOnline(rider.isOnline);
+  }, [rider]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrors({});
     setSuccessMsg("");
 
-    const result = editRestaurantSchema.safeParse({
+    const result = editRiderSchema.safeParse({
       name,
       email,
       password,
-      address,
-      description: description,
-      currentCommissionPercent: commissionPercent,
-      currentDeliveryFee: deliveryFee,
+      phone,
       bkashAccount: bkash,
       bankAccount: bankAccount,
-      isOpen: isRestaurantOpen,
+      isOnline: isRiderOnline,
     });
 
     if (!result.success) {
@@ -133,7 +114,7 @@ export default function EditResturantForm({
 
     try {
       const res = await axios.put(
-        `http://localhost:5000/admin/restaurants/${restaurant.restaurantId}`,
+        `http://localhost:5000/admin/riders/${rider.riderId}`,
         result.data,
       );
 
@@ -185,7 +166,7 @@ export default function EditResturantForm({
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="w-full">
           <label className="block font-medium text-gray-700 mb-1">
-            <span>Restaurant Name</span>
+            <span>Rider Name</span>
           </label>
           <input
             value={name}
@@ -200,6 +181,7 @@ export default function EditResturantForm({
             </p>
           )}
         </div>
+
         <div className="flex justify-between gap-4">
           <div className="w-full">
             <label className="block font-medium text-gray-700 mb-1">
@@ -238,74 +220,22 @@ export default function EditResturantForm({
         </div>
         <div className="w-full">
           <label className="block font-medium text-gray-700 mb-1">
-            <span>Address</span>
+            <span>Phone</span>
           </label>
           <input
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             type="text"
             className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
           />
-          {errors.address && (
+          {errors.phone && (
             <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
               <Info size={13} />
-              <span>{errors.address[0]}</span>
-            </p>
-          )}
-        </div>
-        <div className="w-full">
-          <label className="block font-medium text-gray-700 mb-1">
-            <span>Description</span>
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
-          />
-          {errors.description && (
-            <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
-              <Info size={13} />
-              <span>{errors.description[0]}</span>
+              <span>{errors.phone[0]}</span>
             </p>
           )}
         </div>
 
-        <div className="flex justify-between gap-4">
-          <div className="w-full">
-            <label className="block font-medium text-gray-700 mb-1">
-              <span>Commission Percent</span>{" "}
-            </label>
-            <input
-              value={commissionPercent}
-              onChange={(e) => setCommissionPercent(e.target.value)}
-              type="number"
-              className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
-            />
-            {errors.currentCommissionPercent && (
-              <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
-                <Info size={13} />
-                <span>{errors.currentCommissionPercent[0]}</span>
-              </p>
-            )}
-          </div>
-          <div className="w-full">
-            <label className="block font-medium text-gray-700 mb-1">
-              <span>Delivery Fee</span>
-            </label>
-            <input
-              value={deliveryFee}
-              onChange={(e) => setDeliveryFee(e.target.value)}
-              type="number"
-              className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
-            />
-            {errors.currentDeliveryFee && (
-              <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
-                <Info size={13} />
-                <span>{errors.currentDeliveryFee[0]}</span>
-              </p>
-            )}
-          </div>
-        </div>
         <div className="flex justify-between gap-4">
           <div className="w-full">
             <label className="block font-medium text-gray-700 mb-1">
@@ -345,17 +275,14 @@ export default function EditResturantForm({
         <div className="full">
           <div className="flex gap-2 font-medium">
             <input
-              checked={isRestaurantOpen}
-              onChange={() => setIsRestaurantOpen(!isRestaurantOpen)}
-              id={String(restaurant.restaurantId)}
+              checked={isRiderOnline}
+              onChange={() => setIsRiderOnline(!isRiderOnline)}
+              id={String(rider.riderId)}
               type="checkbox"
               className="cursor-pointer"
             />
-            <label
-              htmlFor={String(restaurant.restaurantId)}
-              className="cursor-pointer"
-            >
-              Is Open
+            <label htmlFor={String(rider.riderId)} className="cursor-pointer">
+              Is Online
             </label>
           </div>
         </div>
@@ -365,7 +292,7 @@ export default function EditResturantForm({
             type="submit"
             className="w-full mt-5 font-bold bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg"
           >
-            {loading ? "Updating Restaurant..." : "Update Restaurant"}
+            {loading ? "Updating Rider..." : "Update Rider"}
           </button>
         </div>
       </form>

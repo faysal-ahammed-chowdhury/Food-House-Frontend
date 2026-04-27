@@ -1,11 +1,11 @@
 "use client";
-import { Admin } from "@/types/admin/Admin";
+import { Customer } from "@/types/admin/Customer";
 import axios from "axios";
 import { CheckCircle, CircleX, Info } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import * as z from "zod";
 
-export const editAdminSchema = z.object({
+export const editCustomerSchema = z.object({
   name: z.preprocess((val) => {
     if (String(val).trim() === "") return undefined;
     return val;
@@ -20,36 +20,67 @@ export const editAdminSchema = z.object({
     if (String(val).trim() === "") return undefined;
     return val;
   }, z.string().min(6, "Min 6 characters required").max(32, "Max 32 characters allowed").optional()),
+
+  address: z.preprocess((val) => {
+    if (String(val).trim() === "") return undefined;
+    return val;
+  }, z.string().min(1, "Address is required").max(100, "Max 100 characters allowed").optional()),
+
+  phone: z.preprocess(
+    (val) => {
+      if (typeof val !== "string") return undefined;
+      const v = val.trim();
+      return v === "" ? undefined : v;
+    },
+    z
+      .string()
+      .regex(/^(?:\+88)?01[0-9]{9}$/, "Invalid Phone number")
+      .optional(),
+  ),
+
+  isVerified: z.preprocess(
+    (val) => val === "true" || val === true,
+    z.boolean(),
+  ),
 });
 
-export default function EditAdminForm({
-  admin,
+export default function EditCustomerForm({
+  customer,
   onSuccess,
 }: {
-  admin: Admin;
+  customer: Customer;
   onSuccess: () => void;
 }) {
   const [name, setName] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [isCustomerVerified, setIsCustomerVerified] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<string>("");
 
   useEffect(() => {
-    setName(admin.name);
-    setEmail(admin.email);
-  }, [admin]);
+    setName(customer.user.name);
+    setEmail(customer.user.email);
+    setAddress(customer.address);
+    setPhone(customer.phone);
+    setIsCustomerVerified(customer.user.isVerified);
+  }, [customer]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrors({});
     setSuccessMsg("");
 
-    const result = editAdminSchema.safeParse({
+    const result = editCustomerSchema.safeParse({
       name,
-      password,
       email,
+      password,
+      address,
+      phone,
+      isVerified: isCustomerVerified,
     });
 
     if (!result.success) {
@@ -70,7 +101,7 @@ export default function EditAdminForm({
 
     try {
       const res = await axios.put(
-        `http://localhost:5000/admin/admins/${admin.userId}`,
+        `http://localhost:5000/admin/customers/${customer.customerId}`,
         result.data,
       );
 
@@ -122,7 +153,7 @@ export default function EditAdminForm({
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="w-full">
           <label className="block font-medium text-gray-700 mb-1">
-            <span>Name</span>
+            <span>Customer</span>
           </label>
           <input
             value={name}
@@ -156,6 +187,23 @@ export default function EditAdminForm({
         </div>
         <div className="w-full">
           <label className="block font-medium text-gray-700 mb-1">
+            <span>Phone</span>
+          </label>
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            type="text"
+            className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
+          />
+          {errors.phone && (
+            <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
+              <Info size={13} />
+              <span>{errors.phone[0]}</span>
+            </p>
+          )}
+        </div>
+        <div className="w-full">
+          <label className="block font-medium text-gray-700 mb-1">
             <span>Password</span>
           </label>
           <input
@@ -171,6 +219,56 @@ export default function EditAdminForm({
             </p>
           )}
         </div>
+        <div className="w-full">
+          <label className="block font-medium text-gray-700 mb-1">
+            <span>Address</span>
+          </label>
+          <input
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            type="text"
+            className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
+          />
+          {errors.address && (
+            <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
+              <Info size={13} />
+              <span>{errors.address[0]}</span>
+            </p>
+          )}
+        </div>
+        <div className="w-full">
+          <label className="block font-medium text-gray-700 mb-1">
+            <span>Total Orders</span>
+          </label>
+          <input
+            disabled={true}
+            value={customer.totalOrder}
+            type="text"
+            className="block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none disabled:bg-gray-50 
+            disabled:text-gray-500 
+           disabled:border-gray-200 
+           disabled:shadow-none
+           disabled:cursor-not-allowed"
+          />
+        </div>
+
+        <div className="full">
+          <div className="flex gap-2 font-medium">
+            <input
+              checked={isCustomerVerified}
+              onChange={() => setIsCustomerVerified(!isCustomerVerified)}
+              id={String(customer.customerId)}
+              type="checkbox"
+              className="cursor-pointer"
+            />
+            <label
+              htmlFor={String(customer.customerId)}
+              className="cursor-pointer"
+            >
+              Is Verified
+            </label>
+          </div>
+        </div>
 
         <div className="w-full">
           <button
@@ -178,7 +276,7 @@ export default function EditAdminForm({
             type="submit"
             className="w-full mt-5 font-bold bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg"
           >
-            {loading ? "Updating Admin..." : "Update Admin"}
+            {loading ? "Updating Customer..." : "Update Customer"}
           </button>
         </div>
       </form>
