@@ -187,6 +187,30 @@ export default function AddRiderForm({ onSuccess }: { onSuccess: () => void }) {
         </div>
 
         <div className="w-full">
+          <label htmlFor="">
+            <span className="inline-block font-medium text-gray-700 mb-1">
+              Upload NID
+            </span>{" "}
+            <span className="text-red-500">*</span>
+            <input
+              className="cursor-pointer block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
+              onChange={(e) => {
+                const selected = e.target.files?.[0];
+                if (selected) setFile(selected);
+                else setFile(null);
+              }}
+              type="file"
+            />
+          </label>
+          {errors.nid_img && (
+            <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
+              <Info size={13} />
+              <span>{errors.nid_img[0]}</span>
+            </p>
+          )}
+        </div>
+
+        <div className="w-full">
           <label className="block font-medium text-gray-700 mb-1">
             <span>Email</span> <span className="text-red-500">*</span>
           </label>
@@ -274,30 +298,6 @@ export default function AddRiderForm({ onSuccess }: { onSuccess: () => void }) {
               </p>
             )}
           </div>
-        </div>
-
-        <div className="w-full">
-          <label htmlFor="">
-            <span className="inline-block font-medium text-gray-700 mb-1">
-              Upload NID
-            </span>{" "}
-            <span className="text-red-500">*</span>
-            <input
-              className="cursor-pointer block w-full border rounded-lg border-gray-300 p-2 bg-white focus:outline-none"
-              onChange={(e) => {
-                const selected = e.target.files?.[0];
-                if (selected) setFile(selected);
-                else setFile(null);
-              }}
-              type="file"
-            />
-          </label>
-          {errors.nid_img && (
-            <p className="flex items-center gap-2 text-sm text-red-600 mt-1">
-              <Info size={13} />
-              <span>{errors.nid_img[0]}</span>
-            </p>
-          )}
         </div>
 
         <div className="w-full">
