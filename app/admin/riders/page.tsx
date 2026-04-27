@@ -15,12 +15,12 @@ export default function RidersPage() {
   const [selectedEditRider, setSelectedEditRider] = useState<Rider | null>(
     null,
   );
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTxt, setSearchTxt] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
 
   const fetchRiders = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const res = await axios.get("http://localhost:5000/admin/riders", {
         params: { search: searchTxt, status: selectedStatus },
@@ -29,7 +29,7 @@ export default function RidersPage() {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -135,7 +135,7 @@ export default function RidersPage() {
             </thead>
 
             <tbody className="divide-y divide-gray-50">
-              {loading ? (
+              {isLoading ? (
                 <tr>
                   <td colSpan={9}>
                     <p className="text-center py-10 text-lg text-gray-400">

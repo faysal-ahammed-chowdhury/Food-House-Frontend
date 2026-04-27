@@ -14,11 +14,11 @@ export default function CustomersPage() {
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [selectedEditCustomer, setSelectedEditCustomer] =
     useState<Customer | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTxt, setSearchTxt] = useState<string>("");
 
   const fetchCustomers = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const res = await axios.get("http://localhost:5000/admin/customers", {
         params: { search: searchTxt },
@@ -27,7 +27,7 @@ export default function CustomersPage() {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -124,7 +124,7 @@ export default function CustomersPage() {
             </thead>
 
             <tbody className="divide-y divide-gray-50">
-              {loading ? (
+              {isLoading ? (
                 <tr>
                   <td colSpan={9}>
                     <p className="text-center py-10 text-lg text-gray-400">

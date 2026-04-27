@@ -25,7 +25,7 @@ export default function AddAdminForm({ onSuccess }: { onSuccess: () => void }) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -50,7 +50,7 @@ export default function AddAdminForm({ onSuccess }: { onSuccess: () => void }) {
     }
 
     // console.log(result.data);
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const res = await axios.post(
@@ -74,7 +74,7 @@ export default function AddAdminForm({ onSuccess }: { onSuccess: () => void }) {
         setErrors({ server: [messages || "Something went wrong"] });
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -148,11 +148,11 @@ export default function AddAdminForm({ onSuccess }: { onSuccess: () => void }) {
 
         <div className="w-full">
           <button
-            disabled={loading}
+            disabled={isLoading}
             type="submit"
             className="w-full mt-5 font-bold bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg"
           >
-            {loading ? "Creating Admin..." : "Create Admin Account"}
+            {isLoading ? "Creating Admin..." : "Create Admin Account"}
           </button>
         </div>
       </form>

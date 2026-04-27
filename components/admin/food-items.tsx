@@ -1,25 +1,47 @@
 "use client";
 import { Category } from "@/types/admin/Category";
 import { Item } from "@/types/admin/Item";
+import axios from "axios";
 import { Search } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import ItemCard from "./item-card";
 
 export default function FoodItems({
+  id,
   items,
   categories,
-  searchItemTxt,
-  onSearchItemTxt,
-  selectedCategoryName,
-  onSetSelectedCategoryName,
+  onItemsFetched,
 }: {
+  id: number;
   items: Item[];
   categories: Category[];
-  searchItemTxt: string;
-  onSearchItemTxt: Dispatch<SetStateAction<string>>;
-  selectedCategoryName: string;
-  onSetSelectedCategoryName: Dispatch<SetStateAction<string>>;
+  onItemsFetched: Dispatch<SetStateAction<Item[]>>;
 }) {
+  const [searchItemTxt, setSearchItemTxt] = useState<string>("");
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
+
+  const fetchItems = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/admin/restaurants/${id}/items`,
+        {
+          params: {
+            search: searchItemTxt,
+            category: selectedCategoryName,
+          },
+        },
+      );
+      console.log(res.data);
+      onItemsFetched(res.data.data);
+    } catch (err) {
+      console.log(err.response.data.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, [searchItemTxt, selectedCategoryName]);
+
   return (
     <div>
       <div className="mt-8 bg-white p-5 rounded-lg flex gap-5 justify-between items-center">
@@ -27,7 +49,7 @@ export default function FoodItems({
           <Search size={18} />
           <input
             value={searchItemTxt}
-            onChange={(e) => onSearchItemTxt(e.target.value)}
+            onChange={(e) => setSearchItemTxt(e.target.value)}
             type="text"
             placeholder="Search Items"
             className="block w-full focus:outline-none"
@@ -35,7 +57,7 @@ export default function FoodItems({
         </div>
         <div>
           <select
-            onChange={(e) => onSetSelectedCategoryName(e.target.value)}
+            onChange={(e) => setSelectedCategoryName(e.target.value)}
             value={selectedCategoryName}
             className="border rounded-lg font-semibold border-gray-300 px-5 py-3 bg-white focus:outline-none"
           >

@@ -1,10 +1,32 @@
 import { Category } from "@/types/admin/Category";
+import axios from "axios";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import TableHeader from "./table-header";
 export default function CategoryList({
+  id,
   categories,
+  onCategoriesFetched,
 }: {
+  id: number;
   categories: Category[];
+  onCategoriesFetched: Dispatch<SetStateAction<Item[]>>;
 }) {
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/admin/restaurants/${id}/categories`,
+      );
+      console.log(res.data);
+      onCategoriesFetched(res.data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   return (
     <div>
       <div className="my-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">

@@ -38,7 +38,7 @@ export default function AddCustomerForm({
   const [password, setPassword] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -65,7 +65,7 @@ export default function AddCustomerForm({
     }
 
     // console.log(result.data);
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const res = await axios.post(
@@ -91,7 +91,7 @@ export default function AddCustomerForm({
         setErrors({ server: [messages || "Something went wrong"] });
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -199,11 +199,11 @@ export default function AddCustomerForm({
 
         <div className="w-full">
           <button
-            disabled={loading}
+            disabled={isLoading}
             type="submit"
             className="w-full mt-5 font-bold bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg"
           >
-            {loading ? "Creating Customer..." : "Create Customer Account"}
+            {isLoading ? "Creating Customer..." : "Create Customer Account"}
           </button>
         </div>
       </form>

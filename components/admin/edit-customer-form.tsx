@@ -58,7 +58,7 @@ export default function EditCustomerForm({
   const [phone, setPhone] = useState<string>("");
   const [isCustomerVerified, setIsCustomerVerified] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<string>("");
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function EditCustomerForm({
 
     // console.log(result.data);
     // return;
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const res = await axios.put(
@@ -117,7 +117,7 @@ export default function EditCustomerForm({
         setErrors({ server: [messages || "Something went wrong"] });
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -272,11 +272,11 @@ export default function EditCustomerForm({
 
         <div className="w-full">
           <button
-            disabled={loading}
+            disabled={isLoading}
             type="submit"
             className="w-full mt-5 font-bold bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg"
           >
-            {loading ? "Updating Customer..." : "Update Customer"}
+            {isLoading ? "Updating Customer..." : "Update Customer"}
           </button>
         </div>
       </form>
