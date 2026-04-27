@@ -1,6 +1,7 @@
 import { Restaurant } from "@/types/admin/Restaurant";
 import axios from "axios";
 import { Pencil, Trash2, Utensils } from "lucide-react";
+import Link from "next/link";
 
 export default function RestaurantTableItem({
   restaurant,
@@ -79,7 +80,9 @@ export default function RestaurantTableItem({
         <td>
           <div className="flex justify-center gap-3 text-gray-500">
             <button className="cursor-pointer">
-              <Utensils size={16} />
+              <Link href={`/admin/restaurants/${restaurantId}/menu`}>
+                <Utensils size={16} />
+              </Link>
             </button>
             <button
               onClick={() => {
