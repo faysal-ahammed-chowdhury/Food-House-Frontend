@@ -1,14 +1,16 @@
 import { Item } from "@/types/admin/Item";
 import { Tag } from "lucide-react";
+const fallback = "https://via.placeholder.com/400x250?text=No+Image";
 
 export default function ItemCard({ item }: { item: Item }) {
   return (
-    <div className="shadow-md rounded-xl overflow-hidden bg-white">
+    <div className="shadow-md rounded-xl overflow-hidden bg-white border border-gray-200">
       <div>
-        <img
-          className="w-full"
-          src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?q=80&w=400&auto=format&fit=crop"
-        />
+        <div className="w-full h-56 bg-gray-100">
+          {item.imageUrl && (
+            <img src={item.imageUrl} className="w-full h-full object-cover" />
+          )}
+        </div>
       </div>
       <div className="p-5">
         <div className="flex justify-between items-center">

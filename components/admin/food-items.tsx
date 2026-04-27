@@ -1,49 +1,33 @@
 "use client";
+import { Category } from "@/types/admin/Category";
 import { Item } from "@/types/admin/Item";
-import axios from "axios";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import ItemCard from "./item-card";
 
-export default function FoodItems({ restaudantId }: { restaudantId: number }) {
-  const [items, setItems] = useState<Item[]>([]);
-  const [searchTxt, setSearchTxt] = useState<string>("");
-  const [selectedCategoryName, setsSlectedCategoryName] = useState<string>("");
-  const [error, setError] = useState<string>("");
-
-  const fetchItems = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:5000/admin/restaurants/${restaudantId}/items`,
-        {
-          params: {
-            search: searchTxt,
-            categoryName: selectedCategoryName,
-          },
-        },
-      );
-      console.log(res.data);
-      setItems(res.data.data);
-    } catch (err) {
-      setError(err.response.data.message);
-      console.log(err.response.data.message);
-    }
-  };
-
-  useEffect(() => {
-    console.log("here");
-
-    fetchItems();
-  }, [searchTxt]);
-
+export default function FoodItems({
+  items,
+  categories,
+  searchItemTxt,
+  onSearchItemTxt,
+  selectedCategoryName,
+  onSetSelectedCategoryName,
+}: {
+  items: Item[];
+  categories: Category[];
+  searchItemTxt: string;
+  onSearchItemTxt: Dispatch<SetStateAction<string>>;
+  selectedCategoryName: string;
+  onSetSelectedCategoryName: Dispatch<SetStateAction<string>>;
+}) {
   return (
     <div>
       <div className="mt-8 bg-white p-5 rounded-lg flex gap-5 justify-between items-center">
         <div className="flex-1 flex items-center border rounded-lg font-semibold border-gray-300 px-5 py-3 bg-white gap-3">
           <Search size={18} />
           <input
-            value={searchTxt}
-            onChange={(e) => setSearchTxt(e.target.value)}
+            value={searchItemTxt}
+            onChange={(e) => onSearchItemTxt(e.target.value)}
             type="text"
             placeholder="Search Items"
             className="block w-full focus:outline-none"
@@ -51,11 +35,16 @@ export default function FoodItems({ restaudantId }: { restaudantId: number }) {
         </div>
         <div>
           <select
-            onChange={(e) => setsSlectedCategoryName(e.target.value)}
+            onChange={(e) => onSetSelectedCategoryName(e.target.value)}
             value={selectedCategoryName}
             className="border rounded-lg font-semibold border-gray-300 px-5 py-3 bg-white focus:outline-none"
           >
             <option value="">All Categories</option>
+            {categories.map((category) => (
+              <option key={category.categoryId} value={category.name}>
+                {category.name}
+              </option>
+            ))}
           </select>
         </div>
       </div>
