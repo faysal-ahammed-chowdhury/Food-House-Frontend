@@ -19,11 +19,9 @@ export default function FoodItems({
 }) {
   const [searchItemTxt, setSearchItemTxt] = useState<string>("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchItems = async () => {
     try {
-      setIsLoading(true);
       const res = await axios.get(
         `http://localhost:5000/admin/restaurants/${id}/items`,
         {
@@ -37,8 +35,6 @@ export default function FoodItems({
       onItemsFetched(res.data.data);
     } catch (err) {
       console.log(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -46,9 +42,7 @@ export default function FoodItems({
     fetchItems();
   }, [searchItemTxt, selectedCategoryName]);
 
-  return isLoading ? (
-    <p className="mt-8">Loading...</p>
-  ) : (
+  return (
     <div>
       <div className="mt-8 bg-white p-5 rounded-lg flex gap-5 justify-between items-center">
         <div className="flex-1 flex items-center border rounded-lg font-semibold border-gray-300 px-5 py-3 bg-white gap-3">
