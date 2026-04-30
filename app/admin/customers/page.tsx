@@ -106,7 +106,7 @@ export default function CustomersPage() {
       <div className="my-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
+            <thead className="text-center">
               <tr className="border-b border-gray-50 bg-slate-50/50">
                 <TableHeader
                   allHeader={[
@@ -123,7 +123,7 @@ export default function CustomersPage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 text-center">
               {isLoading ? (
                 <tr>
                   <td colSpan={9}>
