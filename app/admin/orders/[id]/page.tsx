@@ -28,6 +28,7 @@ export default function OrderDetailsPage() {
 
   const fetchOrder = async () => {
     try {
+      setError("");
       setIsLoading(true);
       const res = await axios.get(`http://localhost:5000/admin/orders/${id}`);
       setOrder(res.data.data);
@@ -40,7 +41,7 @@ export default function OrderDetailsPage() {
 
   useEffect(() => {
     fetchOrder();
-  }, []);
+  }, [id]);
 
   const cancelOrder = async () => {
     try {
