@@ -23,6 +23,7 @@ export default function OrderDetailsPage() {
   const { id } = useParams();
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const fetchOrder = async () => {
@@ -43,8 +44,7 @@ export default function OrderDetailsPage() {
 
   const cancelOrder = async () => {
     try {
-      setOrder(null);
-      setIsLoading(true);
+      setIsDeleting(true);
       const res = await axios.patch(
         `http://localhost:5000/admin/orders/${id}/cancel`,
       );
@@ -52,7 +52,7 @@ export default function OrderDetailsPage() {
     } catch (err) {
       setError("Something is wrong");
     } finally {
-      setIsLoading(false);
+      setIsDeleting(false);
     }
   };
 
@@ -89,9 +89,10 @@ export default function OrderDetailsPage() {
 
         <div className="bg-white p-10 rounded-lg mt-10">
           <div className="flex justify-between items-center">
-            <div>
+            <div className="relative">
+              <div className="absolute top-10.5 left-3.5 h-11.5 border-l-2 border-dashed border-gray-300" />
               <div className="flex items-center gap-5">
-                <MapPin size={25} />
+                <MapPin size={30} />
                 <div>
                   <h3 className="text-gray-500">Order From</h3>
                   <p className="font-bold">
@@ -99,8 +100,8 @@ export default function OrderDetailsPage() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-5 mt-3">
-                <MapPin size={25} />
+              <div className="flex items-center gap-5 mt-8">
+                <MapPin size={30} />
                 <div>
                   <h3 className="text-gray-500">Delivered to</h3>
                   <p className="font-bold">{order.customerAddress}</p>
@@ -111,10 +112,11 @@ export default function OrderDetailsPage() {
               {order.status !== OrderStatus.DELIVERED &&
                 order.status !== OrderStatus.CANCELLED && (
                   <button
+                    disabled={isDeleting}
                     onClick={cancelOrder}
                     className="bg-rose-100 text-rose-700 border-rose-200 font-bold cursor-pointer px-5 py-3 rounded-full"
                   >
-                    Cancel Order
+                    {isDeleting ? "Cancelling..." : "Cancel Order"}
                   </button>
                 )}
             </div>
