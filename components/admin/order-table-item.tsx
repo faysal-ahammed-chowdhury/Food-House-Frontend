@@ -33,7 +33,7 @@ export default function OrderTableItem({ order }: { order: Order }) {
         </td>
         <td className="px-6 py-5">
           <p className="text-slate-900">
-            {new Date(order.orderAt).toDateString()}
+            {new Date(order.orderAt).toLocaleString()}
           </p>
         </td>
         <td className="px-6 py-5">

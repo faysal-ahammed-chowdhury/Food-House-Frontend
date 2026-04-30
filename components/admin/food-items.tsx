@@ -34,7 +34,7 @@ export default function FoodItems({
       console.log(res.data);
       onItemsFetched(res.data.data);
     } catch (err) {
-      console.log(err.response.data.message);
+      console.log(err);
     }
   };
 

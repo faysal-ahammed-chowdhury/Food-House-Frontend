@@ -19,7 +19,7 @@ export default function Sidebar() {
   return (
     <aside className="w-65 p-5 fixed top-0 bg-white h-screen">
       <nav className="flex flex-col gap-1">
-        <div className="logo mb-8">
+        <div className="logo pb-5 px-3">
           <Link href="/admin">
             <Image src="/logo.jpeg" height={10} width={180} alt="Logo" />
           </Link>
