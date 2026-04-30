@@ -42,7 +42,7 @@ export default function AdminTableItem({
         </td>
 
         <td className="px-6 py-5">
-          <div className="flex gap-3 text-gray-500">
+          <div className="flex justify-center gap-3 text-gray-500">
             <button
               onClick={() => {
                 onEdit(admin);

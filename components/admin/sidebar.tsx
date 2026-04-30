@@ -1,5 +1,6 @@
 "use client";
 import { Bike, List, PieChart, Shield, Users, Utensils } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,8 +17,13 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-65 p-5">
+    <aside className="w-65 p-5 fixed top-0 bg-white h-screen">
       <nav className="flex flex-col gap-1">
+        <div className="logo mb-8">
+          <Link href="/admin">
+            <Image src="/logo.jpeg" height={10} width={180} alt="Logo" />
+          </Link>
+        </div>
         {navLinks.map((link) => {
           const active = pathname === link.href;
 

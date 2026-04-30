@@ -8,18 +8,18 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function BlogPostPage() {
+export default function RestaurantMenuPage() {
   const { id } = useParams();
   const [items, setItems] = useState<Item[]>([]);
-  const [searchItemTxt, setSearchItemTxt] = useState<string>("");
-  const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
   const [isItemPartSelected, setIsItemPartSelected] = useState<boolean>(true);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const fetchRestaurant = async () => {
     try {
+      setIsLoading(true);
       const res = await axios.get(
         `http://localhost:5000/admin/restaurants/${id}`,
       );
@@ -28,55 +28,34 @@ export default function BlogPostPage() {
     } catch (err) {
       setError(err.response.data.message);
       console.log(err.response.data.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchCategories = async () => {
     try {
+      setIsLoading(true);
       const res = await axios.get(
         `http://localhost:5000/admin/restaurants/${id}/categories`,
       );
       console.log(res.data);
       setCategories(res.data.data);
     } catch (err) {
-      setError(err.response.data.message);
-      console.log(err.response.data.message);
-    }
-  };
-
-  const fetchItems = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:5000/admin/restaurants/${id}/items`,
-        {
-          params: {
-            search: searchItemTxt,
-            category: selectedCategoryName,
-          },
-        },
-      );
-      console.log(res.data);
-      setItems(res.data.data);
-    } catch (err) {
-      setError(err.response.data.message);
-      console.log(err.response.data.message);
+      console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchRestaurant();
     fetchCategories();
-  }, []);
+  }, [id]);
 
-  useEffect(() => {
-    fetchItems();
-  }, [searchItemTxt, selectedCategoryName]);
-
-  if (error) {
-    return <h1 className="text-center font-bold text-2xl">{error}</h1>;
-  }
-
-  return restaurant ? (
+  return isLoading ? (
+    <p className="text-md">Loading...</p>
+  ) : restaurant ? (
     <div>
       <div className="mb-15">
         <h1 className="text-3xl font-bold">{restaurant.user.name} - Menu</h1>
@@ -102,20 +81,22 @@ export default function BlogPostPage() {
 
       {isItemPartSelected ? (
         <FoodItems
+          id={restaurant.restaurantId}
           items={items}
           categories={categories}
-          searchItemTxt={searchItemTxt}
-          onSearchItemTxt={setSearchItemTxt}
-          selectedCategoryName={selectedCategoryName}
-          onSetSelectedCategoryName={setSelectedCategoryName}
+          onItemsFetched={setItems}
         />
       ) : (
-        <CategoryList categories={categories} />
+        <CategoryList
+          id={restaurant.restaurantId}
+          categories={categories}
+          onCategoriesFetched={setCategories}
+        />
       )}
     </div>
   ) : (
     <div>
-      <p className="font-md">{error ? error : "Loading..."}</p>
+      <p className="font-md">{error}</p>
     </div>
   );
 }

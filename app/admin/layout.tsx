@@ -1,6 +1,5 @@
 import Sidebar from "@/components/admin/sidebar";
 import { LogOut, User } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function AdminLayout({
@@ -8,12 +7,7 @@ export default function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <>
-      <header className="flex justify-between items-center px-10 py-3 border-b border-gray-100">
-        <div className="logo">
-          <Link href="/admin">
-            <Image src="/logo.jpeg" height={10} width={180} alt="Logo" />
-          </Link>
-        </div>
+      <header className="flex justify-end items-center px-10 py-8 border-b border-gray-100">
         <div className="right flex items-center">
           <Link
             href="/"
@@ -27,9 +21,11 @@ export default function AdminLayout({
           </Link>
         </div>
       </header>
-      <div className="min-h-screen flex">
-        <Sidebar />
-        <main className="bg-gray-100 flex-1 p-10">{children}</main>
+      <Sidebar />
+      <div className="min-h-screen">
+        <main className="h-screen w-[calc(100%-260px)] ml-auto bg-gray-100 p-10">
+          {children}
+        </main>
       </div>
       <footer className="py-5 border-t border-gray-100">
         <p className="text-center">

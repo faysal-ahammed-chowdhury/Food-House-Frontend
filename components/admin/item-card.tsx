@@ -1,6 +1,5 @@
 import { Item } from "@/types/admin/Item";
 import { Tag } from "lucide-react";
-const fallback = "https://via.placeholder.com/400x250?text=No+Image";
 
 export default function ItemCard({ item }: { item: Item }) {
   return (

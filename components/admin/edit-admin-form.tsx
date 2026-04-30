@@ -33,7 +33,7 @@ export default function EditAdminForm({
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<string>("");
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function EditAdminForm({
 
     // console.log(result.data);
     // return;
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const res = await axios.put(
@@ -86,7 +86,7 @@ export default function EditAdminForm({
         setErrors({ server: [messages || "Something went wrong"] });
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -174,11 +174,11 @@ export default function EditAdminForm({
 
         <div className="w-full">
           <button
-            disabled={loading}
+            disabled={isLoading}
             type="submit"
             className="w-full mt-5 font-bold bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg"
           >
-            {loading ? "Updating Admin..." : "Update Admin"}
+            {isLoading ? "Updating Admin..." : "Update Admin"}
           </button>
         </div>
       </form>

@@ -14,11 +14,11 @@ export default function RestaurantsPage() {
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [selectedEditRestaurant, setSelectedEditRestaurant] =
     useState<Restaurant | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTxt, setSearchTxt] = useState<string>("");
 
   const fetchRestaurants = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const res = await axios.get("http://localhost:5000/admin/restaurants", {
         params: { search: searchTxt },
@@ -27,7 +27,7 @@ export default function RestaurantsPage() {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -106,7 +106,7 @@ export default function RestaurantsPage() {
       <div className="my-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
+            <thead className="text-center">
               <tr className="border-b border-gray-50 bg-slate-50/50">
                 <TableHeader
                   allHeader={[
@@ -124,8 +124,8 @@ export default function RestaurantsPage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-50">
-              {loading ? (
+            <tbody className="divide-y divide-gray-50 text-center">
+              {isLoading ? (
                 <tr>
                   <td colSpan={9}>
                     <p className="text-center py-10 text-lg text-gray-400">

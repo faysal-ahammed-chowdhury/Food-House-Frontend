@@ -1,16 +1,38 @@
 import { Category } from "@/types/admin/Category";
+import axios from "axios";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import TableHeader from "./table-header";
 export default function CategoryList({
+  id,
   categories,
+  onCategoriesFetched,
 }: {
+  id: number;
   categories: Category[];
+  onCategoriesFetched: Dispatch<SetStateAction<Item[]>>;
 }) {
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/admin/restaurants/${id}/categories`,
+      );
+      console.log(res.data);
+      onCategoriesFetched(res.data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   return (
     <div>
       <div className="my-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
+            <thead className="text-center">
               <tr className="border-b border-gray-50 bg-slate-50/50">
                 <TableHeader
                   allHeader={["ID", "Category Name", "Items Count"]}
@@ -18,7 +40,7 @@ export default function CategoryList({
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 text-center">
               {categories.length ? (
                 categories.map((category) => (
                   <tr

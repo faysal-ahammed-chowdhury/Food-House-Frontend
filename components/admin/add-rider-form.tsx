@@ -60,7 +60,7 @@ export default function AddRiderForm({ onSuccess }: { onSuccess: () => void }) {
   const [bankAccount, setBankAccount] = useState<string>("");
   const [bkash, setBkash] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -90,7 +90,7 @@ export default function AddRiderForm({ onSuccess }: { onSuccess: () => void }) {
     }
 
     // console.log(result.data);
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -131,7 +131,7 @@ export default function AddRiderForm({ onSuccess }: { onSuccess: () => void }) {
         setErrors({ server: [messages || "Something went wrong"] });
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -302,11 +302,11 @@ export default function AddRiderForm({ onSuccess }: { onSuccess: () => void }) {
 
         <div className="w-full">
           <button
-            disabled={loading}
+            disabled={isLoading}
             type="submit"
             className="w-full mt-5 font-bold bg-pink-500 cursor-pointer px-5 py-3 text-white rounded-lg"
           >
-            {loading ? "Creating Rider..." : "Create Rider Account"}
+            {isLoading ? "Creating Rider..." : "Create Rider Account"}
           </button>
         </div>
       </form>
