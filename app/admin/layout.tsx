@@ -7,7 +7,7 @@ export default function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <>
-      <header className="flex justify-end items-center px-10 py-8 border-b border-gray-100">
+      <header className="fixed top-0 w-full bg-white flex justify-end items-center px-10 py-8 border-b border-gray-100">
         <div className="right flex items-center">
           <Link
             href="/"
@@ -22,11 +22,9 @@ export default function AdminLayout({
         </div>
       </header>
       <Sidebar />
-      <div className="min-h-screen">
-        <main className="h-screen w-[calc(100%-260px)] ml-auto bg-gray-100 p-10">
-          {children}
-        </main>
-      </div>
+      <main className="min-h-screen w-[calc(100%-260px)] ml-auto bg-gray-100 p-10 mt-22">
+        {children}
+      </main>
       <footer className="py-5 border-t border-gray-100">
         <p className="text-center">
           © {new Date().getFullYear()} Food House. All rights reserved.

@@ -104,7 +104,7 @@ export default function RidersPage() {
           <select
             onChange={(e) => setSelectedStatus(e.target.value)}
             value={selectedStatus}
-            className="border rounded-lg font-semibold border-gray-300 px-5 py-3 bg-white focus:outline-none"
+            className="w-full border rounded-lg font-semibold border-gray-300 px-5 py-3 bg-white focus:outline-none"
           >
             <option value="">All</option>
             <option value="online">Online</option>
