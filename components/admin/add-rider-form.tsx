@@ -106,7 +106,7 @@ export default function AddRiderForm({ onSuccess }: { onSuccess: () => void }) {
       formData.append("nid_img", result.data.nid_img);
 
       const res = await axios.post(
-        "http://localhost:5000/admin/riders",
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/riders`,
         formData,
       );
 

@@ -20,9 +20,12 @@ export default function RestaurantsPage() {
   const fetchRestaurants = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/admin/restaurants", {
-        params: { search: searchTxt },
-      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants`,
+        {
+          params: { search: searchTxt },
+        },
+      );
       setRestaurants(res.data.data);
     } catch (err) {
       console.error(err);

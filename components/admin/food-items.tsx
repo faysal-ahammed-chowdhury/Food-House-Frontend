@@ -23,7 +23,7 @@ export default function FoodItems({
   const fetchItems = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/admin/restaurants/${id}/items`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants/${id}/items`,
         {
           params: {
             search: searchItemTxt,

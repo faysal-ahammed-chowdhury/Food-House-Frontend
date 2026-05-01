@@ -21,9 +21,12 @@ export default function AdminsPage() {
   const fetchAdmins = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/admin/admins", {
-        params: { search: searchTxt },
-      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/admins`,
+        {
+          params: { search: searchTxt },
+        },
+      );
       setAdmins(res.data.data);
     } catch (err) {
       console.error(err);

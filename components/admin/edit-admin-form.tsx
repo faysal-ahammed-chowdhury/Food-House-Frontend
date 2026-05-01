@@ -70,7 +70,7 @@ export default function EditAdminForm({
 
     try {
       const res = await axios.put(
-        `http://localhost:5000/admin/admins/${admin.userId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/admins/${admin.userId}`,
         result.data,
       );
 
