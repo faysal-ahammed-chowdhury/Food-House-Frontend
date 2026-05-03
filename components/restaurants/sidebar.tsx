@@ -5,17 +5,17 @@ import { usePathname } from "next/navigation";
 
 
 
-export default function Sidebar({ user_id }: { user_id: string }) {
+export default function Sidebar({ restaurant_id }: { restaurant_id: string }) {
   const pathname = usePathname();
 
   const navLinks = [
-    { Link: `/restaurants/${user_id}/dashboard`, label: "Dashboard", icon: Home },
-    { Link: `/restaurants/${user_id}/menu`, label: "Menu Management", icon: List },
-    { Link: `/restaurants/${user_id}/orders/active`, label: "Active Orders", icon: CookingPot },
-    { Link: `/restaurants/${user_id}/orders/history`, label: "Order History", icon: FileText },
-    { Link: `/restaurants/${user_id}/vouchers`, label: "Vouchers", icon: Box },
-    { Link: `/restaurants/${user_id}/financials`, label: "Financials", icon: DollarSign },
-    { Link: `/restaurants/${user_id}/profile`, label: "Profile", icon: UserIcon },
+    { Link: `/restaurants/${restaurant_id}/dashboard`, label: "Dashboard", icon: Home },
+    { Link: `/restaurants/${restaurant_id}/menu`, label: "Menu Management", icon: List },
+    { Link: `/restaurants/${restaurant_id}/orders/active`, label: "Active Orders", icon: CookingPot },
+    { Link: `/restaurants/${restaurant_id}/orders/history`, label: "Order History", icon: FileText },
+    { Link: `/restaurants/${restaurant_id}/vouchers`, label: "Vouchers", icon: Box },
+    { Link: `/restaurants/${restaurant_id}/financials`, label: "Financials", icon: DollarSign },
+    { Link: `/restaurants/${restaurant_id}/profile`, label: "Profile", icon: UserIcon },
   ];
 
   return (

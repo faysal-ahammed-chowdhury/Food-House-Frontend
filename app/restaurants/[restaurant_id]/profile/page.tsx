@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, use, useEffect } from "react";
-import { z } from "zod";
+import { boolean, set, z } from "zod";
 import Footer from "@/components/restaurants/footer";
 import Header from "@/components/restaurants/header";
 import Sidebar from "@/components/restaurants/sidebar";
@@ -12,6 +12,9 @@ import {
 } from 'lucide-react';
 import { FormField } from "@/components/restaurants/form_field";
 import axios from "axios";
+import MyModal from "@/components/restaurants/my-modal";
+import { profile } from "console";
+import ProfileUpdateForm from "@/components/restaurants/profile_update_form";
 
 
 
@@ -65,9 +68,11 @@ const passwordSchema = z.object({
 });
 
 
-
-export default function Profile({ params }: { params: Promise<{ user_id: string }>}){
-  const { user_id } = use(params);
+export default function Profile({ params }: { params: Promise<{ restaurant_id: string }>}){
+  
+  const [ShowProfileUpdateModal, setShowProfileUpdateModal] = useState(false);
+  const [ShowPasswordUpdateModal, setShowPasswordUpdateModal] = useState(false);
+  const { restaurant_id } = use(params);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     email: "",
@@ -83,14 +88,27 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
   });
 
 
-  const [jsonData, setJsonData] = useState(null);
+  const [OnDB, setOnDB] = useState({
+    email: "",
+    restaurantName: "",
+    description: "",
+    address: "",
+    bankAccount: "",
+    bkash: "",
+    newPassword: "",
+    confirmPassword: "",
+    bannerUrl: "",
+    isOpen: false,
+  });
+  
+
   useEffect(() => {
     fetchData();
   }, []);
 
   async function fetchData() {
      try {
-      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${user_id}`;
+      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
       const response = await axios.get(RQ_URL);
       if(response.data.success){
         const jsonData = response.data.data;
@@ -105,7 +123,21 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
           bannerUrl: jsonData.bannerUrl || "",
           isOpen: jsonData.isOpen || false,
         }));
+
+        setOnDB((prev) => ({
+          ...prev,
+          restaurantName: jsonData.user.name || "",
+          email: jsonData.user?.email || "",
+          description: jsonData.description || "",
+          address: jsonData.address || "",
+          bankAccount: jsonData.bankAccount || "",
+          bkash: jsonData.bkashAccount || "",
+          bannerUrl: jsonData.bannerUrl || "",
+          isOpen: jsonData.isOpen || false,
+        }));
+        
       }
+      
     } 
     catch (error) {
       console.error(error);
@@ -115,7 +147,7 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
   const handleToggle = async () => {
     const toggledValue= !formData.isOpen;
     const statusText = toggledValue ? "open" : "closed";
-    const URL= `${process.env.NEXT_PUBLIC_API_URL}/restaurant/updateStatus/${user_id}/${statusText}`;
+    const URL= `${process.env.NEXT_PUBLIC_API_URL}/restaurant/updateStatus/${restaurant_id}/${statusText}`;
     setFormData(prev => ({ ...prev, isOpen: toggledValue }));
     try{
       const response = await axios.patch(URL);
@@ -125,6 +157,79 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
       alert("Failed to update shop status. Please try again.");
     }
   }
+
+  const [change_MESSAGE, setChange_MESSAGE] = useState("");
+
+  const CHANGE_MESSAGE = async () => {
+    setChange_MESSAGE("");
+    let anyChange = false;
+    if(OnDB.email !== formData.email){
+      if(anyChange===false){
+        anyChange=true;
+        setChange_MESSAGE("Changes detected in---> ");
+      }
+      else{
+          setChange_MESSAGE(prev => prev + ", ");
+      }
+      setChange_MESSAGE(prev => prev + "Business Email");
+    }
+
+      if(OnDB.restaurantName !== formData.restaurantName){
+        if(anyChange===false){
+          anyChange=true;
+          setChange_MESSAGE("Changes detected in---> ");
+        } 
+        else{
+          setChange_MESSAGE(prev => prev + ", ");
+        }
+        setChange_MESSAGE(prev => prev + "Restaurant Name");
+      }
+
+      if(OnDB.description !== formData.description){
+        if(anyChange===false){
+          anyChange=true;
+          setChange_MESSAGE("Changes detected in---> ");
+        } 
+        else{
+          setChange_MESSAGE(prev => prev + ", ");
+        }
+        setChange_MESSAGE(prev => prev + " Description");
+      }
+
+      if(OnDB.address !== formData.address){
+        if(anyChange===false){
+          anyChange=true;
+          setChange_MESSAGE("Changes detected in---> ");
+        } 
+        else{
+          setChange_MESSAGE(prev => prev + ", ");
+        }
+        setChange_MESSAGE(prev => prev + "Address");
+      }
+
+      if(OnDB.bankAccount !== formData.bankAccount){
+        if(anyChange===false){
+          anyChange=true;
+          setChange_MESSAGE("Changes detected in---> ");
+        } 
+        else{
+          setChange_MESSAGE(prev => prev + ", ");
+        }
+        setChange_MESSAGE(prev => prev + "Bank Account");
+      }
+
+      if(OnDB.bkash !== formData.bkash){
+        if(anyChange===false){
+          anyChange=true;
+          setChange_MESSAGE("Changes detected in---> ");
+        } 
+        else{
+          setChange_MESSAGE(prev => prev + ", ");
+        }
+        setChange_MESSAGE(prev => prev + "Bkash Account");
+      }
+  }
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -140,7 +245,7 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
 
 
   const handleImageUpdate = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if ("BannerUrl" in errors) {
+    if ("bannerUrl" in errors) {
       setErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors.bannerUrl;
@@ -153,7 +258,7 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
       setErrors(prev => ({ ...prev, bannerUrl: "File size must be less than 2MB" }));
       return;
     } 
-    const URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${user_id}`;
+    const URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
     const uploadData = new FormData();
     uploadData.append('myfile', file);
 
@@ -166,16 +271,62 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
       });
       if (response.data.data.bannerUrl) {
         setFormData(prev => ({ ...prev, bannerUrl: response.data.data.bannerUrl }));
+        setOnDB(prev => ({ ...prev, bannerUrl: response.data.data.bannerUrl }));
       }
       alert("Image updated successfully!" + "The saved image name is: '" + response.data.data.bannerUrl + "'");
     } catch (error) {
       alert("Something went wrong. Failed to upload image");
     }
   };
+
+
+  const handleEmail = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+
+    if(value !== OnDB.email){
+      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/checkEmail?email=${e.target.value}`;
+      const response = await axios.get(RQ_URL);
+      if(response.data.exists===true){
+        setErrors(prev => ({ ...prev, email: "Email already exists." }));
+      }
+    }
+  }
   
+
+  useEffect(() => {
+    CHANGE_MESSAGE();
+  }, [handleChange, handleEmail]);
+
+
+  const profile_modal_open = () => {
+    setShowProfileUpdateModal(true);
+  }
+
+  const profile_modal_close = () => {
+    setShowProfileUpdateModal(false);
+  };
+
+  const passsword_modal_open = () => {
+    setShowPasswordUpdateModal(true);
+  }
+
+  const password_modal_close = () => {
+    setShowPasswordUpdateModal(false);
+  }
+
+
 
 
   
+
   const validateProfile = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -194,8 +345,7 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
       });
       setErrors(currentErrors);
     } else {
-      setErrors(currentErrors);
-      alert("Profile updated successfully!");
+      if(change_MESSAGE!=="")profile_modal_open();
     }
   };
 
@@ -225,11 +375,29 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
 
   return (
     <>
-    <Header user_id={user_id} name={formData.restaurantName}/>
+    <MyModal
+        title="Confirm Password to Update Restaurant Profile"
+        open={ShowProfileUpdateModal}
+        onClose={profile_modal_close}
+    >
+        <ProfileUpdateForm 
+          formData ={formData} 
+          OnDB = {OnDB}
+          restaurant_id={restaurant_id}
+          onSuccess={() => {
+            fetchData();
+            profile_modal_close();
+          }}
+          
+        />
+    </MyModal>
+   
+
+    <Header restaurant_id={restaurant_id} name={OnDB.restaurantName}/>
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">   
       <div className="flex flex-1">
         <aside className="w-64 hidden md:block bg-white border-r border-slate-200">
-          <Sidebar user_id={user_id} />
+          <Sidebar restaurant_id={restaurant_id} />
         </aside>
         
         <main className="flex-1 p-8 md:p-12 overflow-y-auto">
@@ -271,9 +439,9 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
                         <span>Update Photo</span>
                         <input type="file"  id="photo-upload" className="hidden" accept=".jpg, .jpeg, .png, .webp" onChange={handleImageUpdate}/>
                       </label>
-                        {errors.BannerUrl && (
+                        {errors.bannerUrl && (
                           <span className="text-red-500 text-sm mt-1">
-                            {errors.BannerUrl}
+                            {errors.bannerUrl}
                           </span>
                        )}
                     </div>
@@ -281,7 +449,7 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
 
                   <form className="space-y-6" onSubmit={validateProfile}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField label="Business Email" icon={Mail} name="email" value={formData.email} onChange={handleChange} error={errors.email} />
+                      <FormField label="Business Email" icon={Mail} name="email" value={formData.email} onChange={handleEmail} error={errors.email} />
                       <FormField label="Restaurant Name" icon={Store} name="restaurantName" value={formData.restaurantName} onChange={handleChange} error={errors.restaurantName} />
                     </div>
 
@@ -290,9 +458,17 @@ export default function Profile({ params }: { params: Promise<{ user_id: string 
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-slate-50 rounded-2xl">
                       <FormField label="Bank Account" icon={CreditCard} name="bankAccount" placeholder="0000-0000-0000" value={formData.bankAccount} onChange={handleChange} error={errors.bankAccount} />
-                      <FormField label="bKash Number" icon={Smartphone} name="bkash" placeholder="017XXXXXXXX" value={formData.bkash} onChange={handleChange} error={errors.bkash} />
+                      <FormField label="BKash Number" icon={Smartphone} name="bkash" placeholder="017XXXXXXXX" value={formData.bkash} onChange={handleChange} error={errors.bkash} />
                     </div>
-
+                    { change_MESSAGE!=="" && (
+                      <>
+                      <span className="border border-amber-400 bg-amber-50 text-amber-700 px-2 py-0.5 rounded-md font-medium">
+                        {change_MESSAGE}
+                      </span><br /><br />
+                      </>
+                      
+                    )}
+                    
                     <button type="submit" className="w-full bg-[#f82c77] hover:bg-[#d91b61] text-white py-4 rounded-xl font-bold flex justify-center items-center gap-2 transition-all shadow-lg active:scale-[0.98]">
                       <Save size={20} /> Update Restaurant Profile
                     </button>
