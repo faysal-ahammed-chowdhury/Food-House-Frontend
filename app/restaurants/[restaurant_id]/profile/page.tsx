@@ -15,6 +15,7 @@ import axios from "axios";
 import MyModal from "@/components/restaurants/my-modal";
 import { profile } from "console";
 import ProfileUpdateForm from "@/components/restaurants/profile_update_form";
+import PasswordUpdateForm from "@/components/restaurants/password_update_form";
 
 
 
@@ -112,18 +113,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
       const response = await axios.get(RQ_URL);
       if(response.data.success){
         const jsonData = response.data.data;
-        setFormData((prev) => ({
-          ...prev,
-          restaurantName: jsonData.user.name || "",
-          email: jsonData.user?.email || "",
-          description: jsonData.description || "",
-          address: jsonData.address || "",
-          bankAccount: jsonData.bankAccount || "",
-          bkash: jsonData.bkashAccount || "",
-          bannerUrl: jsonData.bannerUrl || "",
-          isOpen: jsonData.isOpen || false,
-        }));
-
+        
         setOnDB((prev) => ({
           ...prev,
           restaurantName: jsonData.user.name || "",
@@ -136,6 +126,17 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
           isOpen: jsonData.isOpen || false,
         }));
         
+        setFormData((prev) => ({
+          ...prev,
+          restaurantName: jsonData.user.name || "",
+          email: jsonData.user?.email || "",
+          description: jsonData.description || "",
+          address: jsonData.address || "",
+          bankAccount: jsonData.bankAccount || "",
+          bkash: jsonData.bkashAccount || "",
+          bannerUrl: jsonData.bannerUrl || "",
+          isOpen: jsonData.isOpen || false,
+        }));        
       }
       
     } 
@@ -323,10 +324,6 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
   }
 
 
-
-
-  
-
   const validateProfile = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -349,7 +346,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
     }
   };
 
-  const validatePassword = (e: React.FormEvent) => {
+  const validatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const currentErrors = { ...errors };
@@ -365,12 +362,26 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
         }
       });
       setErrors(currentErrors);
-    } else {
-      setFormData(prev => ({ ...prev, newPassword: "", confirmPassword: "" }));
-      alert("Password changed successfully!");
+    } 
+    else {
+      const URL= `${process.env.NEXT_PUBLIC_API_URL}/restaurant/matchPassword`;
+      const payload = {
+        restaurantId: Number(restaurant_id),
+        password: formData.newPassword
+      };
+      const response = await axios.post(URL, payload);  
+      // console.log(response.data.match);
+      if(response.data.match===true){
+          setErrors((prevErrors) => ({
+             ...prevErrors,
+            newPassword: "New password cannot be the same as old password."
+          }));
+      }
+      else{
+        passsword_modal_open();
+      }
     }
   };
-
  
 
   return (
@@ -387,6 +398,22 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
           onSuccess={() => {
             fetchData();
             profile_modal_close();
+          }}
+        />
+    </MyModal>
+
+    <MyModal
+        title="Confirm Password to Update Password"
+        open={ShowPasswordUpdateModal}
+        onClose={password_modal_close}
+    >
+        <PasswordUpdateForm 
+          password={formData.newPassword}
+          restaurant_id={restaurant_id}
+          onSuccess={() => {
+            fetchData();
+            password_modal_close();
+            setFormData(prev => ({ ...prev, newPassword: "", confirmPassword: "" }));
           }}
           
         />

@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { FormField } from "./form_field";
 import { Lock } from "lucide-react";
-import { set, z } from "zod";
+import { z } from "zod";
+import axios from "axios";
+
 
 interface ProfileUpdateFormProps {
   formData: {
@@ -41,20 +43,66 @@ export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant
     const [password, setPassword] = useState("");
 
    
-
    const handlePassChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrors("");
     setPassword(e.target.value);
    }
 
-   const validatePass = (e: React.FormEvent) => {
+   const validatePass = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors("");
     const result = PasswordSchema.safeParse(password);
     if (!result.success) {
        setErrors(result.error.issues[0].message);
-    } else {
-      
+    } 
+    else {
+      const URL= `${process.env.NEXT_PUBLIC_API_URL}/restaurant/matchPassword`;
+      const payload = {
+        restaurantId: Number(restaurant_id),
+        password: password
+      };
+
+      console.log(payload)
+
+      try{
+        const response = await axios.post(URL, payload);
+        // console.log(response.data.match);
+        // console.log(restaurant_id)
+        // console.log(password)
+        if(response.data.match===true){
+          setPassword("");
+          setErrors("");
+          const updatePayload = {};
+          const fields = ["email", "restaurantName", "description", "address", "bankAccount", "bkash"];
+            
+          fields.forEach((field) => {
+            const newValue = (formData as any)[field];
+            const oldValue = (OnDB as any)[field];
+            if (newValue !== undefined && newValue !== oldValue) {
+              (updatePayload as any)[field] = newValue;
+            }
+          });
+          const updateURL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
+          const updateResponse = await axios.put(updateURL, updatePayload);
+
+          console.log(updateResponse.data.success);
+          if(updateResponse.data.success===true){
+            alert("Profile updated successfully!");
+            onSuccess();
+          }
+          else{
+            alert("Failed to update profile. Please try again later.");
+          }     
+        }
+        else{
+          setPassword("");
+          setErrors("Incorrect password. Please try again.");
+          return;
+        }
+      }
+      catch(error){  
+        console.error('Access Denied');
+      }
     }
    }
 
@@ -70,7 +118,6 @@ export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant
         </button>
     </form>
     </div>
-    {restaurant_id}
     </>
   );
 }
