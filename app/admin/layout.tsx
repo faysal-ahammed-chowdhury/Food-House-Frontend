@@ -1,10 +1,31 @@
+"use client";
 import Sidebar from "@/components/admin/sidebar";
+import axios from "axios";
 import { LogOut, User } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const router = useRouter();
+
+  const handleLogout = async (e: any) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+
+      router.push("/");
+    } catch {}
+  };
+
   return (
     <>
       <header className="fixed top-0 w-full bg-white flex justify-end items-center px-10 py-8 border-b border-gray-100">
@@ -16,9 +37,9 @@ export default function AdminLayout({
             <User size={18} />
             <p className="ml-2">Faysal Ahammed Chowdhury</p>
           </Link>
-          <Link href="/" className="ml-8">
+          <button onClick={handleLogout} className="cursor-pointer ml-8">
             <LogOut size={18} />
-          </Link>
+          </button>
         </div>
       </header>
       <Sidebar />
