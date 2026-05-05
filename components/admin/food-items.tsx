@@ -29,6 +29,7 @@ export default function FoodItems({
             search: searchItemTxt,
             category: selectedCategoryName,
           },
+          withCredentials: true,
         },
       );
       console.log(res.data);

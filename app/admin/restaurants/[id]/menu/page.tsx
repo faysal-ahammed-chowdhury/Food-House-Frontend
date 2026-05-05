@@ -23,6 +23,9 @@ export default function RestaurantMenuPage() {
       setIsLoading(true);
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants/${id}`,
+        {
+          withCredentials: true,
+        },
       );
       console.log(res.data);
       setRestaurant(res.data.data);
@@ -39,6 +42,9 @@ export default function RestaurantMenuPage() {
       setIsLoading(true);
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants/${id}/categories`,
+        {
+          withCredentials: true,
+        },
       );
       console.log(res.data);
       setCategories(res.data.data);

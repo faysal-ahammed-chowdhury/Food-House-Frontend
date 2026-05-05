@@ -103,6 +103,7 @@ export default function EditCustomerForm({
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/customers/${customer.customerId}`,
         result.data,
+        { withCredentials: true },
       );
 
       onSuccess();

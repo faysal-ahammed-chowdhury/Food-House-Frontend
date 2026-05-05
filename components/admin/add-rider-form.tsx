@@ -108,6 +108,9 @@ export default function AddRiderForm({ onSuccess }: { onSuccess: () => void }) {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/riders`,
         formData,
+        {
+          withCredentials: true,
+        },
       );
 
       //   console.log(res.data);

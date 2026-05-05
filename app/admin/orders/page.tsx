@@ -27,6 +27,7 @@ export default function OrdersPage() {
             dateFrom,
             dateTo,
           },
+          withCredentials: true,
         },
       );
       setOrders(res.data.data);

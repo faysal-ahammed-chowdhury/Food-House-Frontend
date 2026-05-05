@@ -26,6 +26,7 @@ export default function RidersPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/admin/riders`,
         {
           params: { search: searchTxt, status: selectedStatus },
+          withCredentials: true,
         },
       );
       setRider(res.data.data);

@@ -25,6 +25,7 @@ export default function AdminsPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/admin/admins`,
         {
           params: { search: searchTxt },
+          withCredentials: true,
         },
       );
       setAdmins(res.data.data);

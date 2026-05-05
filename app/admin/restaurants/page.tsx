@@ -24,6 +24,7 @@ export default function RestaurantsPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants`,
         {
           params: { search: searchTxt },
+          withCredentials: true,
         },
       );
       setRestaurants(res.data.data);

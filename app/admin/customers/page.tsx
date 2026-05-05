@@ -24,6 +24,7 @@ export default function CustomersPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/admin/customers`,
         {
           params: { search: searchTxt },
+          withCredentials: true,
         },
       );
       setCustomers(res.data.data);

@@ -72,6 +72,7 @@ export default function EditAdminForm({
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/admins/${admin.userId}`,
         result.data,
+        { withCredentials: true },
       );
 
       onSuccess();

@@ -56,6 +56,9 @@ export default function AddAdminForm({ onSuccess }: { onSuccess: () => void }) {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/admins`,
         result.data,
+        {
+          withCredentials: true,
+        },
       );
 
       //   console.log(res.data);

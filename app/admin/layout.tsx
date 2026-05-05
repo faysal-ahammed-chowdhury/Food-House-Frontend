@@ -1,14 +1,19 @@
 "use client";
 import Sidebar from "@/components/admin/sidebar";
+import AuthContext from "@/contexts/auth/auth-context";
 import axios from "axios";
 import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
 
 export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter();
+  const authContext = useContext(AuthContext);
+
+  console.log(authContext);
 
   const handleLogout = async (e: any) => {
     e.preventDefault();
@@ -35,7 +40,7 @@ export default function AdminLayout({
             className="text-gray-600 flex items-center font-medium hover:text-pink-500 transition"
           >
             <User size={18} />
-            <p className="ml-2">Faysal Ahammed Chowdhury</p>
+            <p className="ml-2">{authContext?.user?.name}</p>
           </Link>
           <button onClick={handleLogout} className="cursor-pointer ml-8">
             <LogOut size={18} />

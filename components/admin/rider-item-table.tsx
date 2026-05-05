@@ -29,6 +29,7 @@ export default function RiderTableItem({
     try {
       const res = await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/riders/${riderId}`,
+        { withCredentials: true },
       );
       onSuccess();
     } catch (err) {

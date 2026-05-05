@@ -21,6 +21,9 @@ export default function AdminTableItem({
     try {
       const res = await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/admins/${userId}`,
+        {
+          withCredentials: true,
+        },
       );
       onSuccess();
     } catch (err) {

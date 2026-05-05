@@ -32,6 +32,7 @@ export default function RestaurantTableItem({
     try {
       const res = await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants/${restaurantId}`,
+        { withCredentials: true },
       );
       onSuccess();
     } catch (err) {

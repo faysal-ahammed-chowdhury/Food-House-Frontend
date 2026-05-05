@@ -32,6 +32,9 @@ export default function OrderDetailsPage() {
       setIsLoading(true);
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/orders/${id}`,
+        {
+          withCredentials: true,
+        },
       );
       setOrder(res.data.data);
     } catch (err) {
@@ -50,6 +53,8 @@ export default function OrderDetailsPage() {
       setIsDeleting(true);
       const res = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/orders/${id}/cancel`,
+        {},
+        { withCredentials: true },
       );
       setOrder(res.data.data);
     } catch (err) {
