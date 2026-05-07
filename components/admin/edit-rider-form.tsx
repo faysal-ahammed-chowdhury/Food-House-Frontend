@@ -114,8 +114,9 @@ export default function EditRiderForm({
 
     try {
       const res = await axios.put(
-        `http://localhost:5000/admin/riders/${rider.riderId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/riders/${rider.riderId}`,
         result.data,
+        { withCredentials: true },
       );
 
       onSuccess();

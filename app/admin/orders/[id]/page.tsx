@@ -30,7 +30,12 @@ export default function OrderDetailsPage() {
     try {
       setError("");
       setIsLoading(true);
-      const res = await axios.get(`http://localhost:5000/admin/orders/${id}`);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/orders/${id}`,
+        {
+          withCredentials: true,
+        },
+      );
       setOrder(res.data.data);
     } catch (err) {
       setError("Something is wrong");
@@ -47,7 +52,9 @@ export default function OrderDetailsPage() {
     try {
       setIsDeleting(true);
       const res = await axios.patch(
-        `http://localhost:5000/admin/orders/${id}/cancel`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/orders/${id}/cancel`,
+        {},
+        { withCredentials: true },
       );
       setOrder(res.data.data);
     } catch (err) {

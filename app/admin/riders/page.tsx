@@ -22,9 +22,13 @@ export default function RidersPage() {
   const fetchRiders = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/admin/riders", {
-        params: { search: searchTxt, status: selectedStatus },
-      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/riders`,
+        {
+          params: { search: searchTxt, status: selectedStatus },
+          withCredentials: true,
+        },
+      );
       setRider(res.data.data);
     } catch (err) {
       console.error(err);
