@@ -133,8 +133,9 @@ export default function EditResturantForm({
 
     try {
       const res = await axios.put(
-        `http://localhost:5000/admin/restaurants/${restaurant.restaurantId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants/${restaurant.restaurantId}`,
         result.data,
+        { withCredentials: true },
       );
 
       onSuccess();

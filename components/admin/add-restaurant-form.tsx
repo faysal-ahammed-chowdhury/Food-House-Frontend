@@ -116,8 +116,11 @@ export default function AddRestaurantForm({
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/admin/restaurants",
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants`,
         result.data,
+        {
+          withCredentials: true,
+        },
       );
 
       //   console.log(res.data);

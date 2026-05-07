@@ -9,12 +9,15 @@ export default function CategoryList({
 }: {
   id: number;
   categories: Category[];
-  onCategoriesFetched: Dispatch<SetStateAction<Item[]>>;
+  onCategoriesFetched: Dispatch<SetStateAction<Category[]>>;
 }) {
   const fetchCategories = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/admin/restaurants/${id}/categories`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/restaurants/${id}/categories`,
+        {
+          withCredentials: true,
+        },
       );
       console.log(res.data);
       onCategoriesFetched(res.data.data);
