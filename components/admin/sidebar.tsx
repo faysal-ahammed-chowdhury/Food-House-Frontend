@@ -1,5 +1,13 @@
 "use client";
-import { Bike, List, PieChart, Shield, Users, Utensils } from "lucide-react";
+import {
+  Bike,
+  List,
+  PieChart,
+  Shield,
+  User,
+  Users,
+  Utensils,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,6 +19,7 @@ const navLinks = [
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/admins", label: "Admins", icon: Shield },
   { href: "/admin/orders", label: "All Orders", icon: List },
+  { href: "/admin/profile", label: "Profile", icon: User },
 ];
 
 export default function Sidebar() {

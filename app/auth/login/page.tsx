@@ -1,10 +1,11 @@
 "use client";
 
+import AuthContext from "@/contexts/auth/auth-context";
 import { UserRoles } from "@/enums/user-roles.enum";
 import axios from "axios";
 import { AlertCircle, Info, Lock, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as z from "zod";
 
 export const loginSchema = z.object({
@@ -23,8 +24,28 @@ export default function Login() {
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const authContext = useContext(AuthContext);
 
   const router = useRouter();
+
+  console.log(authContext);
+
+  useEffect(() => {
+    if (authContext?.isLoadingUser) return;
+
+    if (authContext?.user && authContext.user.role === UserRoles.CUSTOMER) {
+      router.push("/");
+    } else if (
+      authContext?.user &&
+      authContext.user.role === UserRoles.RESTAURANT
+    ) {
+      router.push("/restaurant");
+    } else if (authContext?.user && authContext.user.role === UserRoles.RIDER) {
+      router.push("/rider");
+    } else if (authContext?.user && authContext.user.role === UserRoles.ADMIN) {
+      router.push("/admin");
+    }
+  }, [authContext]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -57,6 +78,7 @@ export default function Login() {
         },
       );
 
+      authContext?.fetchUser();
       setEmail("");
       setPassword("");
       if (res.data.data.role === UserRoles.CUSTOMER) router.push("/");

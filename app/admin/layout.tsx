@@ -1,11 +1,12 @@
 "use client";
 import Sidebar from "@/components/admin/sidebar";
 import AuthContext from "@/contexts/auth/auth-context";
+import { UserRoles } from "@/enums/user-roles.enum";
 import axios from "axios";
 import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 export default function AdminLayout({
   children,
@@ -14,6 +15,23 @@ export default function AdminLayout({
   const authContext = useContext(AuthContext);
 
   console.log(authContext);
+
+  useEffect(() => {
+    if (authContext?.isLoadingUser) return;
+
+    if (!authContext?.user) {
+      router.push("/auth/login");
+      return;
+    }
+
+    if (authContext.user.role === UserRoles.CUSTOMER) {
+      router.push("/");
+    } else if (authContext.user.role === UserRoles.RESTAURANT) {
+      router.push("/restaurant");
+    } else if (authContext.user.role === UserRoles.RIDER) {
+      router.push("/rider");
+    }
+  }, [authContext]);
 
   const handleLogout = async (e: any) => {
     e.preventDefault();
@@ -36,7 +54,7 @@ export default function AdminLayout({
       <header className="fixed top-0 w-full bg-white flex justify-end items-center px-10 py-8 border-b border-gray-100">
         <div className="right flex items-center">
           <Link
-            href="/"
+            href="/admin/profile"
             className="text-gray-600 flex items-center font-medium hover:text-pink-500 transition"
           >
             <User size={18} />

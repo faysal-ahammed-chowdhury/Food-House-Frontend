@@ -19,7 +19,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           withCredentials: true,
         },
       );
-      setUser(res.data);
+      setUser(res.data.data);
     } catch {
       setUser(null);
       setUserErr("There is something wrong");
