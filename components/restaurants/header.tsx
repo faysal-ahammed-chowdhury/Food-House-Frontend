@@ -6,7 +6,7 @@ export default function Header({ restaurant_id, name }: { restaurant_id: string;
   return (
     <header className="flex justify-between items-center px-10 py-3 border-b border-gray-100">
       <div className="logo">
-        <Image src="/logo.jpeg" height={10} width={180} alt="Logo" />
+        <Image src="/logo.jpeg" height={8} width={160} alt="Logo" />
       </div>
 
       <div className="right flex items-center">

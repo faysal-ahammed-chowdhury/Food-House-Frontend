@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormField } from "./form_field";
 import { Lock } from "lucide-react";
 import { z } from "zod";
@@ -10,11 +10,11 @@ import axios from "axios";
 interface ProfileUpdateFormProps {
   formData: {
     email?: string;
-    restaurantName?: string;
+    name?: string;
     description?: string;
     address?: string;
     bankAccount?: string;
-    bkash?: string;
+    bkashAccount?: string;
     newPassword?: string;
     confirmPassword?: string;
     bannerUrl?: string;
@@ -22,27 +22,32 @@ interface ProfileUpdateFormProps {
   };
   OnDB: {
     email?: string;
-    restaurantName?: string;
+    name?: string;
     description?: string;
     address?: string;
     bankAccount?: string;
-    bkash?: string;
+    bkashAccount?: string;
     newPassword?: string;
     confirmPassword?: string;
     bannerUrl?: string;
     isOpen?: boolean;
   };
   restaurant_id: string;
+  IsSHOWN?: boolean;
   onSuccess: () => void;
 }
 
 const PasswordSchema = z.string().min(6, "Password must be at least 6 characters");
 
-export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant_id} : ProfileUpdateFormProps) {
+export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant_id, IsSHOWN} : ProfileUpdateFormProps) {
     const [errors, setErrors] = useState("");
     const [password, setPassword] = useState("");
 
-   
+    useEffect(() => {
+      setPassword("");
+      setErrors("");
+    }, [IsSHOWN]);
+
    const handlePassChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrors("");
     setPassword(e.target.value);
@@ -73,8 +78,8 @@ export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant
           setPassword("");
           setErrors("");
           const updatePayload = {};
-          const fields = ["email", "restaurantName", "description", "address", "bankAccount", "bkash"];
-            
+          const fields = ["email", "name", "description", "address", "bankAccount", "bkashAccount"];
+          
           fields.forEach((field) => {
             const newValue = (formData as any)[field];
             const oldValue = (OnDB as any)[field];
@@ -84,8 +89,11 @@ export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant
           });
           const updateURL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
           const updateResponse = await axios.put(updateURL, updatePayload);
+          console.log(updatePayload);
+           console.log(formData);
+            console.log(updatePayload);
 
-          console.log(updateResponse.data.success);
+          // console.log(updateResponse.data.success);
           if(updateResponse.data.success===true){
             alert("Profile updated successfully!");
             onSuccess();

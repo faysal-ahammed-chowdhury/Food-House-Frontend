@@ -11,6 +11,7 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
   const displayName = "PizzaBurg"; //fetch name from params and decode it for display
     return (
     <>
+    <div className="bg-white">
       <Header restaurant_id={restaurant_id} name={displayName} /> 
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
         
@@ -27,6 +28,7 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
         
         <Footer />
       </div>
+    </div>
     </>
   );
 }

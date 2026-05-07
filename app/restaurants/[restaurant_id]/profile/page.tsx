@@ -13,14 +13,13 @@ import {
 import { FormField } from "@/components/restaurants/form_field";
 import axios from "axios";
 import MyModal from "@/components/restaurants/my-modal";
-import { profile } from "console";
 import ProfileUpdateForm from "@/components/restaurants/profile_update_form";
 import PasswordUpdateForm from "@/components/restaurants/password_update_form";
 
 
 
 const profileSchema = z.object({
-  restaurantName: z.string()
+  name: z.string()
     .nonempty("Name is required.")
     .max(45, "Max 45 characters allowed."),
   
@@ -39,7 +38,7 @@ const profileSchema = z.object({
     .nonempty("Address is required.")
     .max(100, "Max 100 characters allowed."),
     
-  bkash: z.string().superRefine((val, ctx) =>{
+  bkashAccount: z.string().superRefine((val, ctx) =>{
     if (val==="") return;
     if (!/^(?:\+88)?01[0-9]{9}$/.test(val)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid phone number." });
@@ -70,18 +69,17 @@ const passwordSchema = z.object({
 
 
 export default function Profile({ params }: { params: Promise<{ restaurant_id: string }>}){
-  
   const [ShowProfileUpdateModal, setShowProfileUpdateModal] = useState(false);
   const [ShowPasswordUpdateModal, setShowPasswordUpdateModal] = useState(false);
   const { restaurant_id } = use(params);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     email: "",
-    restaurantName: "",
+    name: "",
     description: "",
     address: "",
     bankAccount: "",
-    bkash: "",
+    bkashAccount: "",
     newPassword: "",
     confirmPassword: "",
     bannerUrl: "",
@@ -91,11 +89,11 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
 
   const [OnDB, setOnDB] = useState({
     email: "",
-    restaurantName: "",
+    name: "",
     description: "",
     address: "",
     bankAccount: "",
-    bkash: "",
+    bkashAccount: "",
     newPassword: "",
     confirmPassword: "",
     bannerUrl: "",
@@ -116,24 +114,24 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
         
         setOnDB((prev) => ({
           ...prev,
-          restaurantName: jsonData.user.name || "",
+          name: jsonData.user.name || "",
           email: jsonData.user?.email || "",
           description: jsonData.description || "",
           address: jsonData.address || "",
           bankAccount: jsonData.bankAccount || "",
-          bkash: jsonData.bkashAccount || "",
+          bkashAccount: jsonData.bkashAccount || "",
           bannerUrl: jsonData.bannerUrl || "",
           isOpen: jsonData.isOpen || false,
         }));
         
         setFormData((prev) => ({
           ...prev,
-          restaurantName: jsonData.user.name || "",
+          name: jsonData.user.name || "",
           email: jsonData.user?.email || "",
           description: jsonData.description || "",
           address: jsonData.address || "",
           bankAccount: jsonData.bankAccount || "",
-          bkash: jsonData.bkashAccount || "",
+          bkashAccount: jsonData.bkashAccount || "",
           bannerUrl: jsonData.bannerUrl || "",
           isOpen: jsonData.isOpen || false,
         }));        
@@ -175,7 +173,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
       setChange_MESSAGE(prev => prev + "Business Email");
     }
 
-      if(OnDB.restaurantName !== formData.restaurantName){
+      if(OnDB.name !== formData.name){
         if(anyChange===false){
           anyChange=true;
           setChange_MESSAGE("Changes detected in---> ");
@@ -219,7 +217,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
         setChange_MESSAGE(prev => prev + "Bank Account");
       }
 
-      if(OnDB.bkash !== formData.bkash){
+      if(OnDB.bkashAccount !== formData.bkashAccount){
         if(anyChange===false){
           anyChange=true;
           setChange_MESSAGE("Changes detected in---> ");
@@ -296,7 +294,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/checkEmail?email=${e.target.value}`;
       const response = await axios.get(RQ_URL);
       if(response.data.exists===true){
-        setErrors(prev => ({ ...prev, email: "Email already exists." }));
+        setErrors(prev => ({ ...prev, email: "This email is already in use in another account." }));
       }
     }
   }
@@ -328,7 +326,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
     e.preventDefault();
 
     const currentErrors = { ...errors };
-    const profileFields = ["restaurantName", "email", "bannerUrl", "description", "address", "bkash", "bankAccount"];
+    const profileFields = ["name", "email", "bannerUrl", "description", "address", "bkashAccount", "bankAccount"];
     profileFields.forEach(field => delete currentErrors[field]);
 
     const result = profileSchema.safeParse(formData);
@@ -386,12 +384,14 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
 
   return (
     <>
+    <div className="bg-white">
     <MyModal
-        title="Confirm Password to Update Restaurant Profile"
+        title="Confirm Password to Update Profile"
         open={ShowProfileUpdateModal}
         onClose={profile_modal_close}
     >
         <ProfileUpdateForm 
+          IsSHOWN={ShowProfileUpdateModal}
           formData ={formData} 
           OnDB = {OnDB}
           restaurant_id={restaurant_id}
@@ -408,6 +408,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
         onClose={password_modal_close}
     >
         <PasswordUpdateForm 
+          IsSHOWN={ShowPasswordUpdateModal}
           password={formData.newPassword}
           restaurant_id={restaurant_id}
           onSuccess={() => {
@@ -420,7 +421,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
     </MyModal>
    
 
-    <Header restaurant_id={restaurant_id} name={OnDB.restaurantName}/>
+    <Header restaurant_id={restaurant_id} name={OnDB.name}/>
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">   
       <div className="flex flex-1">
         <aside className="w-64 hidden md:block bg-white border-r border-slate-200">
@@ -477,7 +478,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
                   <form className="space-y-6" onSubmit={validateProfile}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField label="Business Email" icon={Mail} name="email" value={formData.email} onChange={handleEmail} error={errors.email} />
-                      <FormField label="Restaurant Name" icon={Store} name="restaurantName" value={formData.restaurantName} onChange={handleChange} error={errors.restaurantName} />
+                      <FormField label="Restaurant Name" icon={Store} name="name" value={formData.name} onChange={handleChange} error={errors.name} />
                     </div>
 
                     <FormField label="Restaurant Description" icon={Info} type="textarea" name="description" rows={3} value={formData.description} onChange={handleChange} error={errors.description} />
@@ -485,7 +486,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-slate-50 rounded-2xl">
                       <FormField label="Bank Account" icon={CreditCard} name="bankAccount" placeholder="0000-0000-0000" value={formData.bankAccount} onChange={handleChange} error={errors.bankAccount} />
-                      <FormField label="BKash Number" icon={Smartphone} name="bkash" placeholder="017XXXXXXXX" value={formData.bkash} onChange={handleChange} error={errors.bkash} />
+                      <FormField label="BKash Number" icon={Smartphone} name="bkashAccount" placeholder="017XXXXXXXX" value={formData.bkashAccount} onChange={handleChange} error={errors.bkashAccount} />
                     </div>
                     { change_MESSAGE!=="" && (
                       <>
@@ -525,6 +526,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
       </div>
       <Footer />
     </div>
-    </>
+  </div>
+  </>
   );
 }

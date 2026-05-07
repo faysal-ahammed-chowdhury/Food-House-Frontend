@@ -24,7 +24,7 @@ export default function MyModal({
   return (
     <div
       onClick={onClose}
-      className={`fixed inset-0 z-50 bg-black/50 flex items-center justify-center ${!open ? "hidden" : ""}`}
+      className={`text-black fixed inset-0 z-50 bg-black/50 flex items-center justify-center ${!open ? "hidden" : ""}`}
     >
       <div
         onClick={(e) => e.stopPropagation()}

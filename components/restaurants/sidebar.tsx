@@ -1,5 +1,5 @@
 "use client";
-import { Bike, Box, CookingPot, DollarSign, FileText, Home, List, Notebook, NotebookIcon, PieChart, Shield, UserIcon, Users, Utensils } from "lucide-react";
+import { Bike, Box, CookingPot, DollarSign, FileText, Home, List, Notebook, NotebookIcon, PieChart, Settings, Shield, UserIcon, Users, Utensils } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -14,8 +14,8 @@ export default function Sidebar({ restaurant_id }: { restaurant_id: string }) {
     { Link: `/restaurants/${restaurant_id}/orders/active`, label: "Active Orders", icon: CookingPot },
     { Link: `/restaurants/${restaurant_id}/orders/history`, label: "Order History", icon: FileText },
     { Link: `/restaurants/${restaurant_id}/vouchers`, label: "Vouchers", icon: Box },
-    { Link: `/restaurants/${restaurant_id}/financials`, label: "Financials", icon: DollarSign },
     { Link: `/restaurants/${restaurant_id}/profile`, label: "Profile", icon: UserIcon },
+    { Link: `/restaurants/${restaurant_id}/testing`, label: "Testing", icon: Settings },
   ];
 
   return (

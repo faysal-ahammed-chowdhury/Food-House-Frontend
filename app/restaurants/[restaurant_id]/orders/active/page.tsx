@@ -10,6 +10,7 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
   const displayName = "PizzaBurg";
   return (
     <>
+    <div className="bg-white">
       <Header restaurant_id={restaurant_id} name={displayName} />
 
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -24,6 +25,7 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
         </div>
         <Footer />
       </div>
+    </div>
     </>
   );
 }

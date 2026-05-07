@@ -11,6 +11,7 @@ export default function Dashboard({ params }: { params: Promise<{ restaurant_id:
   const displayName = "PizzaBurg"; //fetch name from params and decode it for display
     return (
     <>
+    <div className="bg-white">
       <Header restaurant_id={restaurant_id} name={displayName} />
     
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -28,6 +29,7 @@ export default function Dashboard({ params }: { params: Promise<{ restaurant_id:
         
         <Footer />
       </div>
+    </div>
     </>
   );
 }

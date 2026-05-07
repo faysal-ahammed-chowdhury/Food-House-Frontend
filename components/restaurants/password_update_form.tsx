@@ -1,18 +1,22 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormField } from "./form_field";
 import { Lock } from "lucide-react";
-import z, { set } from "zod";
+import z from "zod";
 import axios from "axios";
-import { ca } from "zod/locales";
 
 
 const PasswordSchema = z.string().min(6, "Password must be at least 6 characters");
 
-export default function PasswordUpdateForm({password, restaurant_id, onSuccess} : {password: string, restaurant_id: string, onSuccess: () => void}) {
+export default function PasswordUpdateForm({password, restaurant_id, onSuccess, IsSHOWN} : {password: string, restaurant_id: string, onSuccess: () => void, IsSHOWN?: boolean}) {
     const [passwordErrors, setPasswordErrors ] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");    
+    const [confirmPassword, setConfirmPassword] = useState("");  
+    
+     useEffect(() => {
+          setConfirmPassword("");
+          setPasswordErrors("");
+        }, [IsSHOWN]);
 
     const handlePassChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPasswordErrors("");
