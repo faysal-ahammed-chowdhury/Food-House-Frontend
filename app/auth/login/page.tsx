@@ -30,22 +30,48 @@ export default function Login() {
 
   console.log(authContext);
 
-  useEffect(() => {
-    if (authContext?.isLoadingUser) return;
+  const getResturentID = async (UserID: number) => {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/restaurant/getRestaurantIdbyuserID/${UserID}`,
+        {
+          withCredentials: true,
+        },
+      );
+      return res.data.restaurantId;
+  };
 
-    if (authContext?.user && authContext.user.role === UserRoles.CUSTOMER) {
+useEffect(() => {
+  if (authContext?.isLoadingUser) return;
+
+  const handleNavigation = async () => {
+    const { user } = authContext || {};
+
+    if (!user) return;
+
+    if (user.role === UserRoles.CUSTOMER) {
       router.push("/");
-    } else if (
-      authContext?.user &&
-      authContext.user.role === UserRoles.RESTAURANT
-    ) {
-      router.push("/restaurant");
-    } else if (authContext?.user && authContext.user.role === UserRoles.RIDER) {
+    } 
+    else if (user.role === UserRoles.RESTAURANT) {
+      try {
+        // Await the ID before pushing the route
+        const restaurantID = await getResturentID(user.userId);
+        // console.log("Fetched Restaurant ID:", restaurantID);
+        router.push(`/restaurants/${restaurantID}/dashboard`);
+      } catch (error) {
+        console.error("Failed to fetch Restaurant ID:", error);
+        // Optional: redirect to an error page or login
+      }
+    } 
+    else if (user.role === UserRoles.RIDER) {
       router.push("/rider");
-    } else if (authContext?.user && authContext.user.role === UserRoles.ADMIN) {
+    } 
+    else if (user.role === UserRoles.ADMIN) {
       router.push("/admin");
     }
-  }, [authContext]);
+  };
+
+  handleNavigation();
+}, [authContext, router]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -81,8 +107,6 @@ export default function Login() {
       authContext?.fetchUser();
       setEmail("");
       setPassword("");
-      if (res.data.data.role === UserRoles.CUSTOMER) router.push("/");
-      else router.push("/" + UserRoles.ADMIN.toLowerCase());
     } catch (err) {
       const messages = err.response?.data?.message;
 
