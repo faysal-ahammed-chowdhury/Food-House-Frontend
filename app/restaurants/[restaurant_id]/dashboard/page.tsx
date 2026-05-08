@@ -23,7 +23,7 @@ export default function Dashboard({ params }: { params: Promise<{ restaurant_id:
           </aside>
           
           <main className="flex-1 p-8 md:p-12 overflow-y-auto">
-              <h1>Dashboard</h1>
+              <h1>  </h1>
           </main>
         </div>
         

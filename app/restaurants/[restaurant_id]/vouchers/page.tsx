@@ -41,6 +41,8 @@ export default function Vouchers({ params }: { params: Promise<{ restaurant_id: 
   useEffect(() => {
     fetchVouchers();
   }, []);
+
+  
   async function fetchVouchers() {
       try {
         const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/voucher/${restaurant_id}`;
