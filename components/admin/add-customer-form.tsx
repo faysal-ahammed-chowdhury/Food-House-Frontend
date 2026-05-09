@@ -69,8 +69,11 @@ export default function AddCustomerForm({
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/admin/customers",
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/customers`,
         result.data,
+        {
+          withCredentials: true,
+        },
       );
 
       //   console.log(res.data);
