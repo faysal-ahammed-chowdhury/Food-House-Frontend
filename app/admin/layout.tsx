@@ -23,7 +23,6 @@ export default function AdminLayout({
       router.push("/auth/login");
       return;
     }
-
     if (authContext.user.role === UserRoles.CUSTOMER) {
       router.push("/");
     } else if (authContext.user.role === UserRoles.RESTAURANT) {
@@ -39,7 +38,6 @@ export default function AdminLayout({
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
-        {},
         {
           withCredentials: true,
         },

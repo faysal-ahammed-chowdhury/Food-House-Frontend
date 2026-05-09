@@ -15,7 +15,7 @@ export default function Sidebar({ restaurant_id }: { restaurant_id: string }) {
     { Link: `/restaurants/${restaurant_id}/orders/history`, label: "Order History", icon: FileText },
     { Link: `/restaurants/${restaurant_id}/vouchers`, label: "Vouchers", icon: Box },
     { Link: `/restaurants/${restaurant_id}/profile`, label: "Profile", icon: UserIcon },
-    { Link: `/restaurants/${restaurant_id}/testing`, label: "Testing", icon: Settings },
+    // { Link: `/restaurants/${restaurant_id}/testing`, label: "Testing", icon: Settings },
   ];
 
   return (
