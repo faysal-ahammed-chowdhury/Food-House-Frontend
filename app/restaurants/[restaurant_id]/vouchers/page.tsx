@@ -151,9 +151,11 @@ export default function Vouchers({ params }: { params: Promise<{ restaurant_id: 
                         <div className="text-[9px] text-slate-400 font-medium">
                           EXP: {new Date(voucher_info.expiresAt).toLocaleDateString('en-GB')}
                         </div>
-                        <button 
-                          onClick={() => {deleteVoucher(voucher_info.voucherId)}}
-                          className="btn btn-xs btn-primary bg-pink-600 border-none text-[10px] h-7 min-h-7"
+                        <button
+                          onClick={() => {
+                            deleteVoucher(voucher_info.voucherId);
+                          }}
+                          className="px-3 h-7 text-[10px] font-semibold text-white bg-pink-600 rounded-md hover:bg-pink-700 transition-colors duration-200"
                         >
                           DELETE
                         </button>
