@@ -253,7 +253,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
     }
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024){
       setErrors(prev => ({ ...prev, bannerUrl: "File size must be less than 2MB" }));
       return;
     } 
@@ -272,7 +272,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
         setFormData(prev => ({ ...prev, bannerUrl: response.data.data.bannerUrl }));
         setOnDB(prev => ({ ...prev, bannerUrl: response.data.data.bannerUrl }));
       }
-      alert("Image updated successfully!" + "The saved image name is: '" + response.data.data.bannerUrl + "'");
+      alert("Image updated successfully!");
     } catch (error) {
       alert("Something went wrong. Failed to upload image");
     }
@@ -421,7 +421,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
     </MyModal>
    
 
-    <Header restaurant_id={restaurant_id} name={OnDB.name}/>
+    <Header key={JSON.stringify(OnDB)} restaurant_id={restaurant_id}/>
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">   
       <div className="flex flex-1">
         <aside className="w-64 hidden md:block bg-white border-r border-slate-200">

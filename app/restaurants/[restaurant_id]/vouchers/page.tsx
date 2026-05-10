@@ -13,26 +13,7 @@ import { use, useEffect, useState } from "react";
 
 export default function Vouchers({ params }: { params: Promise<{ restaurant_id: string }>}){
   const { restaurant_id } = use(params);
-  const [displayName, setDisplayName] = useState("");
   const [vouchers, setVouchers] = useState<any[]>([]);
-
-
-  useEffect(() => {
-    getName();
-  }, []);
-  async function getName() {
-     try {
-      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
-      const response = await axios.get(RQ_URL);
-      if(response.data.success){
-        const jsonData = response.data.data;
-        setDisplayName(jsonData.user.name);
-      }
-    } 
-    catch (error) {
-      console.error(error);
-    }
-  }
 
 //   useEffect(() => {
 //   console.log("Vouchers state updated to:", vouchers);
@@ -94,7 +75,7 @@ export default function Vouchers({ params }: { params: Promise<{ restaurant_id: 
     </MyModal>
 
     <div className="bg-white">
-      <Header restaurant_id={restaurant_id} name={displayName}/>
+      <Header restaurant_id={restaurant_id}/>
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans">        
         <div className="flex flex-1">
           <aside className="w-64 hidden md:block bg-white border-r border-slate-200">
@@ -114,8 +95,10 @@ export default function Vouchers({ params }: { params: Promise<{ restaurant_id: 
                 + Create Voucher
               </button>
             </header>
+
+
             <div className="space-y-8">
-              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-black">
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-black">
                 {vouchers.map((voucher_info) => (
                   <div 
                     key={voucher_info.voucherId} 

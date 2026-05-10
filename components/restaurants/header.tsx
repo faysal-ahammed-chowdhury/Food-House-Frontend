@@ -3,8 +3,28 @@ import Image from "next/image";
 import { LogOut, User } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function Header({ restaurant_id, name }: { restaurant_id: string; name: string }) {
+export default function Header({ restaurant_id}: { restaurant_id: string}) {
+  const [displayName, setDisplayName] = useState("");
+  
+  useEffect(() => {
+    getName();
+  }, []);
+  async function getName() {
+     try {
+      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
+      const response = await axios.get(RQ_URL);
+      if(response.data.success){
+        const jsonData = response.data.data;
+        setDisplayName(jsonData.user.name);
+      }
+    } 
+    catch (error) {
+      console.error(error);
+    }
+  }
+  
   const router = useRouter();
   const handleLogout = async (e: any) => {
     e.preventDefault();
@@ -33,7 +53,7 @@ export default function Header({ restaurant_id, name }: { restaurant_id: string;
           className="text-gray-600 flex items-center font-medium hover:text-pink-500 transition"
         >
           <User size={18} />
-          <p className="ml-2">{name}</p>
+          <p className="ml-2">{displayName}</p>
         </Link>
 
         <button onClick={handleLogout} className="cursor-pointer ml-8">
