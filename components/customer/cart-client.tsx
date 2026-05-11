@@ -58,9 +58,7 @@ export default function CartClient() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-[2rem] font-extrabold text-[#1a202c] mb-1">
-          Your Cart
-        </h1>
+        <h1 className="text-[2rem] font-bold text-[#1a202c] mb-1">Your Cart</h1>
         <p className="text-gray-500">
           Manage your orders from different restaurants
         </p>
