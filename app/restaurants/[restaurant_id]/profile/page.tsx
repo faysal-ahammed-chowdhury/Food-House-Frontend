@@ -103,7 +103,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [authContext?.user]);
 
   async function fetchData() {
     if (!authContext?.user) {

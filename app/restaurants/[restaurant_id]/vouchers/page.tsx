@@ -15,7 +15,7 @@ export default function Vouchers({ params }: { params: Promise<{ restaurant_id: 
 
   useEffect(() => {
     fetchVouchers();
-  }, []);
+  }, [authContext?.user]);
 
   
   async function fetchVouchers() {

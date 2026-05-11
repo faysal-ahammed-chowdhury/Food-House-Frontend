@@ -55,7 +55,7 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [authContext?.user]);
 
   async function fetchCategories() {
     if (!authContext?.user) {
