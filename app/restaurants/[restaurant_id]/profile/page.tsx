@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use, useEffect } from "react";
+import { useState, use, useEffect, useContext } from "react";
 import { boolean, set, z } from "zod";
 import { 
   Mail, Store, Info, 
@@ -12,6 +12,8 @@ import axios from "axios";
 import MyModal from "@/components/restaurants/my-modal";
 import ProfileUpdateForm from "@/components/restaurants/profile_update_form";
 import PasswordUpdateForm from "@/components/restaurants/password_update_form";
+import { UserRoles } from "@/enums/user-roles.enum";
+import AuthContext from "@/contexts/auth/auth-context";
 
 
 
@@ -66,6 +68,7 @@ const passwordSchema = z.object({
 
 
 export default function Profile({ params }: { params: Promise<{ restaurant_id: string }>}){
+  const authContext = useContext(AuthContext);
   const [ShowProfileUpdateModal, setShowProfileUpdateModal] = useState(false);
   const [ShowPasswordUpdateModal, setShowPasswordUpdateModal] = useState(false);
   const { restaurant_id } = use(params);
@@ -100,12 +103,19 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [authContext?.user]);
 
   async function fetchData() {
+    if (!authContext?.user) {
+      return;
+    }
+    if(authContext.user!.role !==  UserRoles.RESTAURANT){
+      return;
+    }
+
      try {
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
-      const response = await axios.get(RQ_URL);
+      const response = await axios.get(RQ_URL,{withCredentials: true});
       console.log(response.data.data);
       if(response.data.success){
         const jsonData = response.data.data;
@@ -147,7 +157,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
     const URL= `${process.env.NEXT_PUBLIC_API_URL}/restaurant/updateStatus/${restaurant_id}/${statusText}`;
     setFormData(prev => ({ ...prev, isOpen: toggledValue }));
     try{
-      const response = await axios.patch(URL);
+      const response = await axios.patch(URL,{withCredentials: true});
     }
     catch(error){
       // console.error(error);
@@ -264,7 +274,8 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
 
     try {
       const response = await axios.put(URL, uploadData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true
       });
       if (response.data.data.bannerUrl) {
         setFormData(prev => ({ ...prev, bannerUrl: response.data.data.bannerUrl }));
@@ -290,7 +301,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
 
     if(value !== OnDB.email){
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/checkEmail?email=${e.target.value}`;
-      const response = await axios.get(RQ_URL);
+      const response = await axios.get(RQ_URL,{withCredentials: true});
       if(response.data.exists===true){
         setErrors(prev => ({ ...prev, email: "This email is already in use in another account." }));
       }
@@ -367,7 +378,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
         restaurantId: Number(restaurant_id),
         password: formData.newPassword
       };
-      const response = await axios.post(URL, payload);  
+      const response = await axios.post(URL, payload, {withCredentials: true});  
       // console.log(response.data.match);
       if(response.data.match===true){
           setErrors((prevErrors) => ({
@@ -443,7 +454,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
               <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-8">
                   <div className="flex flex-col sm:flex-row items-center gap-6 mb-10 pb-10 border-b border-slate-100">
-                    <img 
+                      <img 
                       src={process.env.NEXT_PUBLIC_API_URL + "/restaurant/getimage/" + formData.bannerUrl} 
                       className="w-28 h-28 rounded-2xl object-cover border-4 border-white shadow-md flex-shrink-0" 
                       alt="profile" 
@@ -453,7 +464,6 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
                         {formData.isOpen ? 'Online' : 'Currently Closed'}
                       </span>
     
-
                       <label className="cursor-pointer flex flex-row items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm active:scale-95 w-max">
                         <Camera size={16} />
                         <span>Update Photo</span>

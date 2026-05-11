@@ -55,7 +55,7 @@ export default function EditCategoryForm({restaurant_id, category_id, category_n
             if(pre_info.name === formData.name){return;}
             try{
                 const URL= `${process.env.NEXT_PUBLIC_API_URL}/restaurant/categoryName/${restaurant_id}/${formData.name}`;
-                const checkResponse = await axios.get(URL);
+                const checkResponse = await axios.get(URL,{withCredentials: true});
                 if(checkResponse.status === 200){
                     seterrors({ name: "A category with this name already exists." });
                     return;
@@ -63,7 +63,7 @@ export default function EditCategoryForm({restaurant_id, category_id, category_n
             } catch (error) {
                 try {
                 const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/category/${restaurant_id}/${category_id}`;
-                const response = await axios.patch(RQ_URL, parsedData.data);
+                const response = await axios.patch(RQ_URL, parsedData.data, {withCredentials: true});
                 if(response.status === 200){
                     setFormData({
                         name: "",

@@ -34,12 +34,12 @@ export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {
         if(category_id === 0) return;
 
         try {
-            const item_count= await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/restaurant/items/count/${category_id}`);
+            const item_count= await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/restaurant/items/count/${category_id}`,{withCredentials: true});
             console.log(item_count.data);
             if(item_count.data==0){return;}
             try{
                  const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/items/${restaurant_id}/${category_id}`;
-                const response = await axios.get(RQ_URL);        
+                const response = await axios.get(RQ_URL, {withCredentials: true});        
                 console.log(response.data);       
                 setItems(response.data);
             }catch(error){
@@ -61,7 +61,7 @@ export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {
         }
         try{
             const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/items/${itemId}`;
-            await axios.delete(RQ_URL);
+            await axios.delete(RQ_URL, {withCredentials: true});
             alert("Item deleted successfully!");
             fetchItems();
         } catch (error) {
@@ -73,7 +73,7 @@ export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {
     async function toggleAvailability(itemId: number, currentStatus: boolean) {
         try {
             const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/items/${itemId}`;
-            await axios.put(RQ_URL, { isAvailable: !currentStatus });
+            await axios.put(RQ_URL, { isAvailable: !currentStatus }, {withCredentials: true});
             setItems(prev => prev.map(item => 
                 item.itemId === itemId ? {...item, isAvailable: !currentStatus} : item
             ));

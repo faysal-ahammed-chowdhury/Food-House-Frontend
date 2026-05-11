@@ -67,7 +67,7 @@ export default function CreateVoucherForm({restaurant_id, onSuccess} : {restaura
         else{
             try {
                 const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/voucher`;
-                const response = await axios.post(RQ_URL, parsedData.data);
+                const response = await axios.post(RQ_URL, parsedData.data, {withCredentials: true});
                 if(response.status === 201){
                     seterrors({});
                     setFormData({

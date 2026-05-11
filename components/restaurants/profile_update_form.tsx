@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FormField } from "./form_field";
 import { Lock } from "lucide-react";
 import { z } from "zod";
 import axios from "axios";
+import AuthContext from "@/contexts/auth/auth-context";
 
 
 interface ProfileUpdateFormProps {
@@ -40,6 +41,7 @@ interface ProfileUpdateFormProps {
 const PasswordSchema = z.string().min(6, "Password must be at least 6 characters");
 
 export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant_id, IsSHOWN} : ProfileUpdateFormProps) {
+    const authContext = useContext(AuthContext);
     const [errors, setErrors] = useState("");
     const [password, setPassword] = useState("");
 
@@ -70,7 +72,7 @@ export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant
       console.log(payload)
 
       try{
-        const response = await axios.post(URL, payload);
+        const response = await axios.post(URL, payload, {withCredentials: true});
         // console.log(response.data.match);
         // console.log(restaurant_id)
         // console.log(password)
@@ -88,13 +90,14 @@ export default function ProfileUpdateForm({formData, OnDB, onSuccess, restaurant
             }
           });
           const updateURL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
-          const updateResponse = await axios.put(updateURL, updatePayload);
+          const updateResponse = await axios.put(updateURL, updatePayload, {withCredentials: true});
           console.log(updatePayload);
            console.log(formData);
             console.log(updatePayload);
 
           // console.log(updateResponse.data.success);
           if(updateResponse.data.success===true){
+            authContext?.fetchUser();
             alert("Profile updated successfully!");
             onSuccess();
           }

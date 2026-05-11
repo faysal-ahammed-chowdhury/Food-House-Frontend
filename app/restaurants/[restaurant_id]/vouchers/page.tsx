@@ -2,23 +2,32 @@
 
 import CreateVoucherForm from "@/components/restaurants/create_voucher_form";
 import MyModal from "@/components/restaurants/my-modal";
+import AuthContext from "@/contexts/auth/auth-context";
+import { UserRoles } from "@/enums/user-roles.enum";
 import axios from "axios";
-import { use, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 
 
 export default function Vouchers({ params }: { params: Promise<{ restaurant_id: string }>}){
   const { restaurant_id } = use(params);
   const [vouchers, setVouchers] = useState<any[]>([]);
+  const authContext = useContext(AuthContext);
 
   useEffect(() => {
     fetchVouchers();
-  }, []);
+  }, [authContext?.user]);
 
   
   async function fetchVouchers() {
+      if (!authContext?.user) {
+        return;
+      }
+      if(authContext.user!.role !==  UserRoles.RESTAURANT){
+        return;
+      }
       try {
         const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/voucher/${restaurant_id}`;
-        const response = await axios.get(RQ_URL);
+        const response = await axios.get(RQ_URL,{withCredentials: true});
         setVouchers(response.data);
         // console.log(response);       
       } catch (error) {
@@ -31,7 +40,7 @@ export default function Vouchers({ params }: { params: Promise<{ restaurant_id: 
     if (!confirmed) return;
     try {
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/voucher/${voucherId}`;
-      const response = await axios.delete(RQ_URL);
+      const response = await axios.delete(RQ_URL,{withCredentials: true});
       if (response.status === 200){
         setVouchers((prevVouchers) => prevVouchers.filter(v => v.voucherId !== voucherId));
       }
