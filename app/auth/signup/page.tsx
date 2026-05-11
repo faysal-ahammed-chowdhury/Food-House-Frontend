@@ -1,11 +1,14 @@
 "use client";
 
+import AuthContext from "@/contexts/auth/auth-context";
+import { UserRoles } from "@/enums/user-roles.enum";
 import axios from "axios";
 import { CircleX, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { z } from "zod";
 
 export const createCustomerSchema = z.object({
@@ -39,6 +42,49 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const authContext = useContext(AuthContext);
+
+  const router = useRouter();
+
+  console.log(authContext);
+
+  const getResturentID = async (UserID: number) => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/restaurant/getRestaurantIdbyuserID/${UserID}`,
+      {
+        withCredentials: true,
+      },
+    );
+    return res.data.restaurantId;
+  };
+
+  useEffect(() => {
+    if (authContext?.isLoadingUser) return;
+
+    const handleNavigation = async () => {
+      const { user } = authContext || {};
+
+      if (!user) return;
+
+      if (user.role === UserRoles.CUSTOMER) {
+        router.push("/customer/dashboard");
+      } else if (user.role === UserRoles.RESTAURANT) {
+        try {
+          const restaurantID = await getResturentID(user.userId);
+          router.push(`/restaurants/${restaurantID}/dashboard`);
+        } catch (error) {
+          console.error("Failed to fetch Restaurant ID:", error);
+        }
+      } else if (user.role === UserRoles.RIDER) {
+        router.push("/rider");
+      } else if (user.role === UserRoles.ADMIN) {
+        router.push("/admin");
+      }
+    };
+
+    handleNavigation();
+  }, [authContext, router]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();

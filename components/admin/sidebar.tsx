@@ -1,8 +1,8 @@
 "use client";
 import {
   Bike,
+  LayoutDashboard,
   List,
-  PieChart,
   Shield,
   User,
   Users,
@@ -13,7 +13,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { href: "/admin", label: "Overview", icon: PieChart },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/restaurants", label: "Restaurants", icon: Utensils },
   { href: "/admin/riders", label: "Riders", icon: Bike },
   { href: "/admin/customers", label: "Customers", icon: Users },

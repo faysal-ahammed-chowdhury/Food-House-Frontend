@@ -51,7 +51,7 @@ export default function Login() {
       if (!user) return;
 
       if (user.role === UserRoles.CUSTOMER) {
-        router.push("/");
+        router.push("/customer/dashboard");
       } else if (user.role === UserRoles.RESTAURANT) {
         try {
           const restaurantID = await getResturentID(user.userId);
