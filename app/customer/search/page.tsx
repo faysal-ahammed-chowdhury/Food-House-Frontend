@@ -1,6 +1,10 @@
 import Navbar from "@/components/customer/navbar";
 import SearchInput from "@/components/customer/search-input";
 
+export const metadata = {
+  title: "Search | FoodHouse",
+};
+
 export default async function SearchPage({ searchParams }: any) {
   const resolvedParams = await searchParams;
   const query = resolvedParams.query || "";

@@ -1,6 +1,10 @@
 import Navbar from "@/components/customer/navbar";
 import SearchInput from "@/components/customer/search-input";
 
+export const metadata = {
+  title: "Restaurants | FoodHouse",
+};
+
 export default function RestaurantsPage() {
   const restaurants = [
     {
@@ -63,7 +67,7 @@ export default function RestaurantsPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Navbar Section */}
       <div className="bg-white border-b border-gray-100">
-        <main className="max-w-6xl xl:mx-auto w-full">
+        <main className="max-w-7xl xl:mx-auto w-full">
           <Navbar />
         </main>
       </div>

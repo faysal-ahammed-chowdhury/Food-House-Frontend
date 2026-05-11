@@ -1,7 +1,11 @@
-import Navbar from '@/components/customer/navbar'
-import MiddleSection from '@/components/customer/middle-section'
-import PopularCategories from '@/components/customer/popular-categories'
-import TopRestaurants from '@/components/customer/top-resturant'
+import Navbar from "@/components/customer/navbar";
+import MiddleSection from "@/components/customer/middle-section";
+import PopularCategories from "@/components/customer/popular-categories";
+import TopRestaurants from "@/components/customer/top-resturant";
+
+export const metadata = {
+  title: "Home | FoodHouse",
+};
 
 export default function HomePage() {
   return (
@@ -11,5 +15,5 @@ export default function HomePage() {
       <PopularCategories />
       <TopRestaurants />
     </main>
-  )
+  );
 }
