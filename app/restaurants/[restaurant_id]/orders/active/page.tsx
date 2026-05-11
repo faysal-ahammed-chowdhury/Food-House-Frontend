@@ -11,7 +11,7 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
   return (
     <>
     <div className="bg-white">
-      <Header restaurant_id={restaurant_id} name={displayName} />
+      <Header restaurant_id={restaurant_id}/>
 
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
         <div className="flex flex-1">

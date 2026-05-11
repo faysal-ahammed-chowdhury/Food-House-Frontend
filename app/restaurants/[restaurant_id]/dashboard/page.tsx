@@ -3,16 +3,16 @@
 import Footer from "@/components/restaurants/footer";
 import Header from "@/components/restaurants/header";
 import Sidebar from "@/components/restaurants/sidebar";
-import { use } from "react";
+import axios from "axios";
+import { use, useEffect, useState } from "react";
 
 
 export default function Dashboard({ params }: { params: Promise<{ restaurant_id: string }>}){
   const { restaurant_id } = use(params);
-  const displayName = "PizzaBurg"; //fetch name from params and decode it for display
-    return (
+  return (
     <>
     <div className="bg-white">
-      <Header restaurant_id={restaurant_id} name={displayName} />
+      <Header restaurant_id={restaurant_id}/>
     
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
         
