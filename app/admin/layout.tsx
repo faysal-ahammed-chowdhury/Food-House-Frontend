@@ -18,7 +18,6 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (authContext?.isLoadingUser) return;
-
     if (!authContext?.user) {
       router.push("/auth/login");
       return;
@@ -34,15 +33,13 @@ export default function AdminLayout({
 
   const handleLogout = async (e: any) => {
     e.preventDefault();
-
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,{},
         {
           withCredentials: true,
         },
       );
-
       router.push("/");
     } catch {}
   };

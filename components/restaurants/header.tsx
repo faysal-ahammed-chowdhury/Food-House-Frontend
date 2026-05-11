@@ -3,26 +3,22 @@ import Image from "next/image";
 import { LogOut, User } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import AuthContext from "@/contexts/auth/auth-context";
+import { UserRoles } from "@/enums/user-roles.enum";
 
 export default function Header({ restaurant_id}: { restaurant_id: string}) {
   const [displayName, setDisplayName] = useState("");
-  
+  const authContext = useContext(AuthContext);
   useEffect(() => {
     getName();
-  }, []);
+  }, [getName]);
   async function getName() {
-     try {
-      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
-      const response = await axios.get(RQ_URL);
-      if(response.data.success){
-        const jsonData = response.data.data;
-        setDisplayName(jsonData.user.name);
-      }
-    } 
-    catch (error) {
-      console.error(error);
-    }
+    if(authContext?.isLoadingUser) return;
+    const user = authContext?.user;
+    if(!user) return;
+    if(user.role !== UserRoles.RESTAURANT) return;
+    setDisplayName(user.name);
   }
   
   const router = useRouter();

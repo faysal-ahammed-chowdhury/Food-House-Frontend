@@ -43,7 +43,7 @@ export default function CreateCategoryForm({restaurant_id, onSuccess} : {restaur
         else{
             try{
                 const URL= `${process.env.NEXT_PUBLIC_API_URL}/restaurant/categoryName/${restaurant_id}/${formData.name}`;
-                const checkResponse = await axios.get(URL);
+                const checkResponse = await axios.get(URL,{withCredentials: true});
                 if(checkResponse.status === 200){
                     seterrors({ name: "A category with this name already exists." });
                     return;
@@ -51,7 +51,7 @@ export default function CreateCategoryForm({restaurant_id, onSuccess} : {restaur
             } catch (error) {
                 try {
                 const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/category`;
-                const response = await axios.post(RQ_URL, parsedData.data);
+                const response = await axios.post(RQ_URL, parsedData.data, {withCredentials: true});
                 if(response.status === 201){
                     setFormData({
                         name: "",

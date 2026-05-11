@@ -108,7 +108,7 @@ export default function CreateNewItemForm({restaurant_id, category_id, onSuccess
         else{
             try {
                 const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/createItems`;
-                const response = await axios.post(RQ_URL, formData);
+                const response = await axios.post(RQ_URL, formData, {withCredentials: true});
                 setFormData({
                     name: "",
                     description: "",
@@ -128,7 +128,8 @@ export default function CreateNewItemForm({restaurant_id, category_id, onSuccess
                         await axios.put(URL, formData, {
                             headers: {
                                 "Content-Type": "multipart/form-data"
-                            }
+                            },
+                            withCredentials: true
                         });
                     } catch (error) {
                         console.error("Error uploading image:", error);

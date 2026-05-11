@@ -5,8 +5,10 @@ import EditCategoryForm from "@/components/restaurants/Edit_catagoty_form";
 import MyModal from "@/components/restaurants/my-modal";
 import axios from "axios";
 import { Pencil } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 import ShowItemForm from "@/components/restaurants/show_items_form";
+import AuthContext from "@/contexts/auth/auth-context";
+import { UserRoles } from "@/enums/user-roles.enum";
 
 
 export default function Menu({ params }: { params: Promise<{ restaurant_id: string }>}){
@@ -16,7 +18,7 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
   const [ShowEditCategoryModal, setShowEditCategoryModal] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number>(0);
-
+  const authContext = useContext(AuthContext);
 
   function category_modal_close() {
     setShowCreateCategoryModal(false);
@@ -56,10 +58,18 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
   }, []);
 
   async function fetchCategories() {
+    if (!authContext?.user) {
+      return;
+    }
+    if(authContext.user!.role !==  UserRoles.RESTAURANT){
+      return;
+    }
+    
+
     setCategories([]);
     try {
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurantcategories/${restaurant_id}`;
-      const response = await axios.get(RQ_URL);      
+      const response = await axios.get(RQ_URL,{withCredentials: true});      
       setCategories(response.data);
     } catch (error) {
       console.error(error);
@@ -72,7 +82,7 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
     }
     try {
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/category/${restaurant_id}/${categoryId}`;
-      await axios.delete(RQ_URL);
+      await axios.delete(RQ_URL,{withCredentials: true});
       alert("Category deleted successfully!");
       fetchCategories();
     } catch (error) {

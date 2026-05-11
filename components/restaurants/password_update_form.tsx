@@ -38,7 +38,7 @@ export default function PasswordUpdateForm({password, restaurant_id, onSuccess, 
         // console.log("Sending password to backend for validation:", payload);
         
         try{ 
-            const response = await axios.post(URL, payload);
+            const response = await axios.post(URL, payload, {withCredentials: true});
             if(response.data.match===true){
                 setConfirmPassword("");
                 setPasswordErrors("");
@@ -47,7 +47,7 @@ export default function PasswordUpdateForm({password, restaurant_id, onSuccess, 
                     password: password
                 };
                 // console.log("Password validated. Sending update request to backend:", updatePayload);
-                const updateResponse = await axios.put(updateURL, updatePayload);
+                const updateResponse = await axios.put(updateURL, updatePayload, {withCredentials: true});
                 if(updateResponse.data.success===true){
                     alert("Password updated successfully!");
                     onSuccess();

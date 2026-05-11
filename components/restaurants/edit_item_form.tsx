@@ -60,7 +60,7 @@ export default function EditItemForm({itemId,  onSuccess} : {itemId: number, onS
         });
 
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/restaurant/item/${itemId}`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/restaurant/item/${itemId}`, {withCredentials: true});
             const item = response.data;
             setFormData({
                 description: item.description,
@@ -108,7 +108,7 @@ export default function EditItemForm({itemId,  onSuccess} : {itemId: number, onS
                 description: formData.description,
                 price: Number(formData.price),
                 preparationTime: Number(formData.preparationTime)
-            });
+            }, {withCredentials: true});
             setChange_made(false);
             onSuccess();
         } catch (error) {
@@ -141,6 +141,7 @@ export default function EditItemForm({itemId,  onSuccess} : {itemId: number, onS
     try {
       const response = await axios.put(URL, uploadData, {
         headers: { 'Content-Type': 'multipart/form-data' }
+        , withCredentials: true
       });
       if (response.data.imageUrl) {
         setFormData(prev => ({ ...prev, imageUrl: response.data.imageUrl }));

@@ -15,9 +15,7 @@ export default function RestaurantLayout({children,params}: Readonly<{children: 
     const getResturentID = async (UserID: number) => {
         const res = await axios.get(
             `${process.env.NEXT_PUBLIC_API_URL}/restaurant/getRestaurantIdbyuserID/${UserID}`,
-            {
-            withCredentials: true,
-            },
+            {withCredentials: true}
         );
         return res.data.restaurantId;
     };
@@ -29,6 +27,10 @@ export default function RestaurantLayout({children,params}: Readonly<{children: 
 
     if (!user) {
       router.push("/auth/login");
+      return;
+    }
+    if(user.role === UserRoles.ADMIN){
+      router.push("/admin");
       return;
     }
 
