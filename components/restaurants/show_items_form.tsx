@@ -5,17 +5,28 @@ import { ArrowLeftRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import MyModal from "./my-modal";
 import CreateNewItemForm from "./create_new_items_form";
+import EditItemForm from "./edit_item_form";
 
 export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {restaurant_id: string, category_id: number, onSuccess: () => void}) {
     const [items, setItems] = useState<any[]>([]);
     const [showCreateNewItemModal, setShowCreateNewItemModal] = useState(false);
+    const [Item_id_to_edit, setItem_id_to_edit] = useState<number>(0);
+    const [showEditItemModal, setShowEditItemModal] = useState(false);
 
-    function item_modal_close() {
+    function create_NewItem_modal_close() {
         setShowCreateNewItemModal(false);
     }
 
-    function item_modal_open() {
+    function create_NewItem_modal_open() {
         setShowCreateNewItemModal(true);
+    }
+
+    function edit_Item_mmodal_open() {
+        setShowEditItemModal(true);
+    }
+
+    function edit_Item_modal_close() {
+        setShowEditItemModal(false);
     }
 
     async function fetchItems() {
@@ -72,15 +83,20 @@ export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {
         }
     }
 
-
-
+    async function editItem(itemId: number) {
+        setItem_id_to_edit(itemId);
+        edit_Item_mmodal_open();
+    }
 
     return (
         <>
             <MyModal
                   title="Add New Item"
                   open={showCreateNewItemModal}
-                  onClose={item_modal_close}
+                  onClose={()=>{
+                    create_NewItem_modal_close();
+                    fetchItems();
+                  }}
                 >
                 <CreateNewItemForm 
                   restaurant_id={restaurant_id}
@@ -88,7 +104,25 @@ export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {
                   onSuccess={() => {
                     alert("Item created successfully!");
                     fetchItems();
-                    item_modal_close();
+                    create_NewItem_modal_close();
+                  }}
+                />
+            </MyModal>
+
+            <MyModal
+                title={`Edit "${items.find(item => item.itemId === Item_id_to_edit)?.name}" Info`}
+                open={showEditItemModal}
+                onClose={()=>{
+                    edit_Item_modal_close();
+                    fetchItems();
+                }}
+                >
+                <EditItemForm 
+                  itemId={Item_id_to_edit}
+                  onSuccess={() => {
+                    alert("Item updated successfully!");
+                    fetchItems();
+                    edit_Item_modal_close();
                   }}
                 />
             </MyModal>
@@ -96,7 +130,7 @@ export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {
 
 
             <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all"
-                onClick={item_modal_open}
+                onClick={create_NewItem_modal_open}
             >
                 + Add New Item
             </button>
@@ -156,7 +190,7 @@ export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {
                         </td>
                         <td className="border border-gray-300 p-1">
                         <button className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600 transition"
-                            // onClick={() => alert("Edit functionality coming soon!")}
+                            onClick={() => editItem(item.itemId)}
                         >
                             Edit
                         </button>
