@@ -1,48 +1,22 @@
 "use client";
 
-import { FormField } from "@/components/restaurants/form_field";
 import axios from "axios";
+import { ArrowLeftRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { z } from "zod";
+import MyModal from "./my-modal";
+import CreateNewItemForm from "./create_new_items_form";
 
-const itemSchema = z.object({
-    name: z.string().min(1, "Item name is required"),
-    description: z.string().optional(),
-    price: z.number().min(1, "Price must be a positive number"),
-    imageUrl: z.string().optional(),
-    isAvailable: z.boolean(),
-    preparationTime: z.number().min(1, "Preparation time must be a positive number"),
-    categoryId: z.number(),
-    restaurantId: z.number()
-});
-
-export default function CreateItemForm({restaurant_id, category_id, onSuccess} : {restaurant_id: string, category_id: number, onSuccess: () => void}) {
-    const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        price: 0,
-        imageUrl: "",
-        isAvailable: true,
-        preparationTime: "",
-        categoryId: category_id,
-        restaurantId: restaurant_id
-    });
-    const [Errors, seterrors] = useState<Record<string, string>>({});
+export default function ShowItemForm({restaurant_id, category_id, onSuccess} : {restaurant_id: string, category_id: number, onSuccess: () => void}) {
     const [items, setItems] = useState<any[]>([]);
+    const [showCreateNewItemModal, setShowCreateNewItemModal] = useState(false);
 
-
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-        setFormData(prev => ({...prev, [e.target.name]: e.target.value}));
-        if(Errors[e.target.name]){
-            seterrors(prev => {
-                const newErrors = {...prev};
-                delete newErrors[e.target.name];
-                return newErrors;
-            });
-        }
+    function item_modal_close() {
+        setShowCreateNewItemModal(false);
     }
 
-
+    function item_modal_open() {
+        setShowCreateNewItemModal(true);
+    }
 
     async function fetchItems() {
         setItems([]);
@@ -85,10 +59,51 @@ export default function CreateItemForm({restaurant_id, category_id, onSuccess} :
         }
     }
 
+    async function toggleAvailability(itemId: number, currentStatus: boolean) {
+        try {
+            const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/items/${itemId}`;
+            await axios.put(RQ_URL, { isAvailable: !currentStatus });
+            setItems(prev => prev.map(item => 
+                item.itemId === itemId ? {...item, isAvailable: !currentStatus} : item
+            ));
+        } catch (error) {
+            console.error(error);
+            alert("Error updating item availability.");
+        }
+    }
+
+
+
 
     return (
         <>
-            <table className="w-full border-collapse border border-gray-300">
+            <MyModal
+                  title="Add New Item"
+                  open={showCreateNewItemModal}
+                  onClose={item_modal_close}
+                >
+                <CreateNewItemForm 
+                  restaurant_id={restaurant_id}
+                  category_id={category_id}
+                  onSuccess={() => {
+                    alert("Item created successfully!");
+                    fetchItems();
+                    item_modal_close();
+                  }}
+                />
+            </MyModal>
+
+
+
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all"
+                onClick={item_modal_open}
+            >
+                + Add New Item
+            </button>
+
+            <br></br><br></br>
+            {items.length > 0 ? 
+                <table className="w-full border-collapse border border-gray-300">
                 <thead>
                     <tr className="bg-gray-200">
                     <th className="border border-gray-300 p-2">Name</th>
@@ -104,7 +119,6 @@ export default function CreateItemForm({restaurant_id, category_id, onSuccess} :
                     </th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {items.map((item, index) => (
                     <tr key={index} className="text-center">
@@ -130,13 +144,20 @@ export default function CreateItemForm({restaurant_id, category_id, onSuccess} :
 
                         <td className="border border-gray-300 p-2">
                         {item.isAvailable ? "Yes" : "No"}
+                        <button className={`ml-2 px-2 py-1 rounded ${item.isAvailable ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"} text-white transition`}
+                            onClick={() => toggleAvailability(item.itemId, item.isAvailable)}
+                        ><ArrowLeftRight size={13} />
+                        
+                        </button>
                         </td>
 
                         <td className="border border-gray-300 p-1">
                         {item.preparationTime} min
                         </td>
                         <td className="border border-gray-300 p-1">
-                        <button className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600 transition">
+                        <button className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600 transition"
+                            // onClick={() => alert("Edit functionality coming soon!")}
+                        >
                             Edit
                         </button>
                         <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
@@ -149,6 +170,8 @@ export default function CreateItemForm({restaurant_id, category_id, onSuccess} :
                     ))}
                 </tbody>
                 </table>
+                :"No items in this category yet."
+            }
         </>
     );
 }

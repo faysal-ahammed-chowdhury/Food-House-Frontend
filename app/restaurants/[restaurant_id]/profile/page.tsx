@@ -344,6 +344,8 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
     }
   };
 
+  
+
   const validatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
