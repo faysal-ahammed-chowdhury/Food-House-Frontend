@@ -30,6 +30,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "app/admin/restaurants/[id]/menu/page.jsx"
-  ],
+, "components/customer/search-input.jsx"  ],
   "exclude": ["node_modules"]
 }
