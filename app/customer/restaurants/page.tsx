@@ -72,7 +72,7 @@ export default function RestaurantsPage() {
       <main className="max-w-6xl xl:mx-auto w-full px-8 py-10">
         <div className="flex justify-between items-start mb-10">
           <div>
-            <h1 className="text-[2.5rem] font-extrabold text-[#1a202c] mb-1">
+            <h1 className="text-[2.5rem] font-bold text-[#1a202c] mb-1">
               Restaurants
             </h1>
             <p className="text-gray-500 text-lg">
@@ -104,7 +104,7 @@ export default function RestaurantsPage() {
               d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
             ></path>
           </svg>
-          <h2 className="text-[1.5rem] font-extrabold text-[#1a202c]">
+          <h2 className="text-[1.5rem] font-bold text-[#1a202c]">
             All Restaurants
           </h2>
         </div>
