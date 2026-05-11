@@ -53,7 +53,7 @@ export default function SearchInput({ initialQuery = "", variant = "header" }) {
         placeholder="Search restaurants or items..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        onKeyDown={handleKeyDown}
+        onKeyUp={handleSearch}
         className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#f0146b] focus:border-transparent text-gray-700 bg-white shadow-sm"
       />
     </div>
