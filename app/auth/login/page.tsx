@@ -107,10 +107,11 @@ useEffect(() => {
       authContext?.fetchUser();
       setEmail("");
       setPassword("");
-    } catch (err) {
-      const messages = err.response?.data?.message;
+    } catch (err: unknown) {
+      const isAxiosError = axios.isAxiosError(err);
+      const messages = isAxiosError ? err.response?.data?.message : undefined;
 
-      console.log(err.response);
+      console.log(isAxiosError ? err.response : err);
 
       if (Array.isArray(messages)) {
         setErrors({ server: messages });

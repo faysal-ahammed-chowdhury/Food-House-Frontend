@@ -2,9 +2,6 @@
 
 import { useState, use, useEffect } from "react";
 import { boolean, set, z } from "zod";
-import Footer from "@/components/restaurants/footer";
-import Header from "@/components/restaurants/header";
-import Sidebar from "@/components/restaurants/sidebar";
 import { 
   Mail, Store, Info, 
   MapPin, CreditCard, Smartphone, Save, Lock, 
@@ -109,9 +106,10 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
      try {
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurants/${restaurant_id}`;
       const response = await axios.get(RQ_URL);
+      console.log(response.data.data);
       if(response.data.success){
         const jsonData = response.data.data;
-        
+
         setOnDB((prev) => ({
           ...prev,
           name: jsonData.user.name || "",
@@ -422,15 +420,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
         />
     </MyModal>
    
-
-    <Header key={JSON.stringify(OnDB)} restaurant_id={restaurant_id}/>
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">   
-      <div className="flex flex-1">
-        <aside className="w-64 hidden md:block bg-white border-r border-slate-200">
-          <Sidebar restaurant_id={restaurant_id} />
-        </aside>
-        
-        <main className="flex-1 p-8 md:p-12 overflow-y-auto">
+        <div className="bg-gray-50">
           <div className="max-w-4xl mx-auto">
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
               <div>
@@ -524,10 +514,7 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
               </section>
             </div>
           </div>
-        </main>
-      </div>
-      <Footer />
-    </div>
+        </div>
   </div>
   </>
   );
