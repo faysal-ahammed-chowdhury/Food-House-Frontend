@@ -4,6 +4,8 @@ import AuthContext from "@/contexts/auth/auth-context";
 import { UserRoles } from "@/enums/user-roles.enum";
 import axios from "axios";
 import { AlertCircle, Info, Lock, Mail } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import * as z from "zod";
@@ -31,47 +33,41 @@ export default function Login() {
   console.log(authContext);
 
   const getResturentID = async (UserID: number) => {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/restaurant/getRestaurantIdbyuserID/${UserID}`,
-        {
-          withCredentials: true,
-        },
-      );
-      return res.data.restaurantId;
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/restaurant/getRestaurantIdbyuserID/${UserID}`,
+      {
+        withCredentials: true,
+      },
+    );
+    return res.data.restaurantId;
   };
 
-useEffect(() => {
-  if (authContext?.isLoadingUser) return;
+  useEffect(() => {
+    if (authContext?.isLoadingUser) return;
 
-  const handleNavigation = async () => {
-    const { user } = authContext || {};
+    const handleNavigation = async () => {
+      const { user } = authContext || {};
 
-    if (!user) return;
+      if (!user) return;
 
-    if (user.role === UserRoles.CUSTOMER) {
-      router.push("/");
-    } 
-    else if (user.role === UserRoles.RESTAURANT) {
-      try {
-        // Await the ID before pushing the route
-        const restaurantID = await getResturentID(user.userId);
-        // console.log("Fetched Restaurant ID:", restaurantID);
-        router.push(`/restaurants/${restaurantID}/dashboard`);
-      } catch (error) {
-        console.error("Failed to fetch Restaurant ID:", error);
-        // Optional: redirect to an error page or login
+      if (user.role === UserRoles.CUSTOMER) {
+        router.push("/customer/dashboard");
+      } else if (user.role === UserRoles.RESTAURANT) {
+        try {
+          const restaurantID = await getResturentID(user.userId);
+          router.push(`/restaurants/${restaurantID}/dashboard`);
+        } catch (error) {
+          console.error("Failed to fetch Restaurant ID:", error);
+        }
+      } else if (user.role === UserRoles.RIDER) {
+        router.push("/rider");
+      } else if (user.role === UserRoles.ADMIN) {
+        router.push("/admin");
       }
-    } 
-    else if (user.role === UserRoles.RIDER) {
-      router.push("/rider");
-    } 
-    else if (user.role === UserRoles.ADMIN) {
-      router.push("/admin");
-    }
-  };
+    };
 
-  handleNavigation();
-}, [authContext, router]);
+    handleNavigation();
+  }, [authContext, router]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -124,8 +120,34 @@ useEffect(() => {
   };
 
   return (
-    <div className="flex">
-      <div className="w-[50%]"></div>
+    <div className="min-h-screen flex">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-pink-600 flex-col justify-center items-center px-12 text-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070')",
+          }}
+        ></div>
+        <div className="absolute inset-0 bg-[#e21b70] opacity-80 mix-blend-multiply"></div>
+
+        <div className="relative z-10 text-white mt-10">
+          <div className="flex justify-center">
+            <Image src="/logo.jpeg" height={10} width={180} alt="Logo" />
+          </div>
+          <h1 className="text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+            Start your food <br /> journey today.
+          </h1>
+          <p className="text-lg font-medium text-pink-50 max-w-md mx-auto">
+            Create an account and get access to exclusive deals, fast delivery,
+            and the best restaurants in your area.
+          </p>
+        </div>
+
+        <div className="absolute bottom-6 left-6 text-white text-sm font-semibold z-10">
+          © 2026 FOOD HOUSE
+        </div>
+      </div>
       <div className="w-[50%] bg-gray-100">
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
           <div className="w-full max-w-[440px] space-y-8">
@@ -224,12 +246,12 @@ useEffect(() => {
             <div className="text-center">
               <p className="text-[#718096] font-medium">
                 Don't have an account?{" "}
-                <a
-                  href="#"
+                <Link
+                  href="/auth/signup"
                   className="text-[#FF2D75] font-bold hover:underline"
                 >
                   Create one for free
-                </a>
+                </Link>
               </p>
             </div>
           </div>
