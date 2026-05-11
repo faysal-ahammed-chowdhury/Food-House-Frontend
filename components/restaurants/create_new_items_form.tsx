@@ -101,7 +101,10 @@ export default function CreateNewItemForm({restaurant_id, category_id, onSuccess
             seterrors(currentErrors);
             return;
         }
-        if(file===null){return;}
+        if(file===null){
+            seterrors(prev => ({...prev, myfile: "Image is required"}));
+            return;
+        }
         else{
             try {
                 const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/createItems`;
@@ -115,7 +118,6 @@ export default function CreateNewItemForm({restaurant_id, category_id, onSuccess
                     categoryId: category_id,
                     restaurantId: Number(restaurant_id)
                 });
-                console.log(response.data.itemId);
                 if(file){
                     const URL= `${process.env.NEXT_PUBLIC_API_URL}/restaurant/items/${response.data.itemId}`;
                     const formData = new FormData();

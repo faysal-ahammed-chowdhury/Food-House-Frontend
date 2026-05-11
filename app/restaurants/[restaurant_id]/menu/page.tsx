@@ -59,21 +59,15 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
   }, []);
 
   async function fetchCategories() {
+    setCategories([]);
     try {
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurantcategories/${restaurant_id}`;
-      const response = await axios.get(RQ_URL);
-      // console.log(response.data);       
+      const response = await axios.get(RQ_URL);      
       setCategories(response.data);
     } catch (error) {
       console.error(error);
     }
   }
-
-
-  // async function getCatagoryImage(categoryId: string) {
-    
-  // }
-
 
   async function deleteCategory(categoryId: string) {
     if (!confirm("Are you sure you want to delete this category? All the items in this category will also be deleted.")) {
@@ -94,10 +88,14 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
 
   return (
     <>
+    {/* Create Category Modal */}
     <MyModal
       title="Create New Category"
       open={showCreateCategoryModal}
-      onClose={category_modal_close}
+      onClose={() => {
+        fetchCategories();
+        category_modal_close();
+      }}
     >
     <CreateCategoryForm 
       restaurant_id={restaurant_id}
@@ -109,22 +107,7 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
     />
     </MyModal>
 
-    <MyModal
-      title={categories.find(cat => cat.categoryId === selectedCategoryId)?.name + " - Section"|| "Items"}
-      open={showCreateItemModal}
-      onClose={item_modal_close}
-    >
-    <ShowItemForm 
-      restaurant_id={restaurant_id}
-      category_id={selectedCategoryId}
-      onSuccess={() => {
-        alert("Item created successfully!");
-        fetchCategories();
-        item_modal_close();
-      }}
-    />
-    </MyModal>
-
+    {/* Edit Category Modal */}
     <MyModal
       title="Category Name Change"
       open={ShowEditCategoryModal}
@@ -142,8 +125,25 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
     />
     </MyModal>
 
-
-    
+    {/* Show Items Modal */}
+    <MyModal
+      title={categories.find(cat => cat.categoryId === selectedCategoryId)?.name + " - Section"|| "Items"}
+      open={showCreateItemModal}
+      onClose={() => {
+        fetchCategories();
+        item_modal_close();
+      }}
+    >
+    <ShowItemForm 
+      restaurant_id={restaurant_id}
+      category_id={selectedCategoryId}
+      onSuccess={() => {
+        alert("Item created successfully!");
+        fetchCategories();
+        item_modal_close();
+      }}
+    />
+    </MyModal>
 
 
     <div className="bg-white">
