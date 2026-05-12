@@ -12,7 +12,7 @@ export default function Sidebar({ rider_id }: { rider_id: string }) {
     { Link: `/riders/${rider_id}/requests`, label: "Requests", icon: Bike },
     { Link: `/riders/${rider_id}/deliveries/active`, label: "Active Deliveries", icon: Truck },
     { Link: `/riders/${rider_id}/deliveries/history`, label: "Delivery History", icon: FileText },
-    { Link: `/riders/${rider_id}/Finance`, label: "Finance", icon: DollarSign },
+    { Link: `/riders/${rider_id}/finance`, label: "Finance", icon: DollarSign },
     { Link: `/riders/${rider_id}/profile`, label: "Profile", icon: UserIcon },
   ];
 
