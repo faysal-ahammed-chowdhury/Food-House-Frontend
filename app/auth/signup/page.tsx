@@ -129,6 +129,8 @@ export default function RegisterPage() {
       setPassword("");
       setAddress("");
       setPhone("");
+
+      router.push("/auth/check_mail");
     } catch (error: any) {
       const messages = error.response?.data?.message;
 
