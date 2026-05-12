@@ -1,53 +1,56 @@
-"use client";
-import { Stats } from "@/types/admin/Stats";
+import { DashhboardStats } from "@/types/admin/DashhboardStats";
 import axios from "axios";
 import { Bike, DollarSign, ShoppingBag, UtensilsCrossed } from "lucide-react";
-import { useEffect, useState } from "react";
+import { cookies } from "next/headers";
 
-export default function DashboardStats() {
-  const [myStats, setMyStats] = useState<Stats | null>(null);
+const fetchStats = async (): Promise<DashhboardStats | null> => {
+  try {
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore
+      .getAll()
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
 
-  const fetchStats = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/stats`,
-        {
-          withCredentials: true,
-        },
-      );
-      setMyStats(res.data.data);
-    } catch {
-    } finally {
-    }
-  };
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/stats`,
+      {
+        headers: { Cookie: cookieHeader },
+        withCredentials: true,
+      },
+    );
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+    return response.data.data;
+  } catch {
+    return null;
+  }
+};
+
+export default async function DashboardStatsComponent() {
+  const myStats: DashhboardStats | null = await fetchStats();
 
   const statsInfo = [
     {
       label: "Platform Earnings",
-      value: myStats?.platformEarnings || "Null",
+      value: myStats?.platformEarnings ?? "Null",
       icon: <DollarSign className="h-6 w-6" />,
       currency: "৳",
       isHighlighted: true,
     },
     {
       label: "Total Orders",
-      value: myStats?.totalOrders || "Null",
+      value: myStats?.totalOrders ?? "Null",
       icon: <ShoppingBag className="h-6 w-6 text-[#FF2D75]" />,
       isHighlighted: false,
     },
     {
       label: "Restaurants",
-      value: myStats?.totalRestaurant || "Null",
+      value: myStats?.totalRestaurant ?? "Null",
       icon: <UtensilsCrossed className="h-6 w-6 text-[#FF2D75]" />,
       isHighlighted: false,
     },
     {
       label: "Riders",
-      value: myStats?.totalRider || "Null",
+      value: myStats?.totalRider ?? "Null",
       icon: <Bike className="h-6 w-6 text-[#FF2D75]" />,
       isHighlighted: false,
     },

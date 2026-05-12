@@ -132,7 +132,14 @@ export default async function HistoryOrders({
                   </span>
                 </td>
                 <td className="px-6 py-5 whitespace-nowrap text-center text-sm text-gray-500">
-                 {order.orderAt ? new Date(order.orderAt).toLocaleString() : "—"}
+                 {order.orderAt ? new Date(order.orderAt).toLocaleString("en-BD", 
+                 {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }) : "—"}
                 </td>
               </tr>
             ))}

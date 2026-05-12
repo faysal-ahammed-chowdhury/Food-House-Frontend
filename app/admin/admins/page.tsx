@@ -7,6 +7,7 @@ import TableHeader from "@/components/admin/table-header";
 import { Admin } from "@/types/admin/Admin";
 import axios from "axios";
 import { Plus, Search } from "lucide-react";
+import Pusher from "pusher-js";
 import { useEffect, useState } from "react";
 
 export default function AdminsPage() {
@@ -35,6 +36,18 @@ export default function AdminsPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    var pusher = new Pusher(process.env.NEXT_PUBLIC_FAYSAL_PUSHER_KEY || "", {
+      cluster: process.env.NEXT_PUBLIC_FAYSAL_PUSHER_CLUSTER || "",
+    });
+
+    var channel = pusher.subscribe("my-channel");
+    channel.bind("my-event", function (data) {
+      setAdmins(data.data.data);
+      console.log(data);
+    });
+  }, []);
 
   useEffect(() => {
     fetchAdmins();

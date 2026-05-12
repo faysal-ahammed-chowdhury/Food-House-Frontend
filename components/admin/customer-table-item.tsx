@@ -20,7 +20,7 @@ export default function CustomerTableItem({
 
     try {
       const res = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/customer/${customerId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/customers/${customerId}`,
         {
           withCredentials: true,
         },
