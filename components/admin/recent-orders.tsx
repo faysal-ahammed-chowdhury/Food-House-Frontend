@@ -33,7 +33,6 @@ export default function RecentOrders() {
       );
       setOrders(res.data.data);
     } catch {
-      alert("Something is wrong");
     } finally {
       setIsLoading(false);
     }
@@ -44,15 +43,15 @@ export default function RecentOrders() {
   }, []);
 
   return (
-    <div className="my-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <div className="flex justify-between px-6 py-5 bg-slate-50/50">
-          <h1 className="font-bold text-lg">Recent Orders</h1>
+        <div className="flex justify-between px-6 py-5 bg-pink-100">
+          <h1 className="font-bold text-lg text-pink-800">Recent Orders</h1>
           <Link
             className="text-pink-500 border-b border-pink-500 font-bold text-md m-0 p-0"
             href="/admin/orders"
           >
-            See all
+            View All
           </Link>
         </div>
         <table className="w-full text-left border-collapse">

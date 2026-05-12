@@ -1,4 +1,5 @@
 import DashboardStats from "@/components/admin/dashboard-stats";
+import OrderStatusDistribution from "@/components/admin/order-status-count-chart";
 import RecentOrders from "@/components/admin/recent-orders";
 
 export default function Dashboard() {
@@ -12,8 +13,9 @@ export default function Dashboard() {
       </div>
       <div>
         <DashboardStats />
-        <div className="mt-10 grid grid-cols-2 gap-10">
+        <div className="mt-20 grid grid-cols-2 gap-10">
           <RecentOrders />
+          <OrderStatusDistribution />
         </div>
       </div>
     </div>
