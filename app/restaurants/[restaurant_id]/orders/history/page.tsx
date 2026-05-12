@@ -1,5 +1,4 @@
 import { OrderStatus } from "@/enums/order-status";
-import { UserRoles } from "@/enums/user-roles.enum";
 import { cookies } from "next/headers";
 import axios from "axios";
 import HistoryFilterButtons from "@/components/restaurants/history_filter_button";
@@ -21,6 +20,7 @@ type OrderHistoryEntry = {
   discountAmount: number;
   riderName: string;
   status: string;
+  orderAt: string;
 };
 
 type FilterStatus = "ALL" | OrderStatus.DELIVERED | OrderStatus.CANCELLED;
@@ -31,7 +31,7 @@ async function fetchOrderHistory(restaurant_id: string): Promise<OrderHistoryEnt
     const cookieHeader = cookieStore.getAll()
       .map((c) => `${c.name}=${c.value}`)
       .join("; ");
-
+      
     const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/history/${restaurant_id}`;
     const response = await axios.get(RQ_URL, {
       headers: { Cookie: cookieHeader },
@@ -88,6 +88,7 @@ export default async function HistoryOrders({
               <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Discount</th>
               <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Net Total</th>
               <th className="px-6 py-4 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b">Status</th>
+              <th className="px-6 py-4 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b">Time</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -130,11 +131,13 @@ export default async function HistoryOrders({
                     {order.status}
                   </span>
                 </td>
+                <td className="px-6 py-5 whitespace-nowrap text-center text-sm text-gray-500">
+                 {order.orderAt ? new Date(order.orderAt).toLocaleString() : "—"}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
-
         {filteredOrders.length === 0 && (
           <div className="p-20 text-center text-gray-400 font-medium">
             No {filter.toLowerCase()} orders found.
