@@ -1,62 +1,81 @@
 "use client";
 
 import SearchInput from "@/components/customer/search-input";
+import Link from "next/link";
 
 export default function RestaurantsClient() {
   const restaurants = [
     {
-      id: 1,
+      restaurantId: 1,
       name: "Burger Joint",
       image:
         "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=500&auto=format&fit=crop",
       rating: "4.8",
       time: "20-30 min",
       tags: "Burgers • American • Fast Food",
+      address: "101 Main St, Food City",
+      isOpen: true,
+      currentDeliveryFee: 45,
     },
     {
-      id: 2,
+      restaurantId: 2,
       name: "Pizza Paradise",
       image:
         "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=500&auto=format&fit=crop",
       rating: "4.5",
       time: "30-45 min",
       tags: "Pizza • Italian • Comfort",
+      address: "202 Cheese Blvd, Food City",
+      isOpen: true,
+      currentDeliveryFee: 60,
     },
     {
-      id: 3,
+      restaurantId: 3,
       name: "Sushi Zen",
       image:
         "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=500&auto=format&fit=crop",
       rating: "4.9",
       time: "25-40 min",
       tags: "Sushi • Japanese • Seafood",
+      address: "303 Ocean Ave, Food City",
+      isOpen: true,
+      currentDeliveryFee: 80,
     },
     {
-      id: 4,
+      restaurantId: 4,
       name: "Sweet Tooth Desserts",
       image:
         "https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=500&auto=format&fit=crop",
       rating: "4.7",
       time: "15-25 min",
       tags: "Desserts • Bakery • Sweets",
+      address: "404 Sugar Lane, Food City",
+      isOpen: false,
+      currentDeliveryFee: 30,
     },
     {
-      id: 5,
+      restaurantId: 5,
       name: "Taco Fiesta",
       image:
         "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=500&auto=format&fit=crop",
       rating: "4.6",
       time: "20-35 min",
       tags: "Mexican • Tacos • Spicy",
+      address: "505 Spice Rd, Food City",
+      isOpen: true,
+      currentDeliveryFee: 50,
     },
     {
-      id: 6,
+      restaurantId: 6,
       name: "Green Bowl Salads",
       image:
         "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=500&auto=format&fit=crop",
       rating: "4.4",
       time: "15-30 min",
       tags: "Healthy • Vegan • Salads",
+      address: "606 Leafy Way, Food City",
+      isOpen: true,
+      currentDeliveryFee: 40,
     },
   ];
 
@@ -72,11 +91,9 @@ export default function RestaurantsClient() {
           </p>
         </div>
 
-        {/* SearchInput stays here because it's part of the main interactive UI */}
         <SearchInput variant="restaurants" />
       </div>
 
-      {/* Section Title */}
       <div className="flex items-center gap-3 mb-6">
         <svg
           className="w-6 h-6 text-[#f0146b]"
@@ -102,29 +119,39 @@ export default function RestaurantsClient() {
         </h2>
       </div>
 
-      {/* Restaurant Grid */}
       <div className="grid grid-cols-3 gap-8">
         {restaurants.map((restaurant) => (
-          <div
-            key={restaurant.id}
-            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer group"
+          <Link
+            href={`/customer/restaurants/${restaurant.restaurantId}`}
+            key={restaurant.restaurantId}
+            className={`bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 transition-shadow group ${"hover:shadow-md cursor-pointer"}`}
+            onClick={(e) => {
+              if (!restaurant.isOpen) e.preventDefault();
+            }}
           >
-            {/* Restaurant Image */}
             <div className="relative h-48 overflow-hidden">
               <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
+                className={`absolute inset-0 bg-cover bg-center transition-transform duration-300 ${
+                  restaurant.isOpen ? "group-hover:scale-105" : "blur-[2px]"
+                }`}
                 style={{ backgroundImage: `url(${restaurant.image})` }}
               ></div>
+
+              {!restaurant.isOpen && (
+                <div className="absolute inset-0  flex items-center justify-center">
+                  <span className="bg-red-600 text-white font-bold px-6 py-2 rounded-full uppercase tracking-wider text-sm ">
+                    Closed
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Restaurant Details */}
             <div className="p-5">
               <h3 className="text-xl font-bold text-gray-900 mb-1">
                 {restaurant.name}
               </h3>
               <p className="text-gray-500 text-sm mb-4">{restaurant.tags}</p>
 
-              {/* Bottom Row: Rating and Time */}
               <div className="flex items-center justify-between border-t border-gray-100 pt-4">
                 <div className="flex items-center gap-1 text-sm font-bold text-gray-700">
                   <svg
@@ -136,25 +163,33 @@ export default function RestaurantsClient() {
                   </svg>
                   {restaurant.rating}
                 </div>
-                <div className="flex items-center gap-1 text-sm font-medium text-gray-500">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                  {restaurant.time}
+
+                <div className="flex items-center gap-4 text-sm font-medium text-gray-500">
+                  <div className="flex items-center gap-1">
+                    <span className="font-bold">
+                      ৳{restaurant.currentDeliveryFee}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    {restaurant.time}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </>

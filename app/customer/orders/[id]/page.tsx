@@ -1,11 +1,14 @@
 import Navbar from "@/components/customer/navbar";
-import ProfileClient from "@/components/customer/profile-client";
+import OrderDetailsClient from "@/components/customer/order-details-client";
 
 export const metadata = {
-  title: "My Profile | FoodHouse",
+  title: "Order Details | FoodHouse",
 };
 
-export default function ProfilePage() {
+export default async function OrderDetailsPage({ params }: any) {
+  const resolvedParams = await params;
+  const orderId = resolvedParams.id;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b border-gray-100">
@@ -15,7 +18,7 @@ export default function ProfilePage() {
       </div>
 
       <main className="max-w-6xl xl:mx-auto w-full px-8 py-10">
-        <ProfileClient />
+        <OrderDetailsClient orderId={orderId} />
       </main>
     </div>
   );

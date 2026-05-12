@@ -1,11 +1,14 @@
 import Navbar from "@/components/customer/navbar";
-import ProfileClient from "@/components/customer/profile-client";
+import CheckoutClient from "@/components/customer/checkout-client";
 
 export const metadata = {
-  title: "My Profile | FoodHouse",
+  title: "Checkout | FoodHouse",
 };
 
-export default function ProfilePage() {
+export default async function CheckoutPage({ searchParams }: any) {
+  const resolvedParams = await searchParams;
+  const restaurantId = resolvedParams.restaurantId || "";
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b border-gray-100">
@@ -15,7 +18,7 @@ export default function ProfilePage() {
       </div>
 
       <main className="max-w-6xl xl:mx-auto w-full px-8 py-10">
-        <ProfileClient />
+        <CheckoutClient restaurantId={restaurantId} />
       </main>
     </div>
   );

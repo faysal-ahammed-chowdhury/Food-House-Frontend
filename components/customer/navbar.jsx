@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 const Navbar = () => {
   const pathname = usePathname();
 
-  // Helper function to figure out if a link is active
   const isActive = (path) => {
     return pathname === path
       ? "text-[#f0146b] font-bold" // Active style (Pink and bold)

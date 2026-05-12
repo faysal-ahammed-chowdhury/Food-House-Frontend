@@ -1,58 +1,78 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
+
 export default function OrdersClient() {
-  // 1. Dummy Data for Active Orders (Currently happening)
-  const activeOrders = [
+  const [activeOrders, setActiveOrders] = useState([
     {
-      id: "#ORD-9021",
+      orderId: "ORD-CVGR3ORFR",
+      restaurant: "Chillox",
+      items: "7x French Fries",
+      total: 885,
+      status: "PENDING",
+      maxPrepTime: 10,
+      orderAt: "2026-05-12T09:05:59Z",
+    },
+    {
+      orderId: "ORD-9021",
       restaurant: "Burger Joint",
       items: "2x Double Cheeseburger, 1x Large Fries, 2x Cola",
-      total: "$32.50",
-      status: "Preparing",
-      estimatedTime: "15-20 min",
-      date: "May 11, 2026",
+      total: 850,
+      status: "PREPARING",
+      maxPrepTime: 15,
+      orderAt: "2026-05-12T10:15:00Z",
     },
-  ];
+  ]);
 
-  // 2. Dummy Data for Past Orders (Order History)
   const pastOrders = [
     {
-      id: "#ORD-8834",
+      orderId: "ORD-8834",
       restaurant: "Pizza Paradise",
       items: "1x Large Pepperoni Pizza, 1x Garlic Bread",
-      total: "$28.00",
-      status: "Delivered",
-      date: "May 9, 2026",
+      total: 450,
+      status: "DELIVERED",
+      orderAt: "2026-05-09T14:30:00Z",
     },
     {
-      id: "#ORD-8712",
-      restaurant: "Sushi Zen",
-      items: "1x Spicy Tuna Roll, 1x Salmon Sashimi, 1x Miso Soup",
-      total: "$42.00",
-      status: "Delivered",
-      date: "May 5, 2026",
-    },
-    {
-      id: "#ORD-8501",
+      orderId: "ORD-8501",
       restaurant: "Taco Fiesta",
       items: "3x Beef Tacos, 1x Nachos Supreme",
-      total: "$21.50",
-      status: "Cancelled",
-      date: "April 28, 2026",
+      total: 320,
+      status: "CANCELLED",
+      orderAt: "2026-04-28T18:45:00Z",
     },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Preparing":
+      case "PENDING":
+        return "bg-yellow-50 text-orange-500 border-yellow-200";
+      case "ACCEPTED":
+        return "bg-indigo-50 text-indigo-600 border-indigo-200";
+      case "RIDER_ASSIGNED":
+        return "bg-teal-50 text-teal-600 border-teal-200";
+      case "PREPARING":
         return "bg-yellow-50 text-yellow-600 border-yellow-200";
-      case "Delivered":
+      case "READY":
+        return "bg-orange-50 text-orange-600 border-orange-200";
+      case "PICKED":
+        return "bg-blue-50 text-blue-600 border-blue-200";
+      case "DELIVERED":
         return "bg-green-50 text-green-600 border-green-200";
-      case "Cancelled":
+      case "CANCELLED":
         return "bg-red-50 text-red-600 border-red-200";
       default:
         return "bg-gray-50 text-gray-600 border-gray-200";
     }
+  };
+
+  const handleCancelOrder = (orderId: string) => {
+    setActiveOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.orderId === orderId ? { ...order, status: "CANCELLED" } : order,
+      ),
+    );
   };
 
   return (
@@ -69,8 +89,8 @@ export default function OrdersClient() {
         <div className="flex flex-col gap-4">
           {activeOrders.map((order) => (
             <div
-              key={order.id}
-              className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex justify-between items-center"
+              key={order.orderId}
+              className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row justify-between md:items-center gap-4"
             >
               <div>
                 <div className="flex items-center gap-3 mb-2">
@@ -84,18 +104,35 @@ export default function OrdersClient() {
                   </span>
                 </div>
                 <p className="text-gray-500 text-sm mb-1">
-                  Order {order.id} • {order.date}
+                  Order #{order.orderId} •{" "}
+                  {new Date(order.orderAt).toLocaleDateString()}
                 </p>
                 <p className="text-gray-700 font-medium">{order.items}</p>
               </div>
 
-              <div className="text-right">
+              <div className="text-left md:text-right flex flex-col md:items-end">
                 <p className="text-2xl font-extrabold text-gray-900 mb-1">
-                  {order.total}
+                  ৳{order.total}
                 </p>
-                <p className="text-[#f0146b] font-semibold text-sm">
-                  Arriving in {order.estimatedTime}
+                <p className="text-[#f0146b] font-semibold text-sm mb-3">
+                  Estimated Delivery: {order.maxPrepTime + 15} mins
                 </p>
+
+                <div className="flex gap-2">
+                  {order.status === "PENDING" && (
+                    <button
+                      onClick={() => handleCancelOrder(order.orderId)}
+                      className="border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+                    >
+                      Cancel Order
+                    </button>
+                  )}
+                  <Link href={`/customer/orders/${order.orderId}`}>
+                    <button className="border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 px-4 py-2 rounded-lg text-sm font-bold transition-colors">
+                      View Details
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
           ))}
@@ -116,7 +153,7 @@ export default function OrdersClient() {
         <div className="flex flex-col gap-4">
           {pastOrders.map((order) => (
             <div
-              key={order.id}
+              key={order.orderId}
               className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
             >
               <div>
@@ -131,31 +168,16 @@ export default function OrdersClient() {
                   </span>
                 </div>
                 <p className="text-gray-500 text-sm mb-1">
-                  Order {order.id} • {order.date}
+                  Order #{order.orderId} •{" "}
+                  {new Date(order.orderAt).toLocaleDateString()}
                 </p>
                 <p className="text-gray-600 text-sm">{order.items}</p>
               </div>
 
               <div className="text-right flex flex-col items-end gap-3">
                 <p className="text-xl font-extrabold text-gray-900">
-                  {order.total}
+                  ৳{order.total}
                 </p>
-                <button className="text-[#f0146b] font-bold text-sm hover:underline flex items-center gap-1">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    ></path>
-                  </svg>
-                  Reorder
-                </button>
               </div>
             </div>
           ))}
