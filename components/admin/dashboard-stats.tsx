@@ -17,7 +17,6 @@ export default function DashboardStats() {
       );
       setMyStats(res.data.data);
     } catch {
-      alert("Something is wrong");
     } finally {
     }
   };
