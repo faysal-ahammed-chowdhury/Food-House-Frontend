@@ -133,10 +133,10 @@ export default function Login() {
 
         <div className="relative z-10 text-white mt-10">
           <div className="flex justify-center">
-            <Image src="/logo.jpeg" height={10} width={180} alt="Logo" />
+            <Image src="/logo_white.png" height={10} width={220} alt="Logo" />
           </div>
           <h1 className="text-5xl font-extrabold tracking-tight mb-4 leading-tight">
-            Start your food <br /> journey today.
+            Delicious food, <br /> delivered to your <br /> doorstep.
           </h1>
           <p className="text-lg font-medium text-pink-50 max-w-md mx-auto">
             Create an account and get access to exclusive deals, fast delivery,

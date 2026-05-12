@@ -1,9 +1,8 @@
-"use client";
 import { OrderStatus } from "@/enums/order-status";
 import { Order } from "@/types/admin/Order";
 import axios from "axios";
+import { cookies } from "next/headers";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import TableHeader from "./table-header";
 
 const statusStyles: Record<OrderStatus, string> = {
@@ -18,29 +17,29 @@ const statusStyles: Record<OrderStatus, string> = {
   [OrderStatus.CANCELLED]: "bg-rose-100 text-rose-700 border-rose-200",
 };
 
-export default function RecentOrders() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+const fetchOrders = async (): Promise<Order[]> => {
+  try {
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore
+      .getAll()
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
 
-  const fetchOrders = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/orders/recent`,
-        {
-          withCredentials: true,
-        },
-      );
-      setOrders(res.data.data);
-    } catch {
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/orders/recent`,
+      {
+        headers: { Cookie: cookieHeader },
+        withCredentials: true,
+      },
+    );
+    return res.data.data;
+  } catch {
+    return [];
+  }
+};
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+export default async function RecentOrders() {
+  const orders = await fetchOrders();
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
@@ -71,15 +70,7 @@ export default function RecentOrders() {
           </thead>
 
           <tbody className="divide-y divide-gray-50 text-center">
-            {isLoading ? (
-              <tr>
-                <td colSpan={20}>
-                  <p className="text-center py-10 text-lg text-gray-400">
-                    Loading...
-                  </p>
-                </td>
-              </tr>
-            ) : orders.length > 0 ? (
+            {orders.length > 0 ? (
               orders.map((order: Order) => (
                 <tr key={order.orderId}>
                   <td className="px-6 py-5">
