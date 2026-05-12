@@ -3,8 +3,24 @@ import Image from "next/image";
 import { LogOut, User } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+import AuthContext from "@/contexts/auth/auth-context";
+import { UserRoles } from "@/enums/user-roles.enum";
 
-export default function Header({ restaurant_id, name }: { restaurant_id: string; name: string }) {
+export default function Header({ restaurant_id}: { restaurant_id: string}) {
+  const [displayName, setDisplayName] = useState("");
+  const authContext = useContext(AuthContext);
+  useEffect(() => {
+    getName();
+  }, [getName]);
+  async function getName() {
+    if(authContext?.isLoadingUser) return;
+    const user = authContext?.user;
+    if(!user) return;
+    if(user.role !== UserRoles.RESTAURANT) return;
+    setDisplayName(user.name);
+  }
+  
   const router = useRouter();
   const handleLogout = async (e: any) => {
     e.preventDefault();
@@ -17,7 +33,6 @@ export default function Header({ restaurant_id, name }: { restaurant_id: string;
         },
       );
       router.push("/");
-      
     } catch {}
   };
   
@@ -33,7 +48,7 @@ export default function Header({ restaurant_id, name }: { restaurant_id: string;
           className="text-gray-600 flex items-center font-medium hover:text-pink-500 transition"
         >
           <User size={18} />
-          <p className="ml-2">{name}</p>
+          <p className="ml-2">{displayName}</p>
         </Link>
 
         <button onClick={handleLogout} className="cursor-pointer ml-8">

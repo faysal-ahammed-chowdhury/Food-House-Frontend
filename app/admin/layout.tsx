@@ -18,15 +18,14 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (authContext?.isLoadingUser) return;
-
     if (!authContext?.user) {
       router.push("/auth/login");
       return;
     }
     if (authContext.user.role === UserRoles.CUSTOMER) {
-      router.push("/");
+      router.push("/customer/dashboard");
     } else if (authContext.user.role === UserRoles.RESTAURANT) {
-      router.push('/restaurant/' + authContext.user.userId+'/dashboard');
+      router.push("/auth/login");
     } else if (authContext.user.role === UserRoles.RIDER) {
       router.push("/rider");
     }
@@ -34,15 +33,13 @@ export default function AdminLayout({
 
   const handleLogout = async (e: any) => {
     e.preventDefault();
-
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,{},
         {
           withCredentials: true,
         },
       );
-
       router.push("/");
     } catch {}
   };

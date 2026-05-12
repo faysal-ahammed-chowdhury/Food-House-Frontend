@@ -23,7 +23,6 @@ export default function Sidebar({ restaurant_id }: { restaurant_id: string }) {
       <nav className="flex flex-col gap-1">
         {navLinks.map((link) => {
           const active = pathname === link.Link;
-
           return (
             <Link
               key={link.Link}

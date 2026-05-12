@@ -67,7 +67,7 @@ export default function CreateVoucherForm({restaurant_id, onSuccess} : {restaura
         else{
             try {
                 const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/voucher`;
-                const response = await axios.post(RQ_URL, parsedData.data);
+                const response = await axios.post(RQ_URL, parsedData.data, {withCredentials: true});
                 if(response.status === 201){
                     seterrors({});
                     setFormData({
@@ -98,21 +98,22 @@ export default function CreateVoucherForm({restaurant_id, onSuccess} : {restaura
 
     return (
         <>  
-            <FormField label="Expires At" type="datetime-local" name="expiresAt"  value={formData.expiresAt} onChange={handleChange} error={Errors.expiresAt}
-                onFocus={(e: { target: { showPicker: () => any; }; }) => e.target.showPicker()} /> <br></br>
-            <FormField label="Voucher Code" type="text" name="voucherCode"  value={formData.voucherCode} onChange={handleChange} error={Errors.voucherCode} /><br></br>
-            <FormField label="Discount Percentage" type="number" name="percent" value={formData.percent} onChange={handleChange} error={Errors.percent} /><br></br>
-            <FormField label="Max Discount" type="number" name="maxDiscount" value={formData.maxDiscount} onChange={handleChange} error={Errors.maxDiscount} /><br></br>
-            <FormField label="Min Order Amount" type="number" name="minOrderAmount" value={formData.minOrderAmount} onChange={handleChange} error={Errors.minOrderAmount} />
-            
-                <br></br> 
-                <button className="w-full mx-auto block align-middle text-white text-align-center px-6 py-3 rounded-xl font-bold items-center transition-all active:scale-95 shadow-lg bg-pink-600 hover:bg-pink-700"
-                    onClick={validateAndSubmit}
-                >
-                    Create Voucher
-                </button>
+            <div className="max-w-2xl">
+                <FormField label="Expires At" type="datetime-local" name="expiresAt"  value={formData.expiresAt} onChange={handleChange} error={Errors.expiresAt}
+                    onFocus={(e: { target: { showPicker: () => any; }; }) => e.target.showPicker()} /> <br></br>
+                <FormField label="Voucher Code" type="text" name="voucherCode"  value={formData.voucherCode} onChange={handleChange} error={Errors.voucherCode} /><br></br>
+                <FormField label="Discount Percentage" type="number" name="percent" value={formData.percent} onChange={handleChange} error={Errors.percent} /><br></br>
+                <FormField label="Max Discount" type="number" name="maxDiscount" value={formData.maxDiscount} onChange={handleChange} error={Errors.maxDiscount} /><br></br>
+                <FormField label="Min Order Amount" type="number" name="minOrderAmount" value={formData.minOrderAmount} onChange={handleChange} error={Errors.minOrderAmount} />
+                
+                    <br></br> 
+                    <button className="w-full mx-auto block align-middle text-white text-align-center px-6 py-3 rounded-xl font-bold items-center transition-all active:scale-95 shadow-lg bg-pink-600 hover:bg-pink-700"
+                        onClick={validateAndSubmit}
+                    >
+                        Create Voucher
+                    </button>
 
-
+            </div>
         </>
     )
 }
