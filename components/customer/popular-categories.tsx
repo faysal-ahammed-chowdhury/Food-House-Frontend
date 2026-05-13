@@ -14,25 +14,15 @@ const PopularCategories = () => {
       
       <div className="grid grid-cols-4 gap-6">
         {categories.map((category, index) => (
-          <Link 
-            key={index} 
-            href={`/customer/search?query=${category.name.toLowerCase()}`}
-            className="relative h-48 rounded-2xl overflow-hidden cursor-pointer group shadow-sm block"
-          >
+          <Link key={index} href={`/customer/search?query=${category.name.toLowerCase()}`}className="relative h-48 rounded-2xl overflow-hidden cursor-pointer group shadow-sm block">
             {/* Image Background */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
-              style={{ backgroundImage: `url(${category.image})` }}
-            ></div>
-            
+            <div className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105" style={{ backgroundImage: `url(${category.image})` }}></div>
             {/* Dark gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/10 to-transparent"></div>
             
             {/* Centered Text */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-white text-2xl font-bold tracking-wide drop-shadow-lg">
-                {category.name}
-              </span>
+              <span className="text-white text-2xl font-bold tracking-wide drop-shadow-lg">{category.name}</span>
             </div>
           </Link>
         ))}
