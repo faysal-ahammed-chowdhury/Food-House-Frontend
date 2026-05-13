@@ -1,8 +1,5 @@
-"use client";
-
 import SearchInput from "@/components/customer/search-input";
 
-// We define that this component expects to receive the 'query' from the server
 export default function SearchClient({ query }: { query: string }) {
   return (
     <>
