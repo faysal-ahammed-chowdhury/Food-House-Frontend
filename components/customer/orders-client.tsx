@@ -4,13 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import axios from "axios"; 
 
-export default function OrdersClient({ 
-  initialActiveOrders, 
-  initialPastOrders 
-}: { 
-  initialActiveOrders: any[]; 
-  initialPastOrders: any[]; 
-}) {
+export default function OrdersClient(
+  { initialActiveOrders, initialPastOrders }: { initialActiveOrders: any[]; initialPastOrders: any[]; }) {
   
   const [activeOrders, setActiveOrders] = useState(initialActiveOrders);
   const pastOrders = initialPastOrders;
