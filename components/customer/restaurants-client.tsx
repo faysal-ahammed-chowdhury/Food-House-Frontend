@@ -7,35 +7,16 @@ export default function RestaurantsClient({ restaurants }: { restaurants: any[] 
     <>
       <div className="flex justify-between items-start mb-10">
         <div>
-          <h1 className="text-[2.5rem] font-bold text-[#1a202c] mb-1">
-            Restaurants
-          </h1>
-          <p className="text-gray-500 text-lg">
-            Find your favorite meals nearby
-          </p>
+          <h1 className="text-[2.5rem] font-bold text-[#1a202c] mb-1"> Restaurants </h1>
+          <p className="text-gray-500 text-lg"> Find your favorite meals nearby</p>
         </div>
         <SearchInput variant="restaurants" />
       </div>
 
       <div className="flex items-center gap-3 mb-6">
-        <svg
-          className="w-6 h-6 text-[#f0146b]"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-          ></path>
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-          ></path>
+        <svg className="w-6 h-6 text-[#f0146b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
         </svg>
         <h2 className="text-[1.5rem] font-bold text-[#1a202c]">
           All Restaurants
