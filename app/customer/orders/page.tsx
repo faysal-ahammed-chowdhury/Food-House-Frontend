@@ -12,7 +12,7 @@ export default async function OrdersPage() {
 
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const response = await axios.get(`${API_URL}/customers/48/orders`);
+    const response = await axios.get(`${API_URL}/customers/47/orders`);
     
     activeOrders = response.data.activeOrders || [];
     pastOrders = response.data.pastOrders || [];
