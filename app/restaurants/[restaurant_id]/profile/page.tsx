@@ -160,7 +160,6 @@ export default function Profile({ params }: { params: Promise<{ restaurant_id: s
       const response = await axios.patch(URL,{withCredentials: true});
     }
     catch(error){
-      // console.error(error);
       alert("Failed to update shop status. Please try again.");
     }
   }
