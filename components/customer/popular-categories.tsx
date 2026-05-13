@@ -16,7 +16,9 @@ const PopularCategories = () => {
         {categories.map((category, index) => (
           <Link key={index} href={`/customer/search?query=${category.name.toLowerCase()}`}className="relative h-48 rounded-2xl overflow-hidden cursor-pointer group shadow-sm block">
             {/* Image Background */}
-            <div className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105" style={{ backgroundImage: `url(${category.image})` }}></div>
+            <div className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105" 
+            style={{ backgroundImage: `url(${category.image})` }}
+            ></div>
             {/* Dark gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/10 to-transparent"></div>
             
