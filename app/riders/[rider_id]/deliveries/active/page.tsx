@@ -1,8 +1,5 @@
 "use client";
 
-import Header from "@/components/riders/header";
-import Sidebar from "@/components/riders/sidebar";
-import Footer from "@/components/riders/footer";
 import { ShoppingBag, MapPin, Phone, ChevronRight } from "lucide-react";
 import { use, useState } from "react";
 
@@ -28,11 +25,11 @@ export default function ActiveDeliveries({ params }: { params: Promise<{ rider_i
   const [deliveries, setDeliveries] = useState<ActiveDelivery[]>(DUMMY_ACTIVE_DELIVERIES);
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      <Header rider_id={rider_id} />
+    
+      
 
       <div className="flex flex-1">
-        <Sidebar rider_id={rider_id} />
+        
 
         <main className="flex-1 p-6 md:p-10">
           <div className="max-w-6xl mx-auto">
@@ -90,7 +87,7 @@ export default function ActiveDeliveries({ params }: { params: Promise<{ rider_i
           </div>
         </main>
       </div>
-      <Footer />
-    </div>
+     
+    
   );
 }

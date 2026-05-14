@@ -1,13 +1,10 @@
 "use client";
 
-import Header from "@/components/riders/header";
-import Sidebar from "@/components/riders/sidebar";
-import Footer from "@/components/riders/footer";
 import Statcard from "@/components/riders/statcard";
 import axios from "axios";
-import { use, useState, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 
-export default function Dashboard({ params }: { params: Promise<{ rider_id: string }> }) {
+export default function RiderDashboardPage({params}: {params: Promise<{rider_id: string}>}) {
   const { rider_id } = use(params);
   const [dashboard, setDashboard] = useState({
     activeDeliveries: 0,
@@ -15,11 +12,31 @@ export default function Dashboard({ params }: { params: Promise<{ rider_id: stri
     todaysEarnings: 0,
     completedOrders: 0,
   });
-  const [isOnline, setIsOnline] = useState(false);
+  
+   const [isOnline, setIsOnline] = useState(false);
+
+   async function fetchStatus() {
+  try {
+
+    console.log("Fetching status for rider ID:", rider_id);
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`
+    );
+    if (response.status === 200) {
+      setIsOnline(response.data.data.isOnline);
+    }
+  } catch (error) {
+    console.error("Error fetching rider status:", error);
+  }
+}
+
+useEffect(() => {
+  fetchStatus();
+}, []);
 
   useEffect(() => {
     fetchDashboard();
-  }, []);
+  }, [rider_id]);
 
   async function fetchDashboard() {
     try {
@@ -33,32 +50,21 @@ export default function Dashboard({ params }: { params: Promise<{ rider_id: stri
           todaysEarnings: data.todaysEarnings,
           completedOrders: data.completedOrders,
         });
-        setIsOnline(data.isOnline);
       }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     }
-  }
+  } 
 
-  const toggleStatus = async () => {
-    try {
-      const newStatus = !isOnline;
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`, {
-        isOnline: newStatus,
-      });
-      setIsOnline(newStatus);
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
+  return(
+    <>
 
-  return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       {/* Header with toggle functionality */}
-      <Header rider_id={rider_id} isOnline={isOnline} toggleStatus={toggleStatus} />
+      {/*<Header rider_id={rider_id} isOnline={isOnline} toggleStatus={toggleStatus} />*/}
 
       <div className="flex flex-1">
-        <Sidebar rider_id={rider_id} />
+        {/*<Sidebar rider_id={rider_id} />*/}
 
         <main className="flex-1 p-6 md:p-10">
           <div className="max-w-7xl mx-auto">
@@ -71,16 +77,21 @@ export default function Dashboard({ params }: { params: Promise<{ rider_id: stri
               </div>
               <div className="flex items-center gap-3 mt-4 md:mt-0">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">STATUS:</span>
-                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider ${isOnline ? 'bg-green-100 text-green-600' : 'bg-pink-100 text-pink-600'}`}>
-                  {isOnline ? 'Online' : 'Offline'}
-                </span>
+                <span
+              className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                isOnline ? "bg-green-100 text-green-600" : "bg-pink-100 text-pink-600"
+              }`}>
+              {isOnline ? "Online" : "Offline"}
+            </span>
               </div>
             </header>
 
             {/* Stats Cards Grid (Matches Screenshot 2026-05-13 145846.png) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               <Statcard value={dashboard.activeDeliveries.toString()} label="ACTIVE DELIVERIES" />
-              <Statcard value={dashboard.availableRequests.toString()} label="AVAILABLE REQUESTS" />
+              <Statcard value={
+                isOnline ? dashboard.availableRequests.toString() : "0"
+              } label="AVAILABLE REQUESTS" />
               <Statcard value={`৳ ${dashboard.todaysEarnings}`} label="TODAY'S EARNINGS" />
               <Statcard value={dashboard.completedOrders.toString()} label="COMPLETED ORDERS" />
             </div>
@@ -89,9 +100,11 @@ export default function Dashboard({ params }: { params: Promise<{ rider_id: stri
         </main>
       </div>
 
-      <Footer />
+      {/*<Footer />*/}
     </div>
-  );
+    
+    
+    </>
+  )
+
 }
-
-

@@ -42,6 +42,17 @@ export default function Login() {
     return res.data.restaurantId;
   };
 
+  const getRIDERID = async (UserID: number) => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/rider/rider-id/${UserID}`,
+      {
+        withCredentials: true,
+      },
+    );
+    return res.data;
+  };
+
+
   useEffect(() => {
     if (authContext?.isLoadingUser) return;
 
@@ -60,7 +71,13 @@ export default function Login() {
           console.error("Failed to fetch Restaurant ID:", error);
         }
       } else if (user.role === UserRoles.RIDER) {
-        router.push("/rider");
+        try {
+          const RIDERID = await getRIDERID(user.userId);
+          router.push(`/riders/${RIDERID}/dashboard`);
+        } catch (error) {
+          console.error("Failed to fetch Rider ID:", error);
+        }
+        
       } else if (user.role === UserRoles.ADMIN) {
         router.push("/admin");
       }

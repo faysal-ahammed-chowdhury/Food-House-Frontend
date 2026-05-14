@@ -305,12 +305,7 @@ const toggleStatus = async () => {
   
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      <Header rider_id={rider_id} isOnline={isOnline} toggleStatus={toggleStatus}/>
- 
-      <div className="flex flex-1">
-        <Sidebar rider_id={rider_id} />
- 
+
         <main className="flex-1 p-6 md:p-10">
           <div className="max-w-6xl mx-auto">
             <header className="mb-8">
@@ -375,9 +370,6 @@ const toggleStatus = async () => {
             </form>
           </div>
         </main>
-      </div>
-      <Footer/>
-    </div>
   );
 }
  
