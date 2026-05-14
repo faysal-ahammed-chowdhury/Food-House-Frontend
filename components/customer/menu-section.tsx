@@ -2,6 +2,11 @@
 
 import Image from "next/image";
 
+import AuthContext from "@/contexts/auth/auth-context";
+import { useContext } from "react";
+
+
+
 export default function MenuSection({
   menuItems,
   cartItems,
@@ -15,6 +20,9 @@ export default function MenuSection({
   onUpdateQuantity: (itemId: number, action: "increase" | "decrease") => void;
   isRestaurantOpen?: boolean;
 }) {
+  const authContext = useContext(AuthContext);
+  const isLoggedIn = !!authContext?.user; // true if user exists, false if null
+  const canAddToCart = isRestaurantOpen && isLoggedIn;
   
   // Group the flat array of items into categories based on the category relation
   const groupedMenu = menuItems.reduce((acc: any, item: any) => {
@@ -103,7 +111,7 @@ export default function MenuSection({
                       ) : (
                         <button
                           onClick={() => {
-                            if (!isRestaurantOpen) return;
+                            if (!canAddToCart) return;
                             // Map the DB fields perfectly for the Cart!
                             onAddToCart({
                               ...item,
@@ -111,9 +119,9 @@ export default function MenuSection({
                               itemPrice: item.price,
                             });
                           }}
-                          disabled={!isRestaurantOpen}
+                          disabled={!canAddToCart}
                           className={`text-sm font-bold px-4 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${
-                            isRestaurantOpen 
+                            canAddToCart 
                               ? "bg-[#f0146b] hover:bg-pink-600 text-white" 
                               : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
                           }`}

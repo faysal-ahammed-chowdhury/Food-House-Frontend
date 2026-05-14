@@ -1,17 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import AuthContext from "@/contexts/auth/auth-context";
+import { useRouter } from "next/navigation";
 // 👇 Import your engine
 import { getGlobalCart, saveRestaurantCart, clearRestaurantCart } from "./cart-manager";
 
 export default function CartClient() {
+  
+  const authContext = useContext(AuthContext);
+  const router = useRouter();
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // 1. LOAD: Ask the engine for the whole cabinet
   useEffect(() => {
+    if (authContext?.isLoadingUser) return;
+
+    if (!authContext?.user) {
+      router.push("/auth/login");
+      return;
+    }
     const globalCart = getGlobalCart();
     // Convert the object { "1": {...}, "2": {...} } into an array
     setRestaurants(Object.values(globalCart));
