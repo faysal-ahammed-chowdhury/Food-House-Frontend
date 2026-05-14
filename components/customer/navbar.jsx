@@ -2,31 +2,39 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation"; // 1. Import useRouter
 import { useContext } from "react";
-import AuthContext from "@/contexts/auth/auth-context"; 
+import axios from "axios"; // 2. Import axios
+import AuthContext from "@/contexts/auth/auth-context";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const authContext = useContext(AuthContext);
 
   const isActive = (path) => {
     return pathname === path
-      ? "text-[#f0146b] font-bold" // pink active
-      : "text-gray-600 hover:text-[#f0146b] transition-colors"; // normal inactive
+      ? "text-[#f0146b] font-bold" 
+      : "text-gray-600 hover:text-[#f0146b] transition-colors"; 
+  };
+
+  const handleLogout = async () => {
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      await axios.post(`${API_URL}/auth/logout`, {}, {
+        withCredentials: true
+      });
+      window.location.href = "/auth/login";
+    } catch (error) {
+      console.error("Failed to log out:", error);
+    }
   };
 
   return (
     <nav className="flex justify-between items-center py-4 px-8 bg-white border-b border-gray-100">
       {/* Logo Section */}
       <Link href="/customer/dashboard" className="flex items-center gap-2">
-        <Image
-          src="/logo.jpeg"
-          alt="FoodHouse"
-          width={140}
-          height={100}
-          className="object-contain"
-        />
+        <Image src="/logo.jpeg" alt="FoodHouse" width={140} height={100} className="object-contain" />
       </Link>
 
       {/* Navigation Links */}
@@ -44,11 +52,8 @@ const Navbar = () => {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
           </svg>
-          {/* 2. Dynamically render the user's name! */}
           <span className="font-medium">
-            {authContext?.isLoadingUser 
-              ? "Loading..." 
-              : authContext?.user?.name || "Profile"}
+            {authContext?.isLoadingUser ? "Loading..." : authContext?.user?.name || "Profile"}
           </span>
         </Link>
 
@@ -59,12 +64,12 @@ const Navbar = () => {
           </svg>
         </Link>
 
-        {/* Logout Icon */}
-        <Link href="/auth/login" className="hover:text-pink-500">
+        {/* 4. Changed <Link> to a <button> with onClick */}
+        <button onClick={handleLogout} className="hover:text-pink-500 cursor-pointer">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
           </svg>
-        </Link>
+        </button>
       </div>
     </nav>
   );
