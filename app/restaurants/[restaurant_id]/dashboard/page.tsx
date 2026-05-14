@@ -8,10 +8,7 @@ export default async function Dashboard({ params }: { params: Promise<{ restaura
   async function active_order_count(restaurant_id: string){
     try {
       const cookieStore = await cookies();
-      const cookieHeader = cookieStore.getAll()
-        .map((c) => `${c.name}=${c.value}`)
-        .join("; ");
-        
+      const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/financialInfo/${restaurant_id}`;
       const response = await axios.get(RQ_URL, {
         headers: { Cookie: cookieHeader },

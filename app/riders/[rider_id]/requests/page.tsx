@@ -4,38 +4,40 @@ import Header from "@/components/riders/header";
 import Sidebar from "@/components/riders/sidebar";
 import Footer from "@/components/riders/footer";
 import { Power, Search, ShoppingBag } from "lucide-react";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import axios from "axios";
 
 export default function DeliveryRequests({ params }: { params: Promise<{ rider_id: string }> }) {
   const { rider_id } = use(params);
   const [isOnline, setIsOnline] = useState(false);
-
-
-
-  const toggleStatus = async () => {
+  async function fetchStatus() {
     try {
-      const newStatus = !isOnline;
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`, {
-        isOnline: newStatus,
-      });
-      setIsOnline(newStatus);
+
+      console.log("Fetching status for rider ID:", rider_id);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`
+      );
+      if (response.status === 200) {
+        setIsOnline(response.data.data.isOnline);
+      }
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error("Error fetching rider status:", error);
     }
-  };
+  }
+
+  useEffect(() => {
+    fetchStatus();
+  }, []);
+
  
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* Header */}
-      <Header rider_id={rider_id} 
-       isOnline={isOnline}
-      toggleStatus={toggleStatus}
-       />
+    
+     
+      
 
       <div className="flex flex-1">
-        {/* Sidebar */}
-        <Sidebar rider_id={rider_id} />
+        
+       
 
         {/* Main Content */}
         <main className="flex-1 p-6 md:p-10">
@@ -66,11 +68,11 @@ export default function DeliveryRequests({ params }: { params: Promise<{ rider_i
               {!isOnline ? (
                 /* Offline State */
                 <div className="text-center max-w-md animate-in fade-in zoom-in duration-500">
-                  <div className="flex justify-center mb-6">
+                  {/* <div className="flex justify-center mb-6">
                     <div className="bg-white p-8 rounded-full shadow-xl shadow-pink-100">
                       <Power size={44} strokeWidth={1.5} className="text-pink-400" />
                     </div>
-                  </div>
+                  </div> */}
                   <h2 className="text-3xl font-black text-slate-800 mb-3">You are Offline</h2>
                   <p className="text-slate-500 font-medium text-lg leading-relaxed mb-8">
                     Go online to see and accept delivery requests.
@@ -94,8 +96,7 @@ export default function DeliveryRequests({ params }: { params: Promise<{ rider_i
         </main>
       </div>
 
-      {/* Footer */}
-      <Footer />
-    </div>
+     
+   
   );
 }
