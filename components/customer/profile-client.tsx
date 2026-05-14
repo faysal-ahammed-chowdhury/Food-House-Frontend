@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import AuthContext from "@/contexts/auth/auth-context"; // Adjust path if needed!
 
 export default function ProfileClient() {
+  const authContext = useContext(AuthContext);
+  const router = useRouter();
+
   const [profile, setProfile] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    role: "",
+    name: "", email: "", phone: "", address: "", role: "",
   });
 
   const [passwords, setPasswords] = useState({
-    newPassword: "",
-    confirmPassword: "",
+    newPassword: "", confirmPassword: "",
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -23,13 +23,24 @@ export default function ProfileClient() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-  const customerId = 1; // Hardcoded for now!
 
   // 1. FETCH PROFILE ON LOAD
   useEffect(() => {
+    // Wait until the AuthContext finishes checking the cookie
+    if (authContext?.isLoadingUser) return;
+
+    // If no user is logged in, kick them to the login screen
+    if (!authContext?.user) {
+      router.push("/auth/login");
+      return;
+    }
+
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${API_URL}/customers/${customerId}/profile`);
+        // ✅ No ID in URL! ✅ withCredentials sends the cookie!
+        const response = await axios.get(`${API_URL}/customers/profile`, {
+          withCredentials: true, 
+        });
         const customerData = response.data;
         
         setProfile({
@@ -47,50 +58,31 @@ export default function ProfileClient() {
     };
 
     fetchProfile();
-  }, []);
+  }, [authContext, router]);
 
   // 2. SAVE PROFILE TO BACKEND
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessages([]); 
     setSuccessMessage("");
-
-    const localErrors: string[] = [];
-    if (profile.phone.length !== 11) {
-      localErrors.push("Phone number must be exactly 11 digits long.");
-    }
-    if (!/^\d+$/.test(profile.phone)) {
-      localErrors.push("Phone number must contain only numbers.");
-    }
-    if (profile.name.trim() === "") {
-      localErrors.push("Full Name cannot be empty.");
-    }
-    if (localErrors.length > 0) {
-      setErrorMessages(localErrors);
-      return; 
-    }
-    setIsSaving(true);
     
+    // ... (Keep all your existing frontend validation logic here) ...
+
+    setIsSaving(true);
     try {
-      await axios.patch(`${API_URL}/customers/${customerId}/profile`, {
+      // ✅ No ID in URL! ✅ Added withCredentials
+      await axios.patch(`${API_URL}/customers/profile`, {
         name: profile.name,
         phone: profile.phone,
         address: profile.address,
+      }, {
+        withCredentials: true 
       });
       
       setSuccessMessage("Profile updated successfully!"); 
       setTimeout(() => setSuccessMessage(""), 3000); 
     } catch (error: any) {
-      console.error("Failed to update profile:", error);
-      const backendError = error.response?.data?.message;
-      
-      if (Array.isArray(backendError)) {
-        setErrorMessages(backendError);
-      } else if (typeof backendError === "string") {
-        setErrorMessages([backendError]);
-      } else {
-        setErrorMessages(["Something went wrong updating your profile."]);
-      }
+      // ... (Keep existing error handling) ...
     } finally {
       setIsSaving(false);
     }
@@ -114,7 +106,7 @@ export default function ProfileClient() {
     }
 
     try {
-      const response = await axios.patch(`${API_URL}/customers/${customerId}/password`, {
+      const response = await axios.patch(`${API_URL}/customers/password`, {
        newPassword: passwords.newPassword,
        confirmPassword: passwords.confirmPassword,
       });

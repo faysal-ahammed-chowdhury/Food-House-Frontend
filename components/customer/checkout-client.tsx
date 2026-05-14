@@ -55,7 +55,9 @@ export default function CheckoutClient({
       };
 
       // Send the POST request
-      await axios.post(`${API_URL}/customers/1/orders`, payload);
+      await axios.post(`${API_URL}/customers/orders`, payload, {
+        withCredentials: true
+      });
 
       // 👇 Look how clean this is now! The engine does all the work.
       clearRestaurantCart(restaurantId as string);
