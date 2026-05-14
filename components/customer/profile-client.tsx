@@ -3,7 +3,35 @@
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import AuthContext from "@/contexts/auth/auth-context"; // Adjust path if needed!
+import AuthContext from "@/contexts/auth/auth-context";
+import { z } from "zod"; 
+
+const profileSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Full Name is required")
+    .regex(/^[^0-9]+$/, "Name cannot contain numbers"),
+  phone: z
+    .string()
+    .min(1, "Phone number is required")
+    .regex(/^\d+$/, "Phone number contains numbers only")
+    .length(11, "Must be exactly 11 digits")
+    .regex(/^01/, "Must start with 01"),
+  address: z
+    .string()
+    .min(5, "Delivery Address must be at least 5 characters long"),
+});
+
+const passwordSchema = z.object({
+  newPassword: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[@#$&]/, "Password must contain a special character (@, #, $, or &)"),
+  confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match!",
+  path: ["confirmPassword"], 
+});
 
 export default function ProfileClient() {
   const authContext = useContext(AuthContext);
@@ -24,20 +52,14 @@ export default function ProfileClient() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-  // 1. FETCH PROFILE ON LOAD
   useEffect(() => {
-    // Wait until the AuthContext finishes checking the cookie
     if (authContext?.isLoadingUser) return;
-
-    // If no user is logged in, kick them to the login screen
     if (!authContext?.user) {
       router.push("/auth/login");
       return;
     }
-
     const fetchProfile = async () => {
       try {
-        // ✅ No ID in URL! ✅ withCredentials sends the cookie!
         const response = await axios.get(`${API_URL}/customers/profile`, {
           withCredentials: true, 
         });
@@ -66,11 +88,22 @@ export default function ProfileClient() {
     setErrorMessages([]); 
     setSuccessMessage("");
     
-    // ... (Keep all your existing frontend validation logic here) ...
+    // 3. Zod Validation for Profile
+    const result = profileSchema.safeParse({
+      name: profile.name,
+      phone: profile.phone,
+      address: profile.address,
+    });
+
+    if (!result.success) {
+      // Extract all error messages into a simple string array
+      const errors = result.error.issues.map((err) => err.message);
+      setErrorMessages(errors);
+      return;
+    }
 
     setIsSaving(true);
     try {
-      // ✅ No ID in URL! ✅ Added withCredentials
       await axios.patch(`${API_URL}/customers/profile`, {
         name: profile.name,
         phone: profile.phone,
@@ -82,39 +115,44 @@ export default function ProfileClient() {
       setSuccessMessage("Profile updated successfully!"); 
       setTimeout(() => setSuccessMessage(""), 3000); 
     } catch (error: any) {
-      // ... (Keep existing error handling) ...
+      const backendError = error.response?.data?.message;
+      setErrorMessages(Array.isArray(backendError) ? backendError : [backendError || "Failed to update profile"]);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Keep Password & Delete as UI placeholders until backend routes are made
+  // 4. Update Password
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessages([]);
     setSuccessMessage("");
 
-    // Frontend Validation
-    if (passwords.newPassword.length < 8) {
-     setErrorMessages(["Password must be at least 8 characters long."]);
-     return;
-    }
+    // 5. Zod Validation for Password
+    const result = passwordSchema.safeParse({
+      newPassword: passwords.newPassword,
+      confirmPassword: passwords.confirmPassword,
+    });
 
-    if (passwords.newPassword !== passwords.confirmPassword) {
-     setErrorMessages(["Passwords do not match!"]);
-     return;
+    if (!result.success) {
+      const errors = result.error.issues.map((err) => err.message);
+      setErrorMessages(errors);
+      return;
     }
 
     try {
       const response = await axios.patch(`${API_URL}/customers/password`, {
-       newPassword: passwords.newPassword,
-       confirmPassword: passwords.confirmPassword,
+        newPassword: passwords.newPassword,
+        confirmPassword: passwords.confirmPassword,
+      }, {
+        withCredentials: true
       });
     
       setSuccessMessage(response.data.message);
-      setPasswords({ newPassword: "", confirmPassword: "" }); // Clear fields
+      setPasswords({ newPassword: "", confirmPassword: "" }); 
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error: any) {
-     const backendError = error.response?.data?.message;
+      const backendError = error.response?.data?.message;
       setErrorMessages(Array.isArray(backendError) ? backendError : [backendError || "Failed to update password"]);
     }
   };
@@ -197,7 +235,7 @@ export default function ProfileClient() {
                   value={profile.name}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                   className="border border-gray-200 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:border-[#f0146b] focus:ring-1 focus:ring-[#f0146b] transition-colors"
-                  required
+                  
                 />
               </div>
 
@@ -225,7 +263,7 @@ export default function ProfileClient() {
                 value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                 className="border border-gray-200 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:border-[#f0146b] focus:ring-1 focus:ring-[#f0146b] transition-colors"
-                required
+                
               />
             </div>
 
@@ -239,7 +277,7 @@ export default function ProfileClient() {
                 value={profile.address}
                 onChange={(e) => setProfile({ ...profile, address: e.target.value })}
                 className="border border-gray-200 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:border-[#f0146b] focus:ring-1 focus:ring-[#f0146b] transition-colors resize-none"
-                required
+                
               ></textarea>
             </div>
 
