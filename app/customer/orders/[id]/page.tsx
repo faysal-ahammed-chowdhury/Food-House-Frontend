@@ -2,6 +2,8 @@ import axios from "axios";
 import Link from "next/link";
 import Navbar from "@/components/customer/navbar";
 import OrderDetailsClient from "@/components/customer/order-details-client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Order Details | FoodHouse",
@@ -19,8 +21,17 @@ export default async function OrderDetailsPage({
 
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL ;
-    
-    const response = await axios.get(`${API_URL}/customers/orders/${targetId}`);
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;  
+    if (!token) {
+      redirect("/auth/login");
+    }
+    const response = await axios.get(`${API_URL}/customers/orders/${targetId}`, {
+      headers: {
+        Cookie: `token=${token}`,
+      },
+      withCredentials: true,
+    });
     orderData = response.data;
   } catch (error) {
     console.error(`Failed to fetch details for order #${targetId}`, error);

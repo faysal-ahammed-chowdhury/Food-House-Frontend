@@ -2,6 +2,8 @@ import axios from "axios";
 import Link from "next/link";
 import Navbar from "@/components/customer/navbar";
 import RestaurantDetailsClient from "@/components/customer/restaurant-details-client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Restaurant Menu | FoodHouse",
@@ -18,9 +20,17 @@ export default async function RestaurantPage({
 
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    
-    // 👇 THIS IS YOUR BRAND NEW BACKEND ROUTE! 👇
-    const response = await axios.get(`${API_URL}/customers/restaurant-menu/${restaurantId}`);
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) {
+      redirect("/auth/login");
+    }
+    const response = await axios.get(`${API_URL}/customers/restaurant-menu/${restaurantId}`, {
+      headers: {
+        Cookie: `token=${token}`,
+      },
+      withCredentials: true,
+    });
     restaurantData = response.data;
   } catch (error) {
     console.error(`Failed to fetch restaurant #${restaurantId}`, error);

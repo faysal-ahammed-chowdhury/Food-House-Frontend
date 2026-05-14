@@ -2,19 +2,34 @@ export const dynamic = "force-dynamic";
 import axios from "axios";
 import Navbar from "@/components/customer/navbar";
 import OrdersClient from "@/components/customer/orders-client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Orders | FoodHouse",
 };
 
 export default async function OrdersPage() {
+  const cookieStore = cookies();
+  const token = (await cookieStore).get("token")?.value;
+
+  if (!token) {
+    redirect("/auth/login"); 
+  }
+
   let activeOrders = [];
   let pastOrders = [];
 
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    const response = await axios.get(`${API_URL}/customers/1/orders`); 
-    
+
+    const response = await axios.get(`${API_URL}/customers/orders`, {
+      headers: {
+        Cookie: `token=${token}`, 
+      },
+      withCredentials: true,
+    });
+
     activeOrders = response.data.activeOrders || [];
     pastOrders = response.data.pastOrders || [];
   } catch (error) {

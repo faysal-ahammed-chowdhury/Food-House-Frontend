@@ -3,15 +3,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useContext } from "react";
+import AuthContext from "@/contexts/auth/auth-context"; 
 
 const Navbar = () => {
   const pathname = usePathname();
+  const authContext = useContext(AuthContext);
 
   const isActive = (path) => {
     return pathname === path
-      ? "text-[#f0146b] font-bold" //pink active
-      : "text-gray-600 hover:text-[#f0146b] transition-colors"; //normal inactive
+      ? "text-[#f0146b] font-bold" // pink active
+      : "text-gray-600 hover:text-[#f0146b] transition-colors"; // normal inactive
   };
+
   return (
     <nav className="flex justify-between items-center py-4 px-8 bg-white border-b border-gray-100">
       {/* Logo Section */}
@@ -34,12 +38,18 @@ const Navbar = () => {
 
       {/* User Actions */}
       <div className="flex items-center gap-6 text-gray-600">
+        
         {/* Profile Icon */}
         <Link href="/customer/profile" className="flex items-center gap-2 cursor-pointer hover:text-pink-500">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
           </svg>
-          <span className="font-medium">Customer 1</span>
+          {/* 2. Dynamically render the user's name! */}
+          <span className="font-medium">
+            {authContext?.isLoadingUser 
+              ? "Loading..." 
+              : authContext?.user?.name || "Profile"}
+          </span>
         </Link>
 
         {/* Cart Icon */}

@@ -33,8 +33,9 @@ export default function OrdersClient(
     
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL ;
-      await axios.delete(`${API_URL}/customers/1/orders/${orderId}`);
-      
+      await axios.delete(`${API_URL}/customers/orders/${orderId}`, {
+        withCredentials: true
+      });
       console.log(`Successfully deleted order #${orderId} from the database!`);
     } catch (error) {
       console.error("Failed to cancel order in the database:", error);
