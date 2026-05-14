@@ -11,7 +11,7 @@ export default async function RestaurantsPage() {
 
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const response = await axios.get(`${API_URL}/restaurant/all-restaurants`);
+    const response = await axios.get(`${API_URL}/customers/all-restaurants`);
     allRestaurants = response.data;
   } catch (error) {
     console.error("Failed to fetch restaurants:", error);

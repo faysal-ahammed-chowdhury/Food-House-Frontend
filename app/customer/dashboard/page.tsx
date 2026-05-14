@@ -13,7 +13,7 @@ export default async function HomePage() {
 
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const response = await axios.get(`${API_URL}/restaurant/top-restaurants`);
+    const response = await axios.get(`${API_URL}/customers/top-restaurants`);
     topRestaurantsData = response.data;
   } catch (error) {
     console.error("Failed to fetch top restaurants from NestJS:", error);
