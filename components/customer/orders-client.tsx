@@ -1,57 +1,51 @@
 "use client";
 
-export default function OrdersClient() {
-  // 1. Dummy Data for Active Orders (Currently happening)
-  const activeOrders = [
-    {
-      id: "#ORD-9021",
-      restaurant: "Burger Joint",
-      items: "2x Double Cheeseburger, 1x Large Fries, 2x Cola",
-      total: "$32.50",
-      status: "Preparing",
-      estimatedTime: "15-20 min",
-      date: "May 11, 2026",
-    },
-  ];
+import { useState } from "react";
+import Link from "next/link";
+import axios from "axios"; 
 
-  // 2. Dummy Data for Past Orders (Order History)
-  const pastOrders = [
-    {
-      id: "#ORD-8834",
-      restaurant: "Pizza Paradise",
-      items: "1x Large Pepperoni Pizza, 1x Garlic Bread",
-      total: "$28.00",
-      status: "Delivered",
-      date: "May 9, 2026",
-    },
-    {
-      id: "#ORD-8712",
-      restaurant: "Sushi Zen",
-      items: "1x Spicy Tuna Roll, 1x Salmon Sashimi, 1x Miso Soup",
-      total: "$42.00",
-      status: "Delivered",
-      date: "May 5, 2026",
-    },
-    {
-      id: "#ORD-8501",
-      restaurant: "Taco Fiesta",
-      items: "3x Beef Tacos, 1x Nachos Supreme",
-      total: "$21.50",
-      status: "Cancelled",
-      date: "April 28, 2026",
-    },
-  ];
+export default function OrdersClient(
+  { initialActiveOrders, initialPastOrders }: { initialActiveOrders: any[]; initialPastOrders: any[]; }) {
+  
+  const [activeOrders, setActiveOrders] = useState(initialActiveOrders);
+  const pastOrders = initialPastOrders;
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Preparing":
-        return "bg-yellow-50 text-yellow-600 border-yellow-200";
-      case "Delivered":
-        return "bg-green-50 text-green-600 border-green-200";
-      case "Cancelled":
-        return "bg-red-50 text-red-600 border-red-200";
-      default:
-        return "bg-gray-50 text-gray-600 border-gray-200";
+      case "PENDING": return "bg-yellow-50 text-orange-500 border-yellow-200";
+      case "ACCEPTED": return "bg-indigo-50 text-indigo-600 border-indigo-200";
+      case "RIDER_ASSIGNED": return "bg-teal-50 text-teal-600 border-teal-200";
+      case "PREPARING": return "bg-yellow-50 text-yellow-600 border-yellow-200";
+      case "READY": return "bg-orange-50 text-orange-600 border-orange-200";
+      case "PICKED": return "bg-blue-50 text-blue-600 border-blue-200";
+      case "DELIVERED": return "bg-green-50 text-green-600 border-green-200";
+      case "CANCELLED": return "bg-red-50 text-red-600 border-red-200";
+      default: return "bg-gray-50 text-gray-600 border-gray-200";
+    }
+  };
+
+  const handleCancelOrder = async (orderId: string) => {
+    setActiveOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.orderId === orderId ? { ...order, status: "CANCELLED" } : order
+      )
+    );
+    
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL ;
+      await axios.delete(`${API_URL}/customers/orders/${orderId}`, {
+        withCredentials: true
+      });
+      console.log(`Successfully deleted order #${orderId} from the database!`);
+    } catch (error) {
+      console.error("Failed to cancel order in the database:", error);
+      alert("Something went wrong trying to cancel the order. Please try again.");
+      
+      setActiveOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.orderId === orderId ? { ...order, status: "PENDING" } : order
+        )
+      );
     }
   };
 
@@ -66,40 +60,66 @@ export default function OrdersClient() {
           <p className="text-gray-500">Your current orders</p>
         </div>
 
-        <div className="flex flex-col gap-4">
-          {activeOrders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex justify-between items-center"
-            >
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-xl font-bold text-gray-900">
-                    {order.restaurant}
-                  </h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}
-                  >
-                    {order.status}
-                  </span>
+        {activeOrders.length === 0 ? (
+           <p className="text-gray-500 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+             No active orders right now.
+           </p>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {activeOrders.map((order) => (
+              <div
+                key={order.orderId}
+                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row justify-between md:items-center gap-4 hover:shadow-md transition-shadow"
+              >
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {order.restaurant}
+                    </h3>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                  <p className="text-gray-500 text-sm mb-1">
+                    Order #{order.orderId} •{" "}
+                    {new Date(order.orderAt).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-700 font-medium">{order.items}</p>
                 </div>
-                <p className="text-gray-500 text-sm mb-1">
-                  Order {order.id} • {order.date}
-                </p>
-                <p className="text-gray-700 font-medium">{order.items}</p>
-              </div>
 
-              <div className="text-right">
-                <p className="text-2xl font-extrabold text-gray-900 mb-1">
-                  {order.total}
-                </p>
-                <p className="text-[#f0146b] font-semibold text-sm">
-                  Arriving in {order.estimatedTime}
-                </p>
+                <div className="text-left md:text-right flex flex-col md:items-end">
+                  <p className="text-2xl font-extrabold text-gray-900 mb-1">
+                    ৳{order.total}
+                  </p>
+                  {/* Only show estimated delivery if the order isn't cancelled */}
+                  {order.status !== "CANCELLED" && (
+                    <p className="text-[#f0146b] font-semibold text-sm mb-3">
+                      Estimated Delivery: {order.maxPrepTime + 15} mins
+                    </p>
+                  )}
+
+                  <div className="flex gap-2 mt-2">
+                    {order.status === "PENDING" && (
+                      <button
+                        onClick={() => handleCancelOrder(order.orderId)}
+                        className="border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+                      >
+                        Cancel Order
+                      </button>
+                    )}
+                    <Link href={`/customer/orders/${order.orderId}`}>
+                      <button className="border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 px-4 py-2 rounded-lg text-sm font-bold transition-colors">
+                        View Details
+                      </button>
+                    </Link>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* --- ORDER HISTORY SECTION --- */}
@@ -113,53 +133,44 @@ export default function OrdersClient() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4">
-          {pastOrders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
-            >
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-lg font-bold text-gray-900">
-                    {order.restaurant}
-                  </h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}
-                  >
-                    {order.status}
-                  </span>
+        {pastOrders.length === 0 ? (
+          <p className="text-gray-500 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+            No past orders found.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {pastOrders.map((order) => (
+              <div
+                key={order.orderId}
+                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-lg font-bold text-gray-900">
+                      {order.restaurant}
+                    </h3>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                  <p className="text-gray-500 text-sm mb-1">
+                    Order #{order.orderId} •{" "}
+                    {new Date(order.orderAt).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-600 text-sm">{order.items}</p>
                 </div>
-                <p className="text-gray-500 text-sm mb-1">
-                  Order {order.id} • {order.date}
-                </p>
-                <p className="text-gray-600 text-sm">{order.items}</p>
-              </div>
 
-              <div className="text-right flex flex-col items-end gap-3">
-                <p className="text-xl font-extrabold text-gray-900">
-                  {order.total}
-                </p>
-                <button className="text-[#f0146b] font-bold text-sm hover:underline flex items-center gap-1">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    ></path>
-                  </svg>
-                  Reorder
-                </button>
+                <div className="text-right flex flex-col items-end gap-3">
+                  <p className="text-xl font-extrabold text-gray-900">
+                    ৳{order.total}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
