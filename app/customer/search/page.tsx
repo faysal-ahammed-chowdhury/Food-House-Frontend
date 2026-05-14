@@ -1,14 +1,28 @@
 import Navbar from "@/components/customer/navbar";
 import SearchClient from "@/components/customer/search-client";
+import axios from "axios";
 
 export const metadata = {
   title: "Search | FoodHouse",
 };
 
 export default async function SearchPage({ searchParams }: any) {
-  // 1. Server reads the URL
   const resolvedParams = await searchParams;
   const query = resolvedParams.query || "";
+  let searchResults = { restaurants: [], items: [] };
+
+  if (query) {
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const response = await axios.get(`${API_URL}/customers/search?query=${query}`);
+      
+      if (response.data) {
+        searchResults = response.data;
+      }
+    } catch (error) {
+      console.error("Failed to fetch search results.", error);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -19,7 +33,7 @@ export default async function SearchPage({ searchParams }: any) {
       </div>
 
       <main className="max-w-6xl xl:mx-auto w-full px-8 py-10">
-        <SearchClient query={query} />
+        <SearchClient query={query} initialResults={searchResults} />
       </main>
     </div>
   );
