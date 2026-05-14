@@ -4,10 +4,22 @@ import { Tag } from "lucide-react";
 export default function ItemCard({ item }: { item: Item }) {
   return (
     <div className="shadow-md rounded-xl overflow-hidden bg-white border border-gray-200">
-      <div>
+      <div className="relative">
+        <div className="absolute right-5 top-5">
+          <p
+            className={`${!item.isAvailable ? "bg-rose-100 text-rose-700 border-rose-200" : "bg-emerald-100 text-emerald-700 border-emerald-200"}
+            px-3 py-1 rounded-full font-medium`}
+          >
+            {item.isAvailable ? "Available" : "Unavailable"}
+          </p>
+        </div>
         <div className="w-full h-56 bg-gray-100">
           {item.imageUrl && (
-            <img src={item.imageUrl} className="w-full h-full object-cover" />
+            <img
+              src={`${process.env.NEXT_PUBLIC_API_URL}/admin/images/${item.imageUrl}`}
+              alt={item.name}
+              className="w-full h-full object-cover"
+            />
           )}
         </div>
       </div>

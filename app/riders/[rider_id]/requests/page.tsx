@@ -5,18 +5,32 @@ import Sidebar from "@/components/riders/sidebar";
 import Footer from "@/components/riders/footer";
 import { Power, Search, ShoppingBag } from "lucide-react";
 import { use, useState } from "react";
+import axios from "axios";
 
 export default function DeliveryRequests({ params }: { params: Promise<{ rider_id: string }> }) {
   const { rider_id } = use(params);
   const [isOnline, setIsOnline] = useState(false);
 
 
+
+  const toggleStatus = async () => {
+    try {
+      const newStatus = !isOnline;
+      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`, {
+        isOnline: newStatus,
+      });
+      setIsOnline(newStatus);
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+ 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       {/* Header */}
       <Header rider_id={rider_id} 
        isOnline={isOnline}
-      //toggleStatus={toggleStatus}
+      toggleStatus={toggleStatus}
        />
 
       <div className="flex flex-1">
@@ -59,14 +73,9 @@ export default function DeliveryRequests({ params }: { params: Promise<{ rider_i
                   </div>
                   <h2 className="text-3xl font-black text-slate-800 mb-3">You are Offline</h2>
                   <p className="text-slate-500 font-medium text-lg leading-relaxed mb-8">
-                    You must be online to see and accept delivery requests.
+                    Go online to see and accept delivery requests.
                   </p>
-                  <button 
-                    onClick={() => setIsOnline(true)}
-                    className="bg-[#00c58d] hover:bg-emerald-600 text-white px-12 py-4 rounded-xl font-bold text-xl transition-all shadow-lg shadow-emerald-100 active:scale-95"
-                  >
-                    Go Online
-                  </button>
+                  
                 </div>
               ) : (
                 /* Online State (Placeholder for orders) */
@@ -75,12 +84,7 @@ export default function DeliveryRequests({ params }: { params: Promise<{ rider_i
                     <Search size={48} className="mx-auto text-slate-300 mb-4" />
                     <h3 className="text-xl font-bold text-slate-700">Looking for requests...</h3>
                     <p className="text-slate-400 mt-2 font-medium">Orders from your nearby areas will appear here.</p>
-                    <button 
-                      onClick={() => setIsOnline(false)}
-                      className="mt-8 text-pink-500 font-bold hover:underline"
-                    >
-                      Go Offline
-                    </button>
+                    
                   </div>
                 </div>
               )}

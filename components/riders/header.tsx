@@ -2,14 +2,18 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface HeaderProps {
   rider_id: string;
+
   isOnline?: boolean;     
   toggleStatus?: () => void; 
 }
 
 export default function Header({ rider_id, isOnline, toggleStatus }: HeaderProps) {
+//const [displayName, setDisplayName] = useState("");
+
 const router = useRouter();
   const handleLogout = async (e: any) => {
     e.preventDefault();
@@ -49,6 +53,8 @@ const router = useRouter();
         )}
 
         <span className="text-pink-500 font-medium">ID: {rider_id}</span>
+
+       {/* <span className="text-gray-500 font-medium">{displayName}</span>*/}
 
         <button onClick={handleLogout} className="cursor-pointer ml-8">
             <LogOut size={18} />
