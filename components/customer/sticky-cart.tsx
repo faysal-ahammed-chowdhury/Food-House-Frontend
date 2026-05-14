@@ -22,15 +22,6 @@ export default function StickyCart({
   const total = subtotal + deliveryFee;
 
   const handleProceedToCheckout = () => {
-    const cartData = {
-      restaurantId,
-      restaurantName: restaurantName || "Unknown Restaurant",
-      deliveryFee,
-      subtotal,
-      total,
-      items: cartItems,
-    };
-    localStorage.setItem("foodhouse_cart", JSON.stringify(cartData));
     router.push(`/customer/checkout?restaurantId=${restaurantId}`);
   };
 

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import axios from "axios";
 import Navbar from "@/components/customer/navbar";
 import OrdersClient from "@/components/customer/orders-client";
@@ -11,8 +12,8 @@ export default async function OrdersPage() {
   let pastOrders = [];
 
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const response = await axios.get(`${API_URL}/customers/47/orders`);
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const response = await axios.get(`${API_URL}/customers/1/orders`); 
     
     activeOrders = response.data.activeOrders || [];
     pastOrders = response.data.pastOrders || [];

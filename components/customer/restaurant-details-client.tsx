@@ -1,15 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+// 👇 Import your new engine
+import { getRestaurantCart, saveRestaurantCart } from "./cart-manager";
 import MenuSection from "./menu-section";
 import StickyCart from "./sticky-cart"; 
 
-export default function RestaurantDetailsClient({
-  restaurant, // <-- NOW ACCEPTING THE FULL DATABASE OBJECT
-}: {
-  restaurant: any;
-}) {
+export default function RestaurantDetailsClient({ restaurant }: { restaurant: any }) {
   const [cartItems, setCartItems] = useState<any[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const restaurantName = restaurant.user?.name || "Unknown Restaurant";
+  const deliveryFee = restaurant.currentDeliveryFee || 50;
+  const stringRestaurantId = restaurant.restaurantId.toString();
+
+  // 1. LOAD: Ask the engine for this specific restaurant's data
+  useEffect(() => {
+    const existingCart = getRestaurantCart(stringRestaurantId);
+    if (existingCart && existingCart.items) {
+      setCartItems(existingCart.items);
+    }
+    setIsLoaded(true);
+  }, [stringRestaurantId]);
+
+  // 2. SAVE: Tell the engine to save whenever items change
+  useEffect(() => {
+    if (isLoaded) {
+      const subtotal = cartItems.reduce((acc, item) => acc + item.itemPrice * item.quantity, 0);
+      
+      const cartData = {
+        restaurantId: stringRestaurantId,
+        restaurantName: restaurantName,
+        deliveryFee: deliveryFee,
+        subtotal: subtotal,
+        total: subtotal + deliveryFee,
+        items: cartItems,
+      };
+
+      // The engine handles all the complex logic now!
+      saveRestaurantCart(stringRestaurantId, cartData);
+    }
+  }, [cartItems, isLoaded, stringRestaurantId, restaurantName, deliveryFee]);
 
   const handleAddToCart = (item: any) => {
     setCartItems((prev) => [...prev, { ...item, quantity: 1 }]);
@@ -34,10 +65,10 @@ export default function RestaurantDetailsClient({
     );
   };
 
-  // Fallback image if DB doesn't have one
   const bannerImage = restaurant.bannerUrl || "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2000&auto=format&fit=crop";
-  const restaurantName = restaurant.user?.name || "Unknown Restaurant";
-  const deliveryFee = restaurant.currentDeliveryFee || 50;
+
+  // Prevent UI flashing while loading the cart from memory
+  if (!isLoaded) return null;
 
   return (
     <div className="pb-20">
@@ -83,11 +114,11 @@ export default function RestaurantDetailsClient({
         {/* LEFT COLUMN: Menu Items */}
         <div className="flex-1">
           <MenuSection
-            menuItems={restaurant.items || []} // <-- PASSING REAL ITEMS HERE
+            menuItems={restaurant.items || []} 
             cartItems={cartItems}
             onAddToCart={handleAddToCart}
             onUpdateQuantity={handleUpdateQuantity}
-            isRestaurantOpen={restaurant.isOpen !== false} // <-- PASSING OPEN/CLOSE STATUS
+            isRestaurantOpen={restaurant.isOpen !== false} 
           />
         </div>
 
@@ -95,7 +126,7 @@ export default function RestaurantDetailsClient({
         <div className="w-full lg:w-[380px]">
           <div className="sticky top-6">
             <StickyCart
-              restaurantId={restaurant.restaurantId.toString()}
+              restaurantId={stringRestaurantId}
               restaurantName={restaurantName}
               deliveryFee={deliveryFee}
               cartItems={cartItems}
