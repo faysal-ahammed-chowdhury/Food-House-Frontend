@@ -35,13 +35,15 @@ export default function AdminLayout({
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,{},
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        {},
         {
           withCredentials: true,
         },
       );
-      await authContext?.fetchUser?.();
-      router.push("/");
+
+      authContext?.fetchUser();
+      router.push("/auth/login");
     } catch {}
   };
 
