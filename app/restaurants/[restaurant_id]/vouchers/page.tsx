@@ -137,6 +137,11 @@ export default function Vouchers({ params }: { params: Promise<{ restaurant_id: 
             </div>
           ))}
         </section>
+        {vouchers.length === 0 && (
+          <div className="p-20 text-center text-gray-400 font-medium">
+            No vouchers found. Please create a voucher to get started.
+          </div>
+         )}
       </div>
     </>
   );

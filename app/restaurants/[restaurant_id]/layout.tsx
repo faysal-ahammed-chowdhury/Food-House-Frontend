@@ -29,32 +29,17 @@ export default function RestaurantLayout({children,params}: Readonly<{children: 
       router.push("/auth/login");
       return;
     }
-    if(user.role === UserRoles.ADMIN){
-      router.push("/admin");
-      return;
-    }
 
-    if (user.role === UserRoles.CUSTOMER) {
-      router.push("/");
-      return;
-    }
-
-    if (user.role === UserRoles.RESTAURANT) {
+    if(user.role === UserRoles.RESTAURANT) {
       console.log("User ID:", user.userId)
       const restaurantId = await getResturentID(user.userId);
-    //   console.log("Fetched Restaurant ID:", restaurantId);
-    //   console.log("Route Restaurant ID:", restaurant_id);
       if(restaurantId != restaurant_id){
         router.push("/auth/login");
         return;
       }
       return;
     }
-
-    if (user.role === UserRoles.RIDER) {
-      router.push("/rider");
-      return;
-    }
+    router.push("/auth/login");
   };
   redirectUser();
 }, [authContext?.user, authContext?.isLoadingUser, router]);

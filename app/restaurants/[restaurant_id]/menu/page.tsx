@@ -64,16 +64,20 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
     if(authContext.user!.role !==  UserRoles.RESTAURANT){
       return;
     }
-    
-
     setCategories([]);
-    try {
-      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurantcategories/${restaurant_id}`;
-      const response = await axios.get(RQ_URL,{withCredentials: true});      
-      setCategories(response.data);
-    } catch (error) {
-      console.error(error);
-    }
+    try{
+        const URL=`${process.env.NEXT_PUBLIC_API_URL}/restaurant/categoryCount/${restaurant_id}`;
+        const response = await axios.get(URL,{withCredentials: true});
+        if(response.data.categoryCount === 0){return;}
+        try {
+          const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/restaurantcategories/${restaurant_id}`;
+          const response = await axios.get(RQ_URL,{withCredentials: true});      
+          setCategories(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+    } 
+    catch{}
   }
 
   async function deleteCategory(categoryId: string) {
@@ -207,6 +211,11 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
               </div>
             ))}
           </div>
+          {categories.length === 0 && (
+            <div className="p-20 text-center text-gray-400 font-medium">
+              No categories found. Please add a category to get started.
+            </div>
+          )}
       </div>
     </>
   );

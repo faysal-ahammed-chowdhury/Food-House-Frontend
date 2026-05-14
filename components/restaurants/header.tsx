@@ -25,13 +25,8 @@ export default function Header({ restaurant_id}: { restaurant_id: string}) {
   const handleLogout = async (e: any) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
-        {},
-        {
-          withCredentials: true,
-        },
-      );
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,{},{withCredentials: true,});
+      await authContext?.fetchUser?.();
       router.push("/");
     } catch {}
   };

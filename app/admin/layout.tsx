@@ -40,6 +40,7 @@ export default function AdminLayout({
           withCredentials: true,
         },
       );
+      await authContext?.fetchUser?.();
       router.push("/");
     } catch {}
   };
