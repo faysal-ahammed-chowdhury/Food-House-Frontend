@@ -1,23 +1,38 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation"; 
 
 export default function StickyCart({
   restaurantId,
+  restaurantName, 
   deliveryFee,
   cartItems,
 }: {
   restaurantId: string;
+  restaurantName?: string;
   deliveryFee: number;
   cartItems: any[];
 }) {
-  // Calculate Subtotal dynamically based on items in cart
+  const router = useRouter();
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.itemPrice * item.quantity,
     0,
   );
 
   const total = subtotal + deliveryFee;
+
+  const handleProceedToCheckout = () => {
+    const cartData = {
+      restaurantId,
+      restaurantName: restaurantName || "Unknown Restaurant",
+      deliveryFee,
+      subtotal,
+      total,
+      items: cartItems,
+    };
+    localStorage.setItem("foodhouse_cart", JSON.stringify(cartData));
+    router.push(`/customer/checkout?restaurantId=${restaurantId}`);
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -89,12 +104,13 @@ export default function StickyCart({
             </div>
           </div>
 
-          {/* Checkout Button */}
-          <Link href={`/customer/checkout?restaurantId=${restaurantId}`}>
-            <button className="w-full bg-[#f0146b] hover:bg-pink-600 transition-colors text-white font-bold py-3.5 rounded-xl shadow-sm text-sm">
-              Go to Checkout
-            </button>
-          </Link>
+          {/* Checkout Button - NOW USES OUR NEW FUNCTION! */}
+          <button 
+            onClick={handleProceedToCheckout}
+            className="w-full bg-[#f0146b] hover:bg-pink-600 transition-colors text-white font-bold py-3.5 rounded-xl shadow-sm text-sm"
+          >
+            Go to Checkout
+          </button>
         </>
       )}
     </div>
