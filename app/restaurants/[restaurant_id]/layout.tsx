@@ -21,29 +21,29 @@ export default function RestaurantLayout({children,params}: Readonly<{children: 
         return res.data.restaurantId;
     };
 
- useEffect(() => {
-  const redirectUser = async () => {
-    if (authContext?.isLoadingUser) return;
-    const user = authContext?.user;
+  useEffect(() => {
+    const redirectUser = async () => {
+      if (authContext?.isLoadingUser) return;
+      const user = authContext?.user;
 
-    if (!user) {
-      router.push("/auth/login");
-      return;
-    }
-
-    if(user.role === UserRoles.RESTAURANT) {
-      console.log("User ID:", user.userId)
-      const restaurantId = await getResturentID(user.userId);
-      if(restaurantId != restaurant_id){
-        router.push("/auth/login");
+      if (!user) {
+       router.push("/auth/login");
         return;
       }
-      return;
-    }
-    router.push("/auth/login");
-  };
-  redirectUser();
-}, [authContext?.user, authContext?.isLoadingUser, router]);
+
+      if(user.role === UserRoles.RESTAURANT) {
+        console.log("User ID:", user.userId)
+        const restaurantId = await getResturentID(user.userId);
+        if(restaurantId != restaurant_id){
+          router.push("/auth/login");
+          return;
+        }
+        return;
+      }
+      router.push("/auth/login");
+    };
+    redirectUser();
+  }, [authContext?.user, authContext?.isLoadingUser, router]);
 
   return (
     <>  

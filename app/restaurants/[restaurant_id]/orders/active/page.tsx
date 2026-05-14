@@ -6,6 +6,17 @@ import { UserRoles } from "@/enums/user-roles.enum";
 import axios from "axios";
 import { use, useContext, useEffect, useState } from "react";
 
+const statusColors = {
+  [OrderStatus.PENDING]: "bg-yellow-500 shadow-yellow-100",
+  [OrderStatus.ACCEPTED]: "bg-blue-500 shadow-blue-100",
+  [OrderStatus.RIDER_ASSIGNED]: "bg-purple-500 shadow-purple-100",
+  [OrderStatus.PREPARING]: "bg-orange-500 shadow-orange-100",
+  [OrderStatus.READY]: "bg-cyan-500 shadow-cyan-100",
+  [OrderStatus.PICKED]: "bg-indigo-500 shadow-indigo-100",
+  [OrderStatus.DELIVERED]: "bg-green-500 shadow-green-100",
+  [OrderStatus.CANCELLED]: "bg-red-500 shadow-red-100",
+};
+
 type FilterStatus = "ALL" | OrderStatus.PENDING | OrderStatus.ACCEPTED | OrderStatus.RIDER_ASSIGNED | OrderStatus.PREPARING | OrderStatus.READY | OrderStatus.PICKED;
 
 export default function ActiveOrders({ params }: { params: Promise<{ restaurant_id: string }>}) {
@@ -13,16 +24,7 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
   const authContext = useContext(AuthContext);
   const [allactiveOrders, setAllActiveOrders] = useState<any[]>([]);
   const all_status = [OrderStatus.PENDING, OrderStatus.ACCEPTED, OrderStatus.RIDER_ASSIGNED, OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.PICKED];
-  const statusColors = {
-    [OrderStatus.PENDING]: "bg-yellow-500 shadow-yellow-100",
-    [OrderStatus.ACCEPTED]: "bg-blue-500 shadow-blue-100",
-    [OrderStatus.RIDER_ASSIGNED]: "bg-purple-500 shadow-purple-100",
-    [OrderStatus.PREPARING]: "bg-orange-500 shadow-orange-100",
-    [OrderStatus.READY]: "bg-cyan-500 shadow-cyan-100",
-    [OrderStatus.PICKED]: "bg-indigo-500 shadow-indigo-100",
-    [OrderStatus.DELIVERED]: "bg-green-500 shadow-green-100",
-    [OrderStatus.CANCELLED]: "bg-red-500 shadow-red-100",
-  };
+  
   const [currentFilter, setCurrentFilter] = useState<FilterStatus>("ALL");
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -52,6 +54,75 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
     setCount(z);
   }
 
+  async function cancelOrder(orderId: string, curStatus: OrderStatus) {
+    if(curStatus === OrderStatus.PICKED){
+      alert("Cannot cancel an order that has already been picked up by the rider.");
+      return;
+    }
+    if(!confirm("Are you sure you want to cancel this order?")){return;}
+    try{
+      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/orderStatus/${orderId}/${OrderStatus.CANCELLED}`;
+      const response = await axios.patch(RQ_URL,{}, {withCredentials: true});
+      if(response.status === 200){
+        alert("Order cancelled successfully.");
+        setAllActiveOrders((prev) => prev.filter((order) => order.orderId !== orderId));
+      }
+    }
+    catch{
+      alert("Error cancelling order. Please try again.");
+    }
+  }
+
+  async function nextOrderStatus(orderId: string, curStatus: OrderStatus) {
+    let nextStatus: OrderStatus | null = null;
+    if(curStatus === OrderStatus.ACCEPTED){
+      alert("Please wait for the rider to be assign.");
+      return;
+    }
+    if(curStatus === OrderStatus.READY){
+      alert("Please wait for the rider to pick up the order.");
+      return;
+    }
+
+    if(curStatus === OrderStatus.RIDER_ASSIGNED){
+      if(!confirm("Ready to Prepare Meal?")){return;}
+    }
+    if(curStatus === OrderStatus.PREPARING){
+      if(!confirm("Meal is Ready? Wait for the rider to pick it up.")){return;}
+    }
+    
+    switch(curStatus){
+      case OrderStatus.PENDING:
+        nextStatus = OrderStatus.ACCEPTED;
+        break;
+      case OrderStatus.RIDER_ASSIGNED:
+        nextStatus = OrderStatus.PREPARING;
+        break;
+      case OrderStatus.PREPARING:
+        nextStatus = OrderStatus.READY;
+        break;
+      default:
+        nextStatus = null;
+    }
+
+    if(!nextStatus){return;}
+
+    try{
+      const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/orderStatus/${orderId}/${nextStatus}`;
+      const response = await axios.patch(RQ_URL,{}, {withCredentials: true});
+      if(response.status === 200){
+        if(curStatus === OrderStatus.PENDING){
+          alert("Order accepted successfully. Please wait for the rider to be assign.");
+        }
+        setAllActiveOrders((prev) => prev.map((order) => order.orderId === orderId ? {...order, status: nextStatus} : order));
+      }
+    }
+    catch{
+      alert("Error updating order status. Please try again.");
+    }
+  }
+
+
   return (
     <>
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
@@ -74,11 +145,6 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
             </button>
           ))}
         </div>
-
-
-
-
-
       </header>
 
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
@@ -127,7 +193,9 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
                     ৳{(order.subtotal - order.discountAmount).toFixed(2)}
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-center">
-                      <button className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full py-0.5 shadow-sm shadow-red-200">
+                      <button className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full py-0.5 shadow-sm shadow-red-200"
+                        onClick={() => cancelOrder(order.orderId, order.status as OrderStatus)}
+                      >
                         ✕
                       </button>
                       <> </>
@@ -135,7 +203,9 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
                         {order.status}
                       </span>
                       <> </>
-                      <button className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full py-0.5 shadow-sm shadow-green-200">
+                      <button className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full py-0.5 shadow-sm shadow-green-200"
+                        onClick={() => nextOrderStatus(order.orderId, order.status as OrderStatus)}
+                      >
                         ✓
                       </button>
                   </td>
@@ -163,8 +233,6 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
           </div>
         )}
       </div>
-
-
     </>
   );
 } 
