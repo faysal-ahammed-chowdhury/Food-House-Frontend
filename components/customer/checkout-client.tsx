@@ -45,6 +45,7 @@ export default function CheckoutClient({
       
 
       const payload = {
+        restaurantId: parseInt(restaurantId, 10),
         restaurantName: cartData.restaurantName,
         paymentMethod: paymentMethod, 
         items: cartData.items.map((item: any) => ({
