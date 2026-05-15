@@ -9,6 +9,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import * as z from "zod";
+import MyModal from "@/components/restaurants/my-modal"; //forget pass er jonno alada modal create na kore resturent er tai use korlam -_-
+import ForgetPasswordForm from "@/components/forget_pass";
 
 export const loginSchema = z.object({
   email: z
@@ -27,11 +29,8 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const authContext = useContext(AuthContext);
-
   const router = useRouter();
-
   console.log(authContext);
-
   const getResturentID = async (UserID: number) => {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/restaurant/getRestaurantIdbyuserID/${UserID}`,
@@ -51,7 +50,6 @@ export default function Login() {
     );
     return res.data;
   };
-
 
   useEffect(() => {
     if (authContext?.isLoadingUser) return;
@@ -136,7 +134,30 @@ export default function Login() {
     }
   };
 
+  const [show_FORGET_PASSWORD_modal, setShow_FORGET_PASSWORD_modal] = useState<boolean>(false);
+
+  const pass_modal_open = () => {
+    setShow_FORGET_PASSWORD_modal(true);
+  };
+
+  const pass_modal_close = () => {
+    setShow_FORGET_PASSWORD_modal(false);
+  }
+
   return (
+    <>
+    <MyModal
+      title="Recover Your Account"
+      open={show_FORGET_PASSWORD_modal}
+      onClose={pass_modal_close}
+    >
+      <ForgetPasswordForm 
+          onSuccess={() => {
+            pass_modal_close();
+          } } 
+          show_FORGET_PASSWORD_modal={show_FORGET_PASSWORD_modal}/>
+    </MyModal>
+
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:w-1/2 relative bg-pink-600 flex-col justify-center items-center px-12 text-center overflow-hidden">
         <div
@@ -221,12 +242,13 @@ export default function Login() {
                   <label className="block text-[#0A1629] font-bold text-sm">
                     Password
                   </label>
-                  <a
-                    href="#"
+                  <button
+                    onClick={pass_modal_open}
+                    type="button"
                     className="text-[#FF2D75] text-sm font-bold hover:underline"
                   >
                     Forgot Password?
-                  </a>
+                  </button>
                 </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -275,5 +297,6 @@ export default function Login() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -151,15 +151,15 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
         <table className="min-w-full border-separate border-spacing-0">
           <thead>
             <tr className="bg-gray-50/50">
-              <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Customer</th>
-              <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Items</th>
-              <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Subtotal</th>
-              <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Voucher</th>
-              <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Discount</th>
-              <th className="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Net Total</th>
-              <th className="px-6 py-4 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b">Status</th>
-              <th className="px-6 py-4 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b">Rider</th>
-              <th className="px-6 py-4 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b">Time</th>
+              <th className="px-6 py-5 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Customer</th>
+              <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Items</th>
+              <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Subtotal</th>
+              <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Voucher</th>
+              <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Discount</th>
+              <th className="px-4 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest border-b">Net Total</th>
+              <th className="px-4 py-4 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b">Status</th>
+              <th className="px-4 py-4 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b">Rider</th>
+              <th className="px-4 py-4 text-center text-xs font-black text-gray-400 uppercase tracking-widest border-b">Time</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -169,7 +169,7 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
                   <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-800">
                     {order.customerName}
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-4 py-5">
                     <div className="text-xs text-gray-600 leading-relaxed">
                       {order.orderItems.map((item: any) => (
                         <div key={item.itemId}>
@@ -178,21 +178,21 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
                       ))}
                     </div>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-4 py-5 whitespace-nowrap text-sm text-gray-600">
                     ৳{order.subtotal.toLocaleString()}
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap">
+                  <td className="px-4 py-5 whitespace-nowrap">
                     <span className="px-2 py-1 bg-pink-50 text-[#E91E63] text-[10px] font-bold rounded border border-pink-100">
                       {order.voucherCode || "—"}
                     </span>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-red-500 font-medium">
+                  <td className="px-4 py-5 whitespace-nowrap text-sm text-red-500 font-medium">
                     -৳{order.discountAmount.toFixed(2)}
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-900">
+                  <td className="px-4 py-5 whitespace-nowrap text-sm font-bold text-gray-900">
                     ৳{(order.subtotal - order.discountAmount).toFixed(2)}
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-center">
+                  <td className="px-4 py-5 whitespace-nowrap text-center">
                       <button className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full py-0.5 shadow-sm shadow-red-200"
                         onClick={() => cancelOrder(order.orderId, order.status as OrderStatus)}
                       >
