@@ -23,6 +23,7 @@ export default function Menu({ params }: { params: Promise<{ restaurant_id: stri
   function category_modal_close() {
     setShowCreateCategoryModal(false);
   }
+  
   function category_modal_open() {
     setShowCreateCategoryModal(true);
   }
