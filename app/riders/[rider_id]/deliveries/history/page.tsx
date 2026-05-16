@@ -1,4 +1,5 @@
-import { cookies } from "next/headers";
+//ssr--
+
 import axios from "axios";
 import { Search, FileText, Eye, TrendingUp, Package, DollarSign } from "lucide-react";
 
@@ -203,15 +204,13 @@ export default async function DeliveryHistory({ params, searchParams }: PageProp
                   <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                     Date
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">
-                    Action
-                  </th>
+                
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-24 text-center">
+                    <td colSpan={6} className="py-24 text-center">
                       <div className="flex flex-col items-center gap-3 text-slate-400">
                         <div className="bg-slate-100 p-5 rounded-full">
                           <FileText size={40} className="opacity-50" />
@@ -253,15 +252,7 @@ export default async function DeliveryHistory({ params, searchParams }: PageProp
                       <td className="px-6 py-4 text-slate-500 text-sm">
                         {formatDate(item.orderAt)}
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <a
-                          href={`/riders/${rider_id}/orders/${item.orderId}`}
-                          className="inline-flex items-center justify-center p-2 rounded-xl text-pink-500 hover:bg-pink-50 border border-transparent hover:border-pink-100 transition-all"
-                          title="View order"
-                        >
-                          <Eye size={17} />
-                        </a>
-                      </td>
+                     
                     </tr>
                   ))
                 )}

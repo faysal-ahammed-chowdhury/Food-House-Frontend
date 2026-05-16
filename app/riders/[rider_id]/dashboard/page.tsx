@@ -60,11 +60,10 @@ useEffect(() => {
     <>
 
     <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* Header with toggle functionality */}
-      {/*<Header rider_id={rider_id} isOnline={isOnline} toggleStatus={toggleStatus} />*/}
+      
 
       <div className="flex flex-1">
-        {/*<Sidebar rider_id={rider_id} />*/}
+       
 
         <main className="flex-1 p-6 md:p-10">
           <div className="max-w-7xl mx-auto">
@@ -86,7 +85,7 @@ useEffect(() => {
               </div>
             </header>
 
-            {/* Stats Cards Grid (Matches Screenshot 2026-05-13 145846.png) */}
+            {/* Stats Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               <Statcard value={dashboard.activeDeliveries.toString()} label="ACTIVE DELIVERIES" />
               <Statcard value={
@@ -100,7 +99,7 @@ useEffect(() => {
         </main>
       </div>
 
-      {/*<Footer />*/}
+     
     </div>
     
     
