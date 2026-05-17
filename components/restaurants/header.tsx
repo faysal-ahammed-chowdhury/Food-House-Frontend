@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "@/contexts/auth/auth-context";
 import { UserRoles } from "@/enums/user-roles.enum";
+import Pusher from "pusher-js";
 
 export default function Header({ restaurant_id}: { restaurant_id: string}) {
   const [displayName, setDisplayName] = useState("");
@@ -30,6 +31,17 @@ export default function Header({ restaurant_id}: { restaurant_id: string}) {
       router.push("/");
     } catch {}
   };
+
+  useEffect(() => {
+    const pusher = new Pusher("7b2e3ff4ee3ff76372cd", {
+      cluster: "ap1",
+    });
+    const channel = pusher.subscribe("order-channel");
+    channel.bind("new-order", (data: any) => {
+      alert(data);
+
+    });
+  }, []);
   
   return (
     <header className="flex justify-between items-center px-10 py-3 border-b border-gray-100">
