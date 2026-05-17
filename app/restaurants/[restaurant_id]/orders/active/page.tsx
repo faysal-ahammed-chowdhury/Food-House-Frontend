@@ -41,6 +41,7 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
       setAllActiveOrders(response.data);
       console.log(response.data);
       handleFilter(currentFilter);
+      setCount(response.data.length);
     }
     catch{console.error("Error fetching active orders");}
   }
@@ -75,6 +76,10 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
 
   async function nextOrderStatus(orderId: string, curStatus: OrderStatus) {
     let nextStatus: OrderStatus | null = null;
+    if(curStatus === OrderStatus.PICKED){
+      alert("Wait for the rider to deliver the order. You cannot update the status of an order that has already been picked up.");
+      return;
+    }
     if(curStatus === OrderStatus.ACCEPTED){
       alert("Please wait for the rider to be assign.");
       return;
