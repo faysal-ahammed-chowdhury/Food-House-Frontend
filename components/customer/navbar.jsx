@@ -2,14 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation"; // 1. Import useRouter
+import axios from "axios";
+import { usePathname } from "next/navigation"; 
 import { useContext } from "react";
-import axios from "axios"; // 2. Import axios
 import AuthContext from "@/contexts/auth/auth-context";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const router = useRouter();
   const authContext = useContext(AuthContext);
 
   const isActive = (path) => {
