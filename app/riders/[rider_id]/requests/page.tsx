@@ -1,6 +1,6 @@
 "use client";
 
-import {useRouter } from "next/navigation";
+
 import { use, useEffect, useState } from "react";
 import axios from "axios";
 
@@ -9,13 +9,13 @@ export default function DeliveryRequests({ params }: { params: Promise<{ rider_i
   const [isOnline, setIsOnline] = useState(false);
   const [requests, setRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
-  const router = useRouter();
+  
   async function fetchStatus() {
     try {
 
       console.log("Fetching status for rider ID:", rider_id);
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`
+        `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`,{withCredentials: true}
       );
       if (response.status === 200) {
         setIsOnline(response.data.data.isOnline);
@@ -36,7 +36,7 @@ export default function DeliveryRequests({ params }: { params: Promise<{ rider_i
       setLoadingRequests(true);
 
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/rider/available`
+        `${process.env.NEXT_PUBLIC_API_URL}/rider/available`,{withCredentials: true}
       );
 
       setRequests(res.data);
@@ -58,11 +58,11 @@ export default function DeliveryRequests({ params }: { params: Promise<{ rider_i
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/rider/accept`, {
         orderId,
         riderId: rider_id,
-      });
+      },{withCredentials: true}
+    );
       // After accepting remv the accepted order from the list
       setRequests((prev) => prev.filter((req: any) => req.orderId !== orderId));
-     //onno page e jabe
-      //router.push(`/riders/${rider_id}/deliveries/active`);
+     
     } catch (error) {
       console.error("Error accepting delivery:", error);
     }

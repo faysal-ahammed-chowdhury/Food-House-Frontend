@@ -1,16 +1,17 @@
 //ssr--
-
+import { cookies } from "next/headers";
 import axios from "axios";
 import { Search, FileText, Eye, TrendingUp, Package, DollarSign } from "lucide-react";
 
-interface DeliveryHistoryItem {
+interface DeliveryHistoryItem  {
   orderId: number;
   restaurantName: string;
   customerName: string;
   total: number;
-  commissionAmount: number;
+  deliveryFee: number;
   orderAt: string;
 }
+
 
 interface PageProps {
   params: Promise<{ rider_id: string }>;
@@ -19,13 +20,19 @@ interface PageProps {
 
 async function getDeliveredOrders(riderId: string): Promise<DeliveryHistoryItem[]> {
   try {
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.getAll()
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
+
+
     const url = `${process.env.NEXT_PUBLIC_API_URL}/rider/${riderId}/delivered-count`;
-    const response = await axios.get(url, { withCredentials: true });
+    const response = await axios.get(url, { headers: { Cookie: cookieHeader }, withCredentials: true });
     if (response.data === 0) {
       return [];
     }
     try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/rider/${riderId}/delivered-orders`,);
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/rider/${riderId}/delivered-orders`, { headers: { Cookie: cookieHeader }, withCredentials: true });
     console.log("Delivered orders response:", response.data);
     return response.data;
   } catch (error) {
@@ -95,9 +102,11 @@ export default async function DeliveryHistory({ params, searchParams }: PageProp
   const history = await getDeliveredOrders(rider_id);
   const filtered = filterHistory(history, search, date);
 
-  const totalEarnings = history.reduce((sum, item) => sum + item.commissionAmount, 0);
+  const totalEarnings = history.reduce((sum, item) => sum + item.deliveryFee, 0);
   const totalOrders = history.length;
-  const avgOrder = totalOrders > 0 ? (history.reduce((s, i) => s + i.total, 0) / totalOrders).toFixed(0) : "0";
+  //customer bill 
+  const totalCustomerBill = history.reduce((sum, item) => sum + item.total, 0);
+  
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -129,10 +138,11 @@ export default async function DeliveryHistory({ params, searchParams }: PageProp
           />
           <StatCard
             icon={TrendingUp}
-            label="Avg. Order Value"
-            value={`৳${Number(avgOrder).toLocaleString()}`}
-            accent="bg-violet-500"
+            label="Total Customer Bill"
+            value={`৳${totalCustomerBill.toLocaleString()}`}
+            accent="bg-blue-500"
           />
+          
         </div>
 
         {/* Filters — SSR: submits via GET to reload the page */}
@@ -246,7 +256,7 @@ export default async function DeliveryHistory({ params, searchParams }: PageProp
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-full text-xs font-bold">
-                          ৳{item.commissionAmount.toLocaleString()}
+                          ৳{item.deliveryFee.toLocaleString()}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-slate-500 text-sm">
@@ -269,7 +279,7 @@ export default async function DeliveryHistory({ params, searchParams }: PageProp
               <p className="text-xs font-semibold text-slate-600">
                 Filtered earnings:{" "}
                 <span className="text-emerald-600">
-                  ৳{filtered.reduce((s, i) => s + i.commissionAmount, 0).toLocaleString()}
+                  ৳{filtered.reduce((s, i) => s + i.deliveryFee, 0).toLocaleString()}
                 </span>
               </p>
             </div>

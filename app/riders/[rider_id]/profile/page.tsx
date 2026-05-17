@@ -17,7 +17,7 @@ const riderSchema = z.object({
    .max(100, "Max 100 characters allowed."),
  
  
-  /*riderName: z.string().superRefine((val, ctx) => {
+  /*name: z.string().superRefine((val, ctx) => {
     if (val.trim() === "") {
       return;
       //ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Rider name is required."});
@@ -127,7 +127,7 @@ export default function Profile({ params }: { params: Promise<{ rider_id: string
   },[rider_id]);
  
 //toggle status function
-
+/*
 const toggleStatus = async () => {
   try {
     const newStatus = !isOnline;
@@ -145,11 +145,11 @@ const toggleStatus = async () => {
   } catch (error) {
     console.error("Toggle failed:", error);
   }
-};
+};*/
  
   async function fetchProfile() {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/rider/riders/" + rider_id);
+      const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/rider/riders/" + rider_id,{withCredentials: true});
       const data = response.data.data;
       setFormData({
         name: data.name || "",
@@ -186,6 +186,7 @@ const toggleStatus = async () => {
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
+  let flag=true;
   const id = Number(rider_id);
 
   // validation
@@ -205,6 +206,21 @@ const toggleStatus = async () => {
     return;
   }
 
+  if(formData.bkashAccount.length===0){
+    setErrors(prev => ({
+      ...prev,
+      bkashAccount: "Bkash account is required"
+    }));
+    flag=false;
+  }
+  if(formData.bankAccount.length===0){
+    setErrors(prev => ({
+      ...prev,
+      bankAccount: "Bank account is required"
+    }));
+    flag=false;
+  }
+  if(!flag) return;
   try {
     let passwordChanged = false;
 
@@ -234,7 +250,7 @@ const toggleStatus = async () => {
         {
           riderId: id,
           password: formData.oldPassword,
-        }
+        },{withCredentials: true}
       );
 
       if (!check.data.matched) {
@@ -245,7 +261,7 @@ const toggleStatus = async () => {
         return;
       }
 
-      // confirm password match (extra safety)
+      // confirm password match 
       if (formData.newPassword !== formData.confirmPassword) {
         setErrors(prev => ({
           ...prev,
@@ -258,8 +274,9 @@ const toggleStatus = async () => {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/change-password/${id}`,
         {
+          riderId: id,
           newPassword: formData.newPassword,
-        }
+        },{withCredentials: true}
       );
 
       passwordChanged = true;
@@ -275,7 +292,7 @@ const toggleStatus = async () => {
         phone: formData.phone,
         bkashAccount: formData.bkashAccount,
         bankAccount: formData.bankAccount,
-      }
+      },{withCredentials: true}
     );
 
     if (response.data.success) {
