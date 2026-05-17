@@ -2,17 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-<<<<<<< HEAD
-import { usePathname, useRouter } from "next/navigation"; // 1. Import useRouter
-import { useContext, useEffect } from "react";
-import axios from "axios"; // 2. Import axios
-import Pusher from "pusher-js";
-=======
 import axios from "axios";
 import { usePathname } from "next/navigation"; 
 import { useContext } from "react";
->>>>>>> 1287518647c816ff7e2039dc86b8754a3ac1ff90
 import AuthContext from "@/contexts/auth/auth-context";
+import { useEffect } from "react";
+import Pusher from "pusher-js";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -36,15 +31,17 @@ const Navbar = () => {
     }
   };
 
-  useEffect(() => {
-      const pusher = new Pusher("7b2e3ff4ee3ff76372cd", {
-        cluster: "ap1",
+    useEffect(() => {
+      if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+      const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_ID, {
+        cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
       });
       const channel = pusher.subscribe("delivery-channel");
       channel.bind("new-delivery", (data) => {
         alert(data);
       });
     }, []);
+
 
 
 
