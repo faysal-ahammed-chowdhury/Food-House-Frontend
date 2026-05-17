@@ -30,8 +30,8 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-      const pusher = new Pusher("7b2e3ff4ee3ff76372cd", {
-        cluster: "ap1",
+      const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_ID, {
+        cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
       });
       const channel = pusher.subscribe("delivery-channel");
       channel.bind("new-delivery", (data) => {

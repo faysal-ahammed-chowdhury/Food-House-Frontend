@@ -33,15 +33,16 @@ export default function Header({ restaurant_id}: { restaurant_id: string}) {
   };
 
   useEffect(() => {
-    const pusher = new Pusher("7b2e3ff4ee3ff76372cd", {
-      cluster: "ap1",
+    if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_ID, {
+      cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
     });
     const channel = pusher.subscribe("order-channel");
     channel.bind("new-order", (data: any) => {
       alert(data);
-
     });
   }, []);
+
   
   return (
     <header className="flex justify-between items-center px-10 py-3 border-b border-gray-100">
