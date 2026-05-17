@@ -39,8 +39,14 @@ export default function Header({ restaurant_id}: { restaurant_id: string}) {
     });
     const channel = pusher.subscribe("order-channel");
     channel.bind("new-order", (data: any) => {
-      alert(data);
+      if (String(data.restaurantId) === restaurant_id) {
+        alert(data.message);
+      }
     });
+    return () => {
+      channel.unbind_all();
+      pusher.disconnect(); 
+    };
   }, []);
 
   
