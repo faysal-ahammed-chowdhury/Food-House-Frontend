@@ -2,16 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-<<<<<<< HEAD
-import { usePathname, useRouter } from "next/navigation"; // 1. Import useRouter
-import { useContext, useEffect } from "react";
-import axios from "axios"; // 2. Import axios
-import Pusher from "pusher-js";
-=======
 import axios from "axios";
 import { usePathname } from "next/navigation"; 
 import { useContext } from "react";
->>>>>>> 1287518647c816ff7e2039dc86b8754a3ac1ff90
 import AuthContext from "@/contexts/auth/auth-context";
 
 const Navbar = () => {
