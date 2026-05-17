@@ -16,7 +16,7 @@ export default function ActiveDeliveries({
   const [loading, setLoading] = useState(false);
 
   // track picked orders
-  const [pickedOrders, setPickedOrders] = useState<number[]>([]);
+  
 
   // FETCH ACTIVE ORDERS
   async function fetchActiveDeliveries() {
@@ -24,7 +24,7 @@ export default function ActiveDeliveries({
       setLoading(true);
 
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/rider/${rider_id}/running-orders`
+        `${process.env.NEXT_PUBLIC_API_URL}/rider/${rider_id}/running-orders`, {withCredentials: true}
       );
 
       setDeliveries(res.data);
@@ -49,11 +49,15 @@ export default function ActiveDeliveries({
         {
           orderId,
           riderId:Number(rider_id),
-        }
+        },{withCredentials: true}
       );
 
       // update UI instantly
-      setPickedOrders((prev) => [...prev, orderId]);
+      setDeliveries((prev: any) =>
+        prev.map((item: any) =>
+          item.orderId === orderId ? { ...item, status: OrderStatus.PICKED } : item
+        )
+      );
 
     } catch (error:any) {
       //console.error("Pick up failed:", error);
@@ -66,13 +70,11 @@ export default function ActiveDeliveries({
         `${process.env.NEXT_PUBLIC_API_URL}/rider/delivered`,
         {
           orderId,
-          //riderId: rider_id,
           riderId:Number(rider_id)
-        }
+        },{withCredentials: true}
       );
       //remove from UI after delivery
-      setDeliveries((prev: any) =>
-      prev.filter((item: any) => item.orderId !== orderId)
+      setDeliveries((prev: any) => prev.filter((item: any) => item.orderId !== orderId)
     );
     }
     catch (error) {
@@ -174,9 +176,9 @@ export default function ActiveDeliveries({
                             <>
                               <button
                                 onClick={() => handlePickUp(req.orderId)}
-                                disabled={pickedOrders.includes(req.orderId)}
+                                disabled={req.status === OrderStatus.PICKED}
                                 className={`px-4 py-2 rounded-lg text-sm mr-3 ${
-                                  pickedOrders.includes(req.orderId)
+                                  req.status === OrderStatus.PICKED
                                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                                     : "bg-red-500 hover:bg-red-600 text-white"
                                 }`}
@@ -186,11 +188,11 @@ export default function ActiveDeliveries({
 
                               <button
                                 onClick={() => handleDeliver(req.orderId)}
-                                disabled={!pickedOrders.includes(req.orderId)}
+                               disabled={req.status !== OrderStatus.PICKED}
                                 className={`px-4 py-2 rounded-lg text-sm ${
-                                  pickedOrders.includes(req.orderId)
-                                    ? "bg-green-500 hover:bg-green-600 text-white"
-                                    : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                  req.status !== OrderStatus.PICKED
+                                    ?  "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                    : "bg-green-500 hover:bg-green-600 text-white"
                                 }`}
                               >
                                 Deliver

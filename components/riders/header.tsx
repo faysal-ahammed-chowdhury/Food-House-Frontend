@@ -37,7 +37,7 @@ export default function Header({ rider_id}: { rider_id: string}) {
 
     console.log("Fetching status for rider ID:", rider_id);
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`
+      `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`,{withCredentials: true}
     );
     if (response.status === 200) {
       setIsOnline(response.data.data.isOnline);
@@ -57,7 +57,7 @@ useEffect(() => {
     
         await axios.patch(
           `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`,
-          { isOnline: newStatus }
+          { isOnline: newStatus },{withCredentials: true}
         );
     
        fetchStatus();
