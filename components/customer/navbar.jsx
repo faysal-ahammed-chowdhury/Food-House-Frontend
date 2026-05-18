@@ -31,16 +31,16 @@ const Navbar = () => {
     }
   };
 
-    useEffect(() => {
-      if (!process.env.NEXT_PUBLIC_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
-      const pusher = new Pusher(process.env.NEXT_PUBLIC_KEY, {
-        cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
-      });
-      const channel = pusher.subscribe("delivery-channel");
-      channel.bind("new-delivery", (data) => {
-        alert(data.message);
-      });
-    }, []);
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+     const pusher = new Pusher(process.env.NEXT_PUBLIC_KEY, {
+       cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
+    });
+    const channel = pusher.subscribe("delivery-channel");
+    channel.bind("new-delivery", (data) => {
+      alert(data.message);
+    });
+  }, []);
 
 
 
