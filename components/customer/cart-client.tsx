@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import AuthContext from "@/contexts/auth/auth-context";
 import { useRouter } from "next/navigation";
-// 👇 Import your engine
-import { getGlobalCart, saveRestaurantCart, clearRestaurantCart } from "./cart-manager";
+import AuthContext from "@/contexts/auth/auth-context";
+import { useState, useEffect, useContext } from "react";
+import { getGlobalCart, saveRestaurantCart } from "./cart-manager";
 
 export default function CartClient() {
   
@@ -15,21 +14,19 @@ export default function CartClient() {
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // 1. LOAD: Ask the engine for the whole cabinet
+  // 1. LOAD CART DATA 
   useEffect(() => {
     if (authContext?.isLoadingUser) return;
-
     if (!authContext?.user) {
       router.push("/auth/login");
       return;
     }
     const globalCart = getGlobalCart();
-    // Convert the object { "1": {...}, "2": {...} } into an array
     setRestaurants(Object.values(globalCart));
     setIsLoaded(true);
   }, []);
 
-  // 2. Quantity Controls (Uses the engine)
+  // 2. UPDATE CART DATA (Quantity Changes)
   const handleQuantityControl = (restaurantId: string, itemId: number, action: "increase" | "decrease") => {
     const globalCart = getGlobalCart();
     const targetCart = globalCart[restaurantId];
@@ -45,12 +42,11 @@ export default function CartClient() {
     const newSubtotal = updatedItems.reduce((acc: number, i: any) => acc + i.itemPrice * i.quantity, 0);
     const updatedCart = { ...targetCart, items: updatedItems, subtotal: newSubtotal, total: newSubtotal + targetCart.deliveryFee };
 
-    // Save it to the engine, then update the screen
     saveRestaurantCart(restaurantId, updatedCart);
     setRestaurants(Object.values(getGlobalCart())); 
   };
 
-  // 3. Remove Items (Uses the engine)
+  // 3. Remove Items
   const handleRemoveItem = (restaurantId: string, itemId: number) => {
     const globalCart = getGlobalCart();
     const targetCart = globalCart[restaurantId];
@@ -94,14 +90,18 @@ export default function CartClient() {
                 {group.items.map((item: any) => (
                   <div key={item.itemId} className="flex gap-4 items-center">
                     <div className="w-[70px] h-[70px] rounded-xl overflow-hidden relative flex-shrink-0">
-                      <Image src={item.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1000&q=80"} alt={item.itemName} fill unoptimized className="object-cover" />
+                      <Image src={item.imageUrl} alt={item.itemName} fill unoptimized className="object-cover" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-extrabold text-[#1a202c] mb-2">{item.itemName}</h3>
-                      <div className="inline-flex items-center gap-3 bg-pink-50 text-[#f0146b] rounded-full px-3 py-1 font-bold text-sm">
-                        <button onClick={() => handleQuantityControl(group.restaurantId, item.itemId, "decrease")}>-</button>
+                      <div className="inline-flex items-center gap-4 bg-pink-50 text-[#f0146b] rounded-full px-3 py-1.5 font-bold text-md">
+                        <button onClick={() => handleQuantityControl(group.restaurantId, item.itemId, "decrease")}>
+                          -
+                        </button>
                         <span>{item.quantity}</span>
-                        <button onClick={() => handleQuantityControl(group.restaurantId, item.itemId, "increase")}>+</button>
+                        <button onClick={() => handleQuantityControl(group.restaurantId, item.itemId, "increase")}>
+                          +
+                        </button>
                       </div>
                     </div>
                     <div className="text-right flex flex-col justify-between items-end h-[70px]">

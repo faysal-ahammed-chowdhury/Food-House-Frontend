@@ -20,17 +20,33 @@ export default function MenuSection({
   onUpdateQuantity: (itemId: number, action: "increase" | "decrease") => void;
   isRestaurantOpen?: boolean;
 }) {
+
   const authContext = useContext(AuthContext);
-  const isLoggedIn = !!authContext?.user; // true if user exists, false if null
+  const isLoggedIn = authContext?.user ? true : false;
   const canAddToCart = isRestaurantOpen && isLoggedIn;
   
   // Group the flat array of items into categories based on the category relation
-  const groupedMenu = menuItems.reduce((acc: any, item: any) => {
-    const categoryName = item.category?.name || "Uncategorized";
-    if (!acc[categoryName]) acc[categoryName] = [];
-    acc[categoryName].push(item);
-    return acc;
+  const groupedMenu = menuItems.reduce((res: any, item: any) => {
+    const categoryName = item.category?.name ;
+    if (!res[categoryName]) res[categoryName] = [];
+    res[categoryName].push(item);
+    return res;
   }, {});
+//  [
+//   { "name": "Burger", "category": { "name": "Mains" } },
+//   { "name": "Pizza", "category": { "name": "Mains" } },
+//   { "name": "Coke", "category": { "name": "Drinks" } }
+//  ]
+// ------------------------>
+// {
+//   "Mains": [
+//     { "name": "Burger", "category": { "name": "Mains" } },
+//     { "name": "Pizza", "category": { "name": "Mains" } }
+//   ],
+//   "Drinks": [
+//     { "name": "Coke", "category": { "name": "Drinks" } }
+//   ]
+// }
 
   if (!menuItems || menuItems.length === 0) {
     return (
@@ -52,8 +68,6 @@ export default function MenuSection({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {items.map((item: any) => {
               const cartItem = cartItems.find((c) => c.itemId === item.itemId);
-              const defaultImage = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=200&auto=format&fit=crop";
-
               return (
                 <div
                   key={item.itemId}
@@ -63,7 +77,7 @@ export default function MenuSection({
                 >
                   <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative flex-shrink-0">
                     <Image
-                      src={item.imageUrl || defaultImage}
+                      src={item.imageUrl}
                       alt={item.name}
                       fill
                       unoptimized

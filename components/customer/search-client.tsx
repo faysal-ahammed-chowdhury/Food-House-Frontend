@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function SearchClient(
-  { query, initialResults }: { query: string;initialResults: { restaurants: any[]; items: any[] };}) {
+  { query, initialResults }: 
+  { query: string; initialResults: { restaurants: any[]; items: any[] }; }) {
   const restaurants = initialResults?.restaurants || [];
   const items = initialResults?.items || [];
 
@@ -17,9 +18,7 @@ export default function SearchClient(
             Search Results
           </h1>
           <p className="text-gray-500 text-lg">
-            {query
-              ? `Result for "${query}"`
-              : "Search for restaurants or items"}
+            {query ? `Result for "${query}"` : "Search for restaurants or items"}
           </p>
         </div>
 
@@ -27,7 +26,7 @@ export default function SearchClient(
         <SearchInput initialQuery={query} />
       </div>
 
-      {/* --- RELATED ITEMS SECTION --- */}
+      {/* --- ITEMS SECTION --- */}
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-4">
           <svg className="w-7 h-7 text-[#f0146b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +58,6 @@ export default function SearchClient(
                     <p className="text-[#f0146b] font-extrabold mt-1">৳{item.price}</p>
                   </div>
                   
-                  {/* arrow icon */}
                   <div className="text-gray-300 pr-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>

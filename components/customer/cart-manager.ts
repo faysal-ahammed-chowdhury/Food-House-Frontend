@@ -2,7 +2,7 @@
 const CART_KEY = "foodhouse_cart";
 
 export const getGlobalCart = () => {
-  if (typeof window === "undefined") return {}; // SSR Safety
+  if (typeof window === "undefined") return {}; // server side hoile agei return
   try {
     const saved = localStorage.getItem(CART_KEY);
     return saved ? JSON.parse(saved) : {};
