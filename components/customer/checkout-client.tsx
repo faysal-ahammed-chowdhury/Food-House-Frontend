@@ -1,49 +1,46 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
+import { useState, useEffect, useContext} from "react";
+import AuthContext from "@/contexts/auth/auth-context";
 import { getRestaurantCart, clearRestaurantCart } from "./cart-manager";
 
-export default function CheckoutClient({
-  restaurantId,
-  customer, 
-}: {
-  restaurantId: string;
-  customer: any;
-}) {
+
+export default function CheckoutClient({restaurantId,customer}:
+  {restaurantId: string; customer: any;}) {
+
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "BANK" | "BKASH">("COD");
   const [voucherCode, setVoucherCode] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
   const [cartData, setCartData] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  
+  const authContext = useContext(AuthContext);
+  const userId = authContext?.user?.userId;
 
-  // 1. LOAD: Get only this specific restaurant's data
   useEffect(() => {
-    if (restaurantId) {
-      const cart = getRestaurantCart(restaurantId as string);
+    if (restaurantId && userId) {
+      const cart = getRestaurantCart(restaurantId, userId);
       if (cart) {
         setCartData(cart);
       }
     }
     setIsLoaded(true);
-  }, [restaurantId]);
+  }, [restaurantId, userId]);
 
-  // 2. The actual API call to place the order
+
+ 
   const handlePlaceOrder = async () => {
     if (!cartData || !cartData.items || cartData.items.length === 0) {
       alert("Your cart is empty!");
       return;
     }
-
     setIsProcessing(true);
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      
-
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
       const payload = {
         restaurantId: parseInt(restaurantId, 10),
         restaurantName: cartData.restaurantName,
@@ -55,18 +52,12 @@ export default function CheckoutClient({
           quantity: item.quantity,
         })),
       };
-
-      // Send the POST request
-      await axios.post(`${API_URL}/customers/orders`, payload, {
-        withCredentials: true
-      });
-
-      // 👇 Look how clean this is now! The engine does all the work.
-      clearRestaurantCart(restaurantId as string);
-      
+      await axios.post(`${API_URL}/customers/orders`, payload, {withCredentials: true});
+      clearRestaurantCart(restaurantId, userId);
       setIsProcessing(false);
       setIsSuccess(true);
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Failed to place order:", error);
       setIsProcessing(false);
       alert("Something went wrong trying to place your order. Please try again.");
@@ -116,7 +107,7 @@ export default function CheckoutClient({
     );
   }
 
-  const customerName = customer?.user?.name || customer?.name || "Customer";
+  const customerName = customer?.user?.name || "Customer";
   const customerAddress = customer?.address || "Please update your address in profile";
   const customerPhone = customer?.phone || "No phone provided";
 

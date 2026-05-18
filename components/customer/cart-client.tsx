@@ -4,15 +4,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import AuthContext from "@/contexts/auth/auth-context";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext} from "react";
 import { getGlobalCart, saveRestaurantCart } from "./cart-manager";
 
 export default function CartClient() {
   
-  const authContext = useContext(AuthContext);
   const router = useRouter();
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const authContext = useContext(AuthContext);
+  const userId = authContext?.user?.userId;
 
   // 1. LOAD CART DATA 
   useEffect(() => {
@@ -21,14 +23,14 @@ export default function CartClient() {
       router.push("/auth/login");
       return;
     }
-    const globalCart = getGlobalCart();
+    const globalCart = getGlobalCart(userId);
     setRestaurants(Object.values(globalCart));
     setIsLoaded(true);
   }, []);
 
   // 2. UPDATE CART DATA (Quantity Changes)
   const handleQuantityControl = (restaurantId: string, itemId: number, action: "increase" | "decrease") => {
-    const globalCart = getGlobalCart();
+    const globalCart = getGlobalCart(userId);
     const targetCart = globalCart[restaurantId];
     if (!targetCart) return;
 
@@ -42,13 +44,13 @@ export default function CartClient() {
     const newSubtotal = updatedItems.reduce((acc: number, i: any) => acc + i.itemPrice * i.quantity, 0);
     const updatedCart = { ...targetCart, items: updatedItems, subtotal: newSubtotal, total: newSubtotal + targetCart.deliveryFee };
 
-    saveRestaurantCart(restaurantId, updatedCart);
-    setRestaurants(Object.values(getGlobalCart())); 
+    saveRestaurantCart(restaurantId, updatedCart, userId);
+    setRestaurants(Object.values(getGlobalCart(userId))); 
   };
 
   // 3. Remove Items
   const handleRemoveItem = (restaurantId: string, itemId: number) => {
-    const globalCart = getGlobalCart();
+    const globalCart = getGlobalCart(userId);
     const targetCart = globalCart[restaurantId];
     if (!targetCart) return;
 
@@ -56,8 +58,8 @@ export default function CartClient() {
     const newSubtotal = updatedItems.reduce((acc: number, i: any) => acc + i.itemPrice * i.quantity, 0);
     const updatedCart = { ...targetCart, items: updatedItems, subtotal: newSubtotal, total: newSubtotal + targetCart.deliveryFee };
 
-    saveRestaurantCart(restaurantId, updatedCart);
-    setRestaurants(Object.values(getGlobalCart()));
+    saveRestaurantCart(restaurantId, updatedCart, userId);
+    setRestaurants(Object.values(getGlobalCart(userId)));
   };
 
   if (!isLoaded) return null;

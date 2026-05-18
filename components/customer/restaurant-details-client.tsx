@@ -2,8 +2,11 @@
 
 import MenuSection from "./menu-section";
 import StickyCart from "./sticky-cart"; 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import AuthContext from "@/contexts/auth/auth-context";
 import { getRestaurantCart, saveRestaurantCart } from "./cart-manager";
+
+
 
 export default function RestaurantDetailsClient({ restaurant }: { restaurant: any }) {
   const [cartItems, setCartItems] = useState<any[]>([]);
@@ -13,14 +16,17 @@ export default function RestaurantDetailsClient({ restaurant }: { restaurant: an
   const deliveryFee = restaurant.currentDeliveryFee || 50;
   const stringRestaurantId = restaurant.restaurantId.toString();
 
+  const authContext = useContext(AuthContext);
+  const userId = authContext?.user?.userId;
+
   // 1. Load data when component mounts (or when restaurant changes)
   useEffect(() => {
-    const existingCart = getRestaurantCart(stringRestaurantId);
+    const existingCart = getRestaurantCart(stringRestaurantId, userId);
     if (existingCart && existingCart.items) {
       setCartItems(existingCart.items);
     }
     setIsLoaded(true);
-  }, [stringRestaurantId]);//resturant id change hole cart data load hobe 
+  }, [stringRestaurantId, userId]);//resturant id change hole cart data load hobe 
 
   // 2. Save data whenever cartItems changes
   useEffect(() => {
@@ -34,9 +40,9 @@ export default function RestaurantDetailsClient({ restaurant }: { restaurant: an
         total: subtotal + deliveryFee,
         items: cartItems,
       };
-      saveRestaurantCart(stringRestaurantId, cartData);
+      saveRestaurantCart(stringRestaurantId, cartData, userId);
     }
-  }, [cartItems, isLoaded, stringRestaurantId, restaurantName, deliveryFee]);
+  }, [cartItems, isLoaded, stringRestaurantId, restaurantName, deliveryFee, userId]);
 
   const handleAddToCart = (item: any) => {
     setCartItems((prev) => [...prev, { ...item, quantity: 1 }]);
@@ -54,7 +60,7 @@ export default function RestaurantDetailsClient({ restaurant }: { restaurant: an
     );
   };
   
-  const bannerImage = restaurant.bannerUrl;
+  const bannerImage = restaurant.bannerUrl || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdGF1cmFudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60";
   if (!isLoaded) return null;
 
   return (
