@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "@/contexts/auth/auth-context";
 import { UserRoles } from "@/enums/user-roles.enum";
+import Pusher from "pusher-js";
 
 export default function Header({ rider_id}: { rider_id: string}) {
   const [displayName, setDisplayName] = useState("");
@@ -46,6 +47,25 @@ export default function Header({ rider_id}: { rider_id: string}) {
     console.error("Error fetching rider status:", error);
   }
 }
+
+
+
+useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_APP_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_KEY, {
+      cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
+    });
+    const channel = pusher.subscribe("rider-channel");
+    channel.bind("rider-order", (data: any) => {
+      if (String(data.riderId) === rider_id){
+        alert(data.message);
+      }
+    });
+    return () => {
+      channel.unbind_all();
+      pusher.disconnect(); 
+    };
+  }, []);
 
 useEffect(() => {
   fetchStatus();
