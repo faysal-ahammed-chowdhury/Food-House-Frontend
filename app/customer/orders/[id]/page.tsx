@@ -9,11 +9,8 @@ export const metadata = {
   title: "Order Details | FoodHouse",
 };
 
-export default async function OrderDetailsPage({
-  params,
-}: {
-  params: Promise<{ id: string }>; 
-}) {
+export default async function OrderDetailsPage(
+  {params}: {params: Promise<{ id: string }>; }) {
   let orderData = null;
   
   const resolvedParams = await params;
@@ -63,7 +60,6 @@ export default async function OrderDetailsPage({
       </div>
 
       <main className="max-w-6xl xl:mx-auto w-full px-8 py-10">
-        {/* Pass the real database data into the client component */}
         <OrderDetailsClient order={orderData} />
       </main>
     </div>

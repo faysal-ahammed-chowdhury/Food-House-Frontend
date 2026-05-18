@@ -93,7 +93,6 @@ export default function OrdersClient(
                   <p className="text-2xl font-extrabold text-gray-900 mb-1">
                     ৳{order.total}
                   </p>
-                  {/* Only show estimated delivery if the order isn't cancelled */}
                   {order.status !== "CANCELLED" && (
                     <p className="text-[#f0146b] font-semibold text-sm mb-3">
                       Estimated Delivery: {order.maxPrepTime + 15} mins
