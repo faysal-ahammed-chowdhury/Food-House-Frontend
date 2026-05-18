@@ -37,20 +37,16 @@ export default function ProfileClient() {
   const authContext = useContext(AuthContext);
   const router = useRouter();
 
-  const [profile, setProfile] = useState({
-    name: "", email: "", phone: "", address: "", role: "",
-  });
-
-  const [passwords, setPasswords] = useState({
-    newPassword: "", confirmPassword: "",
-  });
-
+  const [profile, setProfile] = useState({ name: "", email: "", phone: "", address: "", role: "",});
+  const [passwords, setPasswords] = useState({newPassword: "", confirmPassword: "",});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [errorMessages, setErrorMessages] = useState<string[]>([]);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [profileErrors, setProfileErrors] = useState<string[]>([]);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [profileSuccess, setProfileSuccess] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     if (authContext?.isLoadingUser) return;
@@ -82,13 +78,11 @@ export default function ProfileClient() {
     fetchProfile();
   }, [authContext, router]);
 
-  // 2. SAVE PROFILE TO BACKEND
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessages([]); 
-    setSuccessMessage("");
+    setProfileErrors([]); 
+    setProfileSuccess(null);
     
-    // 3. Zod Validation for Profile
     const result = profileSchema.safeParse({
       name: profile.name,
       phone: profile.phone,
@@ -96,9 +90,8 @@ export default function ProfileClient() {
     });
 
     if (!result.success) {
-      // Extract all error messages into a simple string array
       const errors = result.error.issues.map((err) => err.message);
-      setErrorMessages(errors);
+      setProfileErrors(errors);
       return;
     }
 
@@ -112,23 +105,21 @@ export default function ProfileClient() {
         withCredentials: true 
       });
       
-      setSuccessMessage("Profile updated successfully!"); 
-      setTimeout(() => setSuccessMessage(""), 3000); 
+      setProfileSuccess("Profile updated successfully!"); 
+      setTimeout(() => setProfileSuccess(null), 3000); 
     } catch (error: any) {
       const backendError = error.response?.data?.message;
-      setErrorMessages(Array.isArray(backendError) ? backendError : [backendError || "Failed to update profile"]);
+      setProfileErrors(Array.isArray(backendError) ? backendError : [backendError || "Failed to update profile"]);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // 4. Update Password
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessages([]);
-    setSuccessMessage("");
+    setPasswordErrors([]);
+    setPasswordSuccess(null);
 
-    // 5. Zod Validation for Password
     const result = passwordSchema.safeParse({
       newPassword: passwords.newPassword,
       confirmPassword: passwords.confirmPassword,
@@ -136,7 +127,7 @@ export default function ProfileClient() {
 
     if (!result.success) {
       const errors = result.error.issues.map((err) => err.message);
-      setErrorMessages(errors);
+      setPasswordErrors(errors);
       return;
     }
 
@@ -148,18 +139,27 @@ export default function ProfileClient() {
         withCredentials: true
       });
     
-      setSuccessMessage(response.data.message);
+      setPasswordSuccess("Password updated successfully!");
       setPasswords({ newPassword: "", confirmPassword: "" }); 
-      setTimeout(() => setSuccessMessage(""), 3000);
+      setTimeout(() => setPasswordSuccess(null), 3000);
     } catch (error: any) {
       const backendError = error.response?.data?.message;
-      setErrorMessages(Array.isArray(backendError) ? backendError : [backendError || "Failed to update password"]);
+      setPasswordErrors(Array.isArray(backendError) ? backendError : [backendError || "Failed to update password"]);
     }
   };
 
-  const handleDeleteAccount = () => {
-    if (confirm("Are you sure you want to delete your account? This cannot be undone.")) {
-      alert("Account deletion endpoint needs to be created on backend!");
+  const handleDeleteAccount = async () => {
+    if (window.confirm("Are you sure you want to delete your account? This cannot be undone.")) {
+      try {
+        setIsSaving(true); 
+        await axios.delete(`${API_URL}/customers/account`, { withCredentials: true });
+        await axios.post(`${API_URL}/auth/logout`, {}, { withCredentials: true });
+        window.location.href = "/auth/login";
+      } catch (error) {
+        console.error("Failed to delete account:", error);
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -187,8 +187,10 @@ export default function ProfileClient() {
       </div>
 
       <div className="flex flex-col gap-6">
+        
         {/* --- CARD 1: MAIN PROFILE --- */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+          
           <div className="flex items-center gap-6 mb-8">
             <div className="w-24 h-24 bg-[#f0146b] rounded-2xl flex items-center justify-center text-white text-4xl font-extrabold shadow-md">
               {profile.name ? profile.name.charAt(0).toUpperCase() : "U"}
@@ -203,28 +205,29 @@ export default function ProfileClient() {
             </div>
           </div>
 
-          {/* Profile Form */}
+          {/* PROFILE */}
           <form onSubmit={handleSaveProfile} className="flex flex-col gap-6">
-            {errorMessages.length > 0 && (
+            {profileErrors.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                 <div className="flex items-center gap-2 text-red-600 font-bold mb-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  Please fix the following errors:
+                  Please fix the following profile errors:
                 </div>
                 <ul className="list-disc pl-7 text-sm text-red-600 font-medium space-y-1">
-                  {errorMessages.map((msg, index) => (
+                  {profileErrors.map((msg, index) => (
                     <li key={index}>{msg}</li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {successMessage && (
+            {profileSuccess && (
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-2 text-green-600 font-bold">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                {successMessage}
+                {profileSuccess}
               </div>
             )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
                 <label className="flex items-center gap-2 text-sm font-extrabold text-[#1a202c]">
@@ -235,11 +238,10 @@ export default function ProfileClient() {
                   value={profile.name}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                   className="border border-gray-200 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:border-[#f0146b] focus:ring-1 focus:ring-[#f0146b] transition-colors"
-                  
                 />
               </div>
 
-              {/* Email Address (Disabled per PRD) */}
+              {/* Email Address */}
               <div className="flex flex-col gap-2">
                 <label className="flex items-center gap-2 text-sm font-extrabold text-[#1a202c]">
                   Email Address
@@ -263,7 +265,6 @@ export default function ProfileClient() {
                 value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                 className="border border-gray-200 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:border-[#f0146b] focus:ring-1 focus:ring-[#f0146b] transition-colors"
-                
               />
             </div>
 
@@ -277,7 +278,6 @@ export default function ProfileClient() {
                 value={profile.address}
                 onChange={(e) => setProfile({ ...profile, address: e.target.value })}
                 className="border border-gray-200 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:border-[#f0146b] focus:ring-1 focus:ring-[#f0146b] transition-colors resize-none"
-                
               ></textarea>
             </div>
 
@@ -293,13 +293,34 @@ export default function ProfileClient() {
           </form>
         </div>
 
-        {/* --- CARD 2: SECURITY --- */}
+        {/* - SECURITY - */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
           <div className="flex items-center gap-2 mb-6">
             <h2 className="text-xl font-extrabold text-[#1a202c]">Security</h2>
           </div>
 
-          <form onSubmit={handleUpdatePassword} className="flex flex-col gap-6">
+          <form onSubmit={handleUpdatePassword} className="flex flex-col gap-6">   
+            {passwordErrors.length > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-red-600 font-bold mb-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  Password Update Failed:
+                </div>
+                <ul className="list-disc pl-7 text-sm text-red-600 font-medium space-y-1">
+                  {passwordErrors.map((msg, index) => (
+                    <li key={index}>{msg}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {passwordSuccess && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-2 text-green-600 font-bold">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                {passwordSuccess}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-extrabold text-[#1a202c]">New Password</label>
