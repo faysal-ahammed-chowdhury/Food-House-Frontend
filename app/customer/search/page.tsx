@@ -13,7 +13,7 @@ export default async function SearchPage({ searchParams }: any) {
 
   if (query) {
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
       const response = await axios.get(`${API_URL}/customers/search?query=${query}`);
       
       if (response.data) {
