@@ -27,7 +27,6 @@ export default function StickyCart({
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      {/* Cart Header */}
       <div className="flex items-center gap-2 mb-6 border-b border-gray-50 pb-4">
         <svg
           className="w-5 h-5 text-[#f0146b]"
@@ -46,7 +45,6 @@ export default function StickyCart({
       </div>
 
       {cartItems.length === 0 ? (
-        // Empty State
         <div className="text-center py-8 text-gray-400">
           <p>Your cart is empty.</p>
           <p className="text-sm">Add some items from the menu!</p>
@@ -56,21 +54,12 @@ export default function StickyCart({
           {/* Cart Items List */}
           <div className="flex flex-col gap-4 mb-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {cartItems.map((item) => (
-              <div
-                key={item.itemId}
-                className="flex justify-between items-start"
-              >
+              <div key={item.itemId} className="flex justify-between items-start">
                 <div>
-                  <h4 className="font-extrabold text-[#1a202c] text-sm">
-                    {item.itemName}
-                  </h4>
-                  <p className="text-gray-400 text-xs mt-0.5">
-                    ৳{item.itemPrice} x {item.quantity}
-                  </p>
+                  <h4 className="font-extrabold text-[#1a202c] text-sm">{item.itemName}</h4>
+                  <p className="text-gray-400 text-xs mt-0.5"> ৳{item.itemPrice} x {item.quantity} </p>
                 </div>
-                <span className="font-extrabold text-[#1a202c] text-sm">
-                  ৳{item.itemPrice * item.quantity}
-                </span>
+                <span className="font-extrabold text-[#1a202c] text-sm">৳{item.itemPrice * item.quantity}</span>
               </div>
             ))}
           </div>
@@ -86,20 +75,12 @@ export default function StickyCart({
               <span className="font-bold text-[#1a202c]">৳{deliveryFee}</span>
             </div>
             <div className="flex justify-between items-center pt-3 mt-1 border-t border-gray-50">
-              <span className="text-lg font-extrabold text-[#1a202c]">
-                Total
-              </span>
-              <span className="text-xl font-extrabold text-[#1a202c]">
-                ৳{total}
-              </span>
+              <span className="text-lg font-extrabold text-[#1a202c]">Total</span>
+              <span className="text-xl font-extrabold text-[#1a202c]">৳{total}</span>
             </div>
           </div>
 
-          {/* Checkout Button - NOW USES OUR NEW FUNCTION! */}
-          <button 
-            onClick={handleProceedToCheckout}
-            className="w-full bg-[#f0146b] hover:bg-pink-600 transition-colors text-white font-bold py-3.5 rounded-xl shadow-sm text-sm"
-          >
+          <button onClick={handleProceedToCheckout} className="w-full bg-[#f0146b] hover:bg-pink-600 transition-colors text-white font-bold py-3.5 rounded-xl shadow-sm text-sm">
             Go to Checkout
           </button>
         </>
