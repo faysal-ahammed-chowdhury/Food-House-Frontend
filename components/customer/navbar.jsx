@@ -38,7 +38,7 @@ const Navbar = () => {
       });
       const channel = pusher.subscribe("delivery-channel");
       channel.bind("new-delivery", (data) => {
-        alert(data);
+        alert(data.message);
       });
     }, []);
 
