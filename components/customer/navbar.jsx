@@ -32,8 +32,8 @@ const Navbar = () => {
   };
 
     useEffect(() => {
-      if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
-      const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_ID, {
+      if (!process.env.NEXT_PUBLIC_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+      const pusher = new Pusher(process.env.NEXT_PUBLIC_KEY, {
         cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
       });
       const channel = pusher.subscribe("delivery-channel");
