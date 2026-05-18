@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect} from "react";
+
 import Link from "next/link";
 import axios from "axios";
+import { useState, useEffect, useContext} from "react";
+import AuthContext from "@/contexts/auth/auth-context";
 import { getRestaurantCart, clearRestaurantCart } from "./cart-manager";
+
 
 export default function CheckoutClient({restaurantId,customer}:
   {restaurantId: string; customer: any;}) {
@@ -13,18 +16,20 @@ export default function CheckoutClient({restaurantId,customer}:
   const [isSuccess, setIsSuccess] = useState(false);
   const [cartData, setCartData] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const userId = customer?.user?.id;
+  
+  const authContext = useContext(AuthContext);
+  const userId = authContext?.user?.userId;
 
   // 1. LOAD: Get only this specific restaurant's data
   useEffect(() => {
-    if (restaurantId) {
+    if (restaurantId && userId) {
       const cart = getRestaurantCart(restaurantId, userId);
       if (cart) {
         setCartData(cart);
       }
     }
     setIsLoaded(true);
-  }, [restaurantId]);
+  }, [restaurantId, userId]);
 
   // 2. The actual API call to place the order
   const handlePlaceOrder = async () => {
@@ -32,13 +37,10 @@ export default function CheckoutClient({restaurantId,customer}:
       alert("Your cart is empty!");
       return;
     }
-
     setIsProcessing(true);
 
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      
-
       const payload = {
         restaurantId: parseInt(restaurantId, 10),
         restaurantName: cartData.restaurantName,
