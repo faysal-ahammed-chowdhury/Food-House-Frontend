@@ -129,15 +129,24 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
     }
   }
 
+  const filteredOrders = useMemo(() => {
+    return allactiveOrders.filter(
+      (order) => currentFilter === "ALL" || order.status === currentFilter
+    );
+  }, [allactiveOrders, currentFilter]);
+
+
+
+  //customer pending pusher
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_ID, {
+    if (!process.env.NEXT_PUBLIC_APP_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_KEY, {
       cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
     });
     const channel = pusher.subscribe("order-channel");
     channel.bind("new-order", (data: any) => {
       if (String(data.restaurantId) === restaurant_id) {
-        console.log("New order received via Pusher:", data);
+        // console.log("New order received via Pusher:", data);
         fetchActiveOrders();
       }
     });
@@ -147,11 +156,45 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
     };
   }, [fetchActiveOrders]);
 
-  const filteredOrders = useMemo(() => {
-  return allactiveOrders.filter(
-    (order) => currentFilter === "ALL" || order.status === currentFilter
-  );
-}, [allactiveOrders, currentFilter]);
+
+  // rider_assigned pusher
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_APP_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_KEY, {
+      cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
+    });
+    const channel = pusher.subscribe("rider_assigned-channel");
+    channel.bind("rider_assigned", (data: any) => {
+      if (String(data.restaurantId) === restaurant_id) {
+        fetchActiveOrders();
+      }
+    });
+    return () => {
+      channel.unbind_all();
+      pusher.disconnect(); 
+    };
+  }, [fetchActiveOrders]);
+
+
+  // picked pusher
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_APP_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_KEY, {
+      cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
+    });
+    const channel = pusher.subscribe("picked-channel");
+    channel.bind("picked", (data: any) => {
+      if (String(data.restaurantId) === restaurant_id) {
+        fetchActiveOrders();
+      }
+    });
+    return () => {
+      channel.unbind_all();
+      pusher.disconnect(); 
+    };
+  }, [fetchActiveOrders]);
+
+
 
   return (
     <>
