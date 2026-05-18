@@ -27,7 +27,7 @@ export default function AdminLayout({
     } else if (authContext.user.role === UserRoles.RESTAURANT) {
       router.push("/auth/login");
     } else if (authContext.user.role === UserRoles.RIDER) {
-      router.push("/rider");
+      router.push("/auth/login");
     }
   }, [authContext]);
 

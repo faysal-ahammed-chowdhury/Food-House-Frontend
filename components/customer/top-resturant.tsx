@@ -26,7 +26,9 @@ const TopRestaurants = ({ restaurants }: { restaurants: any[] }) => {
             <div className="relative h-48 overflow-hidden">
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
-                style={{ backgroundImage: `url(${restaurant.image})` }}
+                style={{
+                  backgroundImage: `url(${process.env.NEXT_PUBLIC_API_URL}/customers/images/${restaurant.image})`,
+                }}
               ></div>
             </div>
 
@@ -34,7 +36,9 @@ const TopRestaurants = ({ restaurants }: { restaurants: any[] }) => {
               <h3 className="text-xl font-bold text-gray-900 mb-1">
                 {restaurant.name}
               </h3>
-              <p className="text-gray-500 text-sm mb-4 line-clamp-1">{restaurant.tags}</p>
+              <p className="text-gray-500 text-sm mb-4 line-clamp-1">
+                {restaurant.tags}
+              </p>
 
               <div className="flex items-center justify-between border-t border-gray-100 pt-4">
                 <div className="flex items-center gap-2 text-sm font-bold text-gray-700">
@@ -45,10 +49,10 @@ const TopRestaurants = ({ restaurants }: { restaurants: any[] }) => {
                 </div>
 
                 <div className="flex items-center gap-2 text-sm font-medium">
-                   <span className="text-emerald-500 font-bold flex items-center gap-1">
-                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                     Open
-                   </span>
+                  <span className="text-emerald-500 font-bold flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    Open
+                  </span>
                 </div>
               </div>
             </div>

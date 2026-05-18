@@ -1,8 +1,7 @@
+import OrdersClient from "@/components/customer/orders-client";
 import axios from "axios";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import Navbar from "@/components/customer/navbar";
-import OrdersClient from "@/components/customer/orders-client";
 
 export const metadata = {
   title: "Orders | FoodHouse",
@@ -13,7 +12,7 @@ export default async function OrdersPage() {
   const token = (await cookieStore).get("token")?.value;
 
   if (!token) {
-    redirect("/auth/login"); 
+    redirect("/auth/login");
   }
 
   let activeOrders = [];
@@ -23,7 +22,7 @@ export default async function OrdersPage() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await axios.get(`${API_URL}/customers/orders`, {
       headers: {
-        Cookie: `token=${token}`, 
+        Cookie: `token=${token}`,
       },
       withCredentials: true,
     });
@@ -36,16 +35,10 @@ export default async function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b border-gray-100">
-        <main className="max-w-7xl xl:mx-auto w-full">
-          <Navbar />
-        </main>
-      </div>
-
       <main className="max-w-6xl xl:mx-auto w-full px-8 py-10">
-        <OrdersClient 
-          initialActiveOrders={activeOrders} 
-          initialPastOrders={pastOrders} 
+        <OrdersClient
+          initialActiveOrders={activeOrders}
+          initialPastOrders={pastOrders}
         />
       </main>
     </div>

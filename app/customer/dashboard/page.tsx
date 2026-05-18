@@ -1,8 +1,7 @@
-import axios from "axios";
-import Navbar from "@/components/customer/navbar";
 import MiddleSection from "@/components/customer/middle-section";
 import PopularCategories from "@/components/customer/popular-categories";
 import TopRestaurants from "@/components/customer/top-resturant";
+import axios from "axios";
 
 export const metadata = {
   title: "Home | FoodHouse",
@@ -21,9 +20,8 @@ export default async function HomePage() {
 
   return (
     <main className="max-w-7xl xl:mx-auto w-full">
-      <Navbar />
       <MiddleSection />
-      <PopularCategories /> 
+      <PopularCategories />
       <TopRestaurants restaurants={topRestaurantsData} />
     </main>
   );
