@@ -20,7 +20,7 @@ export default function RiderDashboardPage({params}: {params: Promise<{rider_id:
 
     console.log("Fetching status for rider ID:", rider_id);
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`
+      `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`,{withCredentials: true}
     );
     if (response.status === 200) {
       setIsOnline(response.data.data.isOnline);
@@ -41,7 +41,7 @@ useEffect(() => {
   async function fetchDashboard() {
     try {
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/dashboard`;
-      const response = await axios.get(RQ_URL);
+      const response = await axios.get(RQ_URL,{withCredentials: true});
       if (response.status === 200) {
         const data = response.data.data;
         setDashboard({

@@ -4,7 +4,8 @@ import AuthContext from "@/contexts/auth/auth-context";
 import { OrderStatus } from "@/enums/order-status";
 import { UserRoles } from "@/enums/user-roles.enum";
 import axios from "axios";
-import { use, useContext, useEffect, useState } from "react";
+import Pusher from "pusher-js";
+import { use, useContext, useEffect, useMemo, useState } from "react";
 
 const statusColors = {
   [OrderStatus.PENDING]: "bg-yellow-500 shadow-yellow-100",
@@ -29,18 +30,19 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
   const [count, setCount] = useState(0);
   useEffect(() => {
     fetchActiveOrders();
-  }, [authContext?.user]);
+  }, [authContext?.user, restaurant_id]);
 
   async function fetchActiveOrders() {
     if(!authContext?.user){return;}
-    if(authContext.user!.role !==  UserRoles.RESTAURANT){return;}
-    setAllActiveOrders([]);
+    if(authContext.user!.role !==  UserRoles.RESTAURANT){
+      setAllActiveOrders([]);
+      return;
+    }
     try{
       const RQ_URL = `${process.env.NEXT_PUBLIC_API_URL}/restaurant/activeOrders/${restaurant_id}`;
       const response = await axios.get(RQ_URL, {withCredentials: true});
       setAllActiveOrders(response.data);
-      console.log(response.data);
-      handleFilter(currentFilter);
+      setCount(response.data.length);
     }
     catch{console.error("Error fetching active orders");}
   }
@@ -53,6 +55,7 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
       ).length;
     setCount(z);
   }
+
 
   async function cancelOrder(orderId: string, curStatus: OrderStatus) {
     if(curStatus === OrderStatus.PICKED){
@@ -75,6 +78,10 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
 
   async function nextOrderStatus(orderId: string, curStatus: OrderStatus) {
     let nextStatus: OrderStatus | null = null;
+    if(curStatus === OrderStatus.PICKED){
+      alert("Wait for the rider to deliver the order. You cannot update the status of an order that has already been picked up.");
+      return;
+    }
     if(curStatus === OrderStatus.ACCEPTED){
       alert("Please wait for the rider to be assign.");
       return;
@@ -122,6 +129,29 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
     }
   }
 
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_ID, {
+      cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
+    });
+    const channel = pusher.subscribe("order-channel");
+    channel.bind("new-order", (data: any) => {
+      if (String(data.restaurantId) === restaurant_id) {
+        console.log("New order received via Pusher:", data);
+        fetchActiveOrders();
+      }
+    });
+    return () => {
+      channel.unbind_all();
+      pusher.disconnect(); 
+    };
+  }, [fetchActiveOrders]);
+
+  const filteredOrders = useMemo(() => {
+  return allactiveOrders.filter(
+    (order) => currentFilter === "ALL" || order.status === currentFilter
+  );
+}, [allactiveOrders, currentFilter]);
 
   return (
     <>
@@ -163,7 +193,7 @@ export default function ActiveOrders({ params }: { params: Promise<{ restaurant_
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {allactiveOrders.map((order) => ( 
+            {filteredOrders.map((order) => ( 
               order.status === currentFilter || currentFilter === "ALL" ?  (
                 <tr key={order.orderId} className="hover:bg-pink-50/20 transition-colors">
                   <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-800">

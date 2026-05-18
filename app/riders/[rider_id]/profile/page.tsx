@@ -5,9 +5,12 @@ import FormField from "@/components/riders/formfield";
 import Header from "@/components/riders/header";
 import Sidebar from "@/components/riders/sidebar";
 import { User, Mail, Phone,  CreditCard, Smartphone, Lock, Save, ShieldCheck } from "lucide-react";
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useContext } from "react";
 import { z } from "zod";
 import axios from "axios";
+import AuthContext from "@/contexts/auth/auth-context";
+import { useRouter } from "next/navigation";
+
  
 ////---schema
 const riderSchema = z.object({  
@@ -17,7 +20,7 @@ const riderSchema = z.object({
    .max(100, "Max 100 characters allowed."),
  
  
-  /*riderName: z.string().superRefine((val, ctx) => {
+  /*name: z.string().superRefine((val, ctx) => {
     if (val.trim() === "") {
       return;
       //ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Rider name is required."});
@@ -120,36 +123,18 @@ export default function Profile({ params }: { params: Promise<{ rider_id: string
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isOnline, setIsOnline] = useState(false);
   const [msg, setMsg] = useState("");
+  const authContext = useContext(AuthContext);
 
  
   useEffect(() => {
     fetchProfile();
   },[rider_id]);
  
-//toggle status function
 
-const toggleStatus = async () => {
-  try {
-    const newStatus = !isOnline;
-
-    const res = await axios.patch(
-      `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/${rider_id}/status`,
-      {
-        isOnline: newStatus,
-      }
-    );
-
-    if (res.data.success) {
-      setIsOnline(newStatus);
-    }
-  } catch (error) {
-    console.error("Toggle failed:", error);
-  }
-};
  
   async function fetchProfile() {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/rider/riders/" + rider_id);
+      const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/rider/riders/" + rider_id,{withCredentials: true});
       const data = response.data.data;
       setFormData({
         name: data.name || "",
@@ -186,6 +171,7 @@ const toggleStatus = async () => {
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
+  let flag=true;
   const id = Number(rider_id);
 
   // validation
@@ -205,6 +191,21 @@ const toggleStatus = async () => {
     return;
   }
 
+  if(formData.bkashAccount.length===0){
+    setErrors(prev => ({
+      ...prev,
+      bkashAccount: "Bkash account is required"
+    }));
+    flag=false;
+  }
+  if(formData.bankAccount.length===0){
+    setErrors(prev => ({
+      ...prev,
+      bankAccount: "Bank account is required"
+    }));
+    flag=false;
+  }
+  if(!flag) return;
   try {
     let passwordChanged = false;
 
@@ -234,7 +235,7 @@ const toggleStatus = async () => {
         {
           riderId: id,
           password: formData.oldPassword,
-        }
+        },{withCredentials: true}
       );
 
       if (!check.data.matched) {
@@ -245,7 +246,7 @@ const toggleStatus = async () => {
         return;
       }
 
-      // confirm password match (extra safety)
+      // confirm password match 
       if (formData.newPassword !== formData.confirmPassword) {
         setErrors(prev => ({
           ...prev,
@@ -258,8 +259,9 @@ const toggleStatus = async () => {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/rider/riders/change-password/${id}`,
         {
+          riderId: id,
           newPassword: formData.newPassword,
-        }
+        },{withCredentials: true}
       );
 
       passwordChanged = true;
@@ -275,7 +277,7 @@ const toggleStatus = async () => {
         phone: formData.phone,
         bkashAccount: formData.bkashAccount,
         bankAccount: formData.bankAccount,
-      }
+      },{withCredentials: true}
     );
 
     if (response.data.success) {
@@ -300,6 +302,36 @@ const toggleStatus = async () => {
   setMsg("Something went wrong!");
 }
 };
+const router = useRouter();
+const handleDeleteAccount = async () => {
+  const confirmDelete = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+
+  if (!confirmDelete) return;
+
+  try {
+    const res = await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/rider/${rider_id}`,
+      { withCredentials: true }
+    );
+
+    if (res.data) {
+      alert("Account deleted successfully!");
+
+      // redirect to login / homepage
+      //window.location.href = "/login"; 
+      try {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,{},{withCredentials: true,});
+      await authContext?.fetchUser?.();
+      router.push("/");
+    } catch {}
+    }
+  } catch (error) {
+    console.error("Delete failed:", error);
+    alert("Failed to delete account.");
+  }
+};
+
+
  
  
   
@@ -366,6 +398,12 @@ const toggleStatus = async () => {
  
               <button type="submit" className="w-full bg-pink-500 hover:bg-pink-700 text-2xl text-white py-4 rounded-xl font-mono font-light flex justify-center items-center gap-2 transition-all shadow-lg active:scale-[0.98]">
                 <Save size={20} /> Save Profile
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                className="w-full bg-red-500 hover:bg-red-700 text-white py-4 rounded-xl font-semibold flex justify-center items-center gap-2 transition-all shadow-lg mt-4">
+                Delete Account
               </button>
             </form>
           </div>

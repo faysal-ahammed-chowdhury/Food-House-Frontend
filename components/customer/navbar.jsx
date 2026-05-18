@@ -6,6 +6,8 @@ import axios from "axios";
 import { usePathname } from "next/navigation"; 
 import { useContext } from "react";
 import AuthContext from "@/contexts/auth/auth-context";
+import { useEffect } from "react";
+import Pusher from "pusher-js";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -28,6 +30,20 @@ const Navbar = () => {
       console.error("Failed to log out:", error);
     }
   };
+
+    useEffect(() => {
+      if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+      const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_ID, {
+        cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
+      });
+      const channel = pusher.subscribe("delivery-channel");
+      channel.bind("new-delivery", (data) => {
+        alert(data);
+      });
+    }, []);
+
+
+
 
   return (
     <nav className="flex justify-between items-center py-4 px-8 bg-white border-b border-gray-100">
