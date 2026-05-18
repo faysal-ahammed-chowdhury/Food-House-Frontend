@@ -33,8 +33,8 @@ export default function Header({ restaurant_id}: { restaurant_id: string}) {
   };
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_ID, {
+    if (!process.env.NEXT_PUBLIC_APP_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_KEY, {
       cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
     });
     const channel = pusher.subscribe("order-channel");
