@@ -4,6 +4,7 @@ import { ShoppingBag, MapPin, ChevronRight } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import axios from "axios";
 import { OrderStatus } from "@/enums/order-status";
+import Pusher from "pusher-js";
 
 export default function ActiveDeliveries({
   params,
@@ -81,7 +82,22 @@ export default function ActiveDeliveries({
     console.error("Delivery failed:", error);
   }
   }
-
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_APP_KEY || !process.env.NEXT_PUBLIC_APP_CLUSTER) return;
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_APP_KEY, {
+      cluster: process.env.NEXT_PUBLIC_APP_CLUSTER,
+    });
+    const channel = pusher.subscribe("rider-channel");
+    channel.bind("rider-order", (data: any) => {
+      if (String(data.riderId) === rider_id){
+        fetchActiveDeliveries();
+      }
+    });
+    return () => {
+      channel.unbind_all();
+      pusher.disconnect(); 
+    };
+  }, []);
 
   return (
     <div className="flex flex-1">
