@@ -36,11 +36,8 @@ export default function OrdersClient(
       await axios.delete(`${API_URL}/customers/orders/${orderId}`, {
         withCredentials: true
       });
-      console.log(`Successfully deleted order #${orderId} from the database!`);
     } catch (error) {
-      console.error("Failed to cancel order in the database:", error);
       alert("Something went wrong trying to cancel the order. Please try again.");
-      
       setActiveOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.orderId === orderId ? { ...order, status: "PENDING" } : order
@@ -93,7 +90,6 @@ export default function OrdersClient(
                   <p className="text-2xl font-extrabold text-gray-900 mb-1">
                     ৳{order.total}
                   </p>
-                  {/* Only show estimated delivery if the order isn't cancelled */}
                   {order.status !== "CANCELLED" && (
                     <p className="text-[#f0146b] font-semibold text-sm mb-3">
                       Estimated Delivery: {order.maxPrepTime + 15} mins

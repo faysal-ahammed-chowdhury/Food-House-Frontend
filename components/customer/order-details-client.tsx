@@ -5,24 +5,15 @@ import Link from "next/link";
 export default function OrderDetailsClient({ order }: { order: any }) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "PENDING":
-        return "bg-yellow-50 text-orange-500 border-yellow-200";
-      case "ACCEPTED":
-        return "bg-green-50 text-green-600 border-green-200";
-      case "RIDER_ASSIGNED":
-        return "bg-teal-50 text-teal-600 border-teal-200";
-      case "PREPARING":
-        return "bg-yellow-50 text-yellow-600 border-yellow-200";
-      case "READY":
-        return "bg-green-50 text-green-600 border-green-200";
-      case "PICKED":
-        return "bg-blue-50 text-blue-600 border-blue-200";
-      case "DELIVERED":
-        return "bg-green-50 text-green-600 border-green-200";
-      case "CANCELLED":
-        return "bg-red-50 text-red-600 border-red-200";
-      default:
-        return "bg-gray-50 text-gray-600 border-gray-200";
+      case "PENDING": return "bg-yellow-50 text-orange-500 border-yellow-200";
+      case "ACCEPTED": return "bg-green-50 text-green-600 border-green-200";
+      case "RIDER_ASSIGNED": return "bg-teal-50 text-teal-600 border-teal-200";
+      case "PREPARING": return "bg-yellow-50 text-yellow-600 border-yellow-200";
+      case "READY": return "bg-green-50 text-green-600 border-green-200";
+      case "PICKED": return "bg-blue-50 text-blue-600 border-blue-200";
+      case "DELIVERED": return "bg-green-50 text-green-600 border-green-200";
+      case "CANCELLED": return "bg-red-50 text-red-600 border-red-200";
+      default: return "bg-gray-50 text-gray-600 border-gray-200";
     }
   };
 
@@ -71,22 +62,9 @@ export default function OrderDetailsClient({ order }: { order: any }) {
       {/* HEADER SECTION */}
       <div className="flex justify-between items-start mb-8">
         <div className="flex items-start gap-4">
-          <Link
-            href="/customer/orders"
-            className="mt-2 text-gray-900 hover:text-[#f0146b] transition-colors"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              ></path>
+          <Link href="/customer/orders" className="mt-2 text-gray-900 hover:text-[#f0146b] transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
           </Link>
           <div>
@@ -129,37 +107,22 @@ export default function OrderDetailsClient({ order }: { order: any }) {
                   const isActive = index === currentStatusIndex;
 
                   return (
-                    <div
-                      key={step.key}
-                      className="flex gap-6 relative mb-8 last:mb-0"
-                    >
+                    <div key={step.key} className="flex gap-6 relative mb-8 last:mb-0">
                       {/* Icon / Dot */}
                       <div
                         className={`relative z-10 flex items-center justify-center shrink-0 mt-0.5 rounded-full border-4 border-white
-            ${isCompleted ? "bg-[#f0146b] w-8 h-8 -ml-1 shadow-sm" : "bg-gray-200 w-6 h-6"}`}
+                        ${isCompleted ? "bg-[#f0146b] w-8 h-8 -ml-1 shadow-sm" : "bg-gray-200 w-6 h-6"}`}
                       >
                         {isCompleted && (
-                          <svg
-                            className="w-4 h-4 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="3"
-                              d="M5 13l4 4L19 7"
-                            ></path>
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
                           </svg>
                         )}
                       </div>
 
                       <div className={isCompleted ? "" : "opacity-60"}>
                         {/* Active is Pink, Completed is Dark Gray, Future is Light Gray */}
-                        <h3
-                          className={`font-bold text-lg ${isActive ? "text-[#f0146b]" : isCompleted ? "text-[#1a202c]" : "text-gray-500"}`}
-                        >
+                        <h3 className={`font-bold text-lg ${isActive ? "text-[#f0146b]" : isCompleted ? "text-[#1a202c]" : "text-gray-500"}`}>
                           {step.title}
                         </h3>
                         <p className="text-gray-500 text-sm mt-0.5">
@@ -247,24 +210,9 @@ export default function OrderDetailsClient({ order }: { order: any }) {
               {order.restaurantName}
             </h3>
             <div className="flex items-start gap-2 text-gray-500 text-sm">
-              <svg
-                className="w-4 h-4 mt-0.5 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                ></path>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                ></path>
+              <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round"strokeLinejoin="round"strokeWidth="2"d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path strokeLinecap="round"strokeLinejoin="round"strokeWidth="2"d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
               <span>{order.restaurantAddress}</span>
             </div>
@@ -280,40 +228,15 @@ export default function OrderDetailsClient({ order }: { order: any }) {
             </h3>
             <div className="flex flex-col gap-3 text-gray-500 text-sm">
               <div className="flex items-start gap-2">
-                <svg
-                  className="w-4 h-4 mt-0.5 shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  ></path>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  ></path>
+                <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
                 <span>{order.customerAddress}</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg
-                  className="w-4 h-4 shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  ></path>
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                 </svg>
                 <span>{order.customer?.phone || "N/A"}</span>
               </div>

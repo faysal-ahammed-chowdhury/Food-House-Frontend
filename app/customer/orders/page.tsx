@@ -1,9 +1,8 @@
-export const dynamic = "force-dynamic";
 import axios from "axios";
-import Navbar from "@/components/customer/navbar";
-import OrdersClient from "@/components/customer/orders-client";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Navbar from "@/components/customer/navbar";
+import OrdersClient from "@/components/customer/orders-client";
 
 export const metadata = {
   title: "Orders | FoodHouse",
@@ -21,8 +20,7 @@ export default async function OrdersPage() {
   let pastOrders = [];
 
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await axios.get(`${API_URL}/customers/orders`, {
       headers: {
         Cookie: `token=${token}`, 
