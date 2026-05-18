@@ -16,6 +16,10 @@ export default function CheckoutClient({restaurantId,customer}:
   const [isSuccess, setIsSuccess] = useState(false);
   const [cartData, setCartData] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const [isVoucherApplied, setIsVoucherApplied] = useState<boolean>(false);
+  const [voucherMessage, setVoucherMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const finalTotal = cartData ? Math.max(0, cartData.total - discountAmount) : 0;
   
   const authContext = useContext(AuthContext);
   const userId = authContext?.user?.userId;
@@ -45,6 +49,8 @@ export default function CheckoutClient({restaurantId,customer}:
         restaurantId: parseInt(restaurantId, 10),
         restaurantName: cartData.restaurantName,
         paymentMethod: paymentMethod, 
+        discountApplied: discountAmount,
+        voucherCode: isVoucherApplied ? voucherCode : null,
         items: cartData.items.map((item: any) => ({
           itemId: item.itemId,
           foodName: item.itemName, 
@@ -61,6 +67,34 @@ export default function CheckoutClient({restaurantId,customer}:
       console.error("Failed to place order:", error);
       setIsProcessing(false);
       alert("Something went wrong trying to place your order. Please try again.");
+    }
+  };
+
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) {
+      setVoucherMessage({ type: 'error', text: 'Please enter a code first' });
+      return;
+    }
+
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await axios.post(`${API_URL}/customers/voucher/validate`, {
+        code: voucherCode,
+        restaurantId: parseInt(restaurantId, 10),
+        subtotal: cartData.subtotal 
+      }, { withCredentials: true });
+
+      setDiscountAmount(response.data.discount);
+      setIsVoucherApplied(true);
+      setVoucherMessage({ type: 'success', text: `Voucher applied! -৳${response.data.discount}` });
+
+    } catch (error: any) {
+      setDiscountAmount(0);
+      setIsVoucherApplied(false);
+      setVoucherMessage({ 
+        type: 'error', 
+        text: error.response?.data?.message || 'Invalid or expired voucher' 
+      });
     }
   };
 
@@ -184,7 +218,7 @@ export default function CheckoutClient({restaurantId,customer}:
                     </span>
                   </div>
                   <span className="font-extrabold text-[#1a202c]">
-                    ৳{item.itemPrice * item.quantity}
+                    ৳{finalTotal-cartData.deliveryFee}
                   </span>
                 </div>
               ))}
@@ -201,10 +235,31 @@ export default function CheckoutClient({restaurantId,customer}:
               <svg className="w-5 h-5 text-[#f0146b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
               <h2 className="text-lg font-bold text-[#1a202c]">Voucher</h2>
             </div>
+            
             <div className="flex gap-2">
-              <input type="text" placeholder="Enter code" value={voucherCode} onChange={(e) => setVoucherCode(e.target.value)} className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#f0146b]" />
-              <button className="bg-[#f0146b] hover:bg-pink-600 text-white font-bold py-2 px-6 rounded-lg text-sm transition-colors">Apply</button>
+              <input 
+                type="text" 
+                placeholder="Enter code" 
+                value={voucherCode} 
+                onChange={(e) => setVoucherCode(e.target.value)} 
+                disabled={isVoucherApplied} 
+                className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#f0146b] disabled:bg-gray-50 disabled:text-gray-400" 
+              />
+              <button 
+                onClick={handleApplyVoucher}
+                disabled={isVoucherApplied} 
+                className="bg-[#f0146b] hover:bg-pink-600 disabled:bg-pink-300 text-white font-bold py-2 px-6 rounded-lg text-sm transition-colors"
+              >
+                {isVoucherApplied ? 'Applied' : 'Apply'}
+              </button>
             </div>
+
+            {/* Display Success or Error Message */}
+            {voucherMessage && (
+              <p className={`mt-3 text-sm font-medium ${voucherMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                {voucherMessage.text}
+              </p>
+            )}
           </div>
 
           {/* Totals Card */}
@@ -220,10 +275,17 @@ export default function CheckoutClient({restaurantId,customer}:
               </div>
             </div>
 
+            {isVoucherApplied && discountAmount > 0 && (
+              <div className="flex justify-between text-green-600 font-bold">
+                <span>Discount ({voucherCode})</span>
+                <span>-৳{discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+
             <div className="border-t border-gray-100 pt-6 mb-6">
               <div className="flex justify-between items-center">
                 <span className="text-xl font-extrabold text-[#1a202c]">Total</span>
-                <span className="text-2xl font-extrabold text-[#f0146b]">৳{cartData.total}</span>
+                <span className="text-2xl font-extrabold text-[#f0146b]">৳{finalTotal.toFixed(2)}</span>
               </div>
             </div>
 
