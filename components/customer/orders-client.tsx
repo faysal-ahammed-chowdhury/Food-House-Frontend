@@ -36,11 +36,8 @@ export default function OrdersClient(
       await axios.delete(`${API_URL}/customers/orders/${orderId}`, {
         withCredentials: true
       });
-      console.log(`Successfully deleted order #${orderId} from the database!`);
     } catch (error) {
-      console.error("Failed to cancel order in the database:", error);
       alert("Something went wrong trying to cancel the order. Please try again.");
-      
       setActiveOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.orderId === orderId ? { ...order, status: "PENDING" } : order
