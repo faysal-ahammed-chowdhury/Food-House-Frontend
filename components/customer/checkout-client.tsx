@@ -1,29 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import Link from "next/link";
 import axios from "axios";
 import { getRestaurantCart, clearRestaurantCart } from "./cart-manager";
 
-export default function CheckoutClient({
-  restaurantId,
-  customer, 
-}: {
-  restaurantId: string;
-  customer: any;
-}) {
+export default function CheckoutClient({restaurantId,customer}:
+  {restaurantId: string; customer: any;}) {
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "BANK" | "BKASH">("COD");
   const [voucherCode, setVoucherCode] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
   const [cartData, setCartData] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const userId = customer?.user?.id;
 
   // 1. LOAD: Get only this specific restaurant's data
   useEffect(() => {
     if (restaurantId) {
-      const cart = getRestaurantCart(restaurantId as string);
+      const cart = getRestaurantCart(restaurantId, userId);
       if (cart) {
         setCartData(cart);
       }
@@ -62,7 +57,7 @@ export default function CheckoutClient({
       });
 
       // 👇 Look how clean this is now! The engine does all the work.
-      clearRestaurantCart(restaurantId as string);
+      clearRestaurantCart(restaurantId, userId);
       
       setIsProcessing(false);
       setIsSuccess(true);

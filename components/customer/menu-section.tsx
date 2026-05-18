@@ -77,7 +77,7 @@ export default function MenuSection({
                 >
                   <div className="w-[100px] h-[100px] rounded-xl overflow-hidden relative flex-shrink-0">
                     <Image
-                      src={item.imageUrl}
+                      src={item.imageUrl||"https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"}
                       alt={item.name}
                       fill
                       unoptimized
