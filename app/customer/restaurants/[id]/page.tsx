@@ -2,25 +2,19 @@ import axios from "axios";
 import Link from "next/link";
 import Navbar from "@/components/customer/navbar";
 import RestaurantDetailsClient from "@/components/customer/restaurant-details-client";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Restaurant Menu | FoodHouse",
 };
 
-export default async function RestaurantPage({
-  params,
-}: {
-  params: Promise<{ id: string }>; // Typed as Promise to prevent Next.js 400 errors!
-}) {
+export default async function RestaurantPage(
+  {params}: { params: Promise<{ id: string }>; }) {
   const resolvedParams = await params;
   const restaurantId = resolvedParams.id;
   let restaurantData = null;
 
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    
+    const API_URL = process.env.NEXT_PUBLIC_API_URL ;
     const response = await axios.get(`${API_URL}/customers/restaurant-menu/${restaurantId}`, {
       withCredentials: true,
     });
@@ -29,7 +23,6 @@ export default async function RestaurantPage({
     console.error(`Failed to fetch restaurant #${restaurantId}`, error);
   }
 
-  // Handle 404 if the restaurant doesn't exist
   if (!restaurantData) {
     return (
       <div className="min-h-screen bg-slate-50">
@@ -56,7 +49,6 @@ export default async function RestaurantPage({
       </div>
 
       <main className="max-w-6xl xl:mx-auto w-full px-8 py-8">
-        {/* Pass the fully fetched database object to the client */}
         <RestaurantDetailsClient restaurant={restaurantData} />
       </main>
     </div>
