@@ -3,7 +3,7 @@
 import AuthContext from "@/contexts/auth/auth-context";
 import { UserRoles } from "@/enums/user-roles.enum";
 import axios from "axios";
-import { CircleX, Info } from "lucide-react";
+import { CheckCircle, CircleX, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -41,6 +41,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [successMsg, setSuccessMsg] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const authContext = useContext(AuthContext);
@@ -130,7 +131,10 @@ export default function RegisterPage() {
       setAddress("");
       setPhone("");
 
-      router.push("/auth/check_mail");
+      setSuccessMsg(
+        "We have sent you a mail with a verification link. Kindly check your inbox and click the link to verify your account.",
+      );
+      //   router.push("/auth/check_mail");
     } catch (error: any) {
       const messages = error.response?.data?.message;
 
@@ -194,6 +198,15 @@ export default function RegisterPage() {
                 </li>
               ))}
             </ul>
+          )}
+
+          {successMsg?.length > 0 && (
+            <div className="my-5 mb-10 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <div className="flex items-center gap-2 text-emerald-700">
+                <CheckCircle size={18} className="shrink-0" />
+                <p className="text-sm font-medium">{successMsg}</p>
+              </div>
+            </div>
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
