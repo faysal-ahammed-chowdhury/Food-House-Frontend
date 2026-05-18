@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-// 👇 Import your new engine
-import { getRestaurantCart, saveRestaurantCart } from "./cart-manager";
 import MenuSection from "./menu-section";
 import StickyCart from "./sticky-cart"; 
+import { useState, useEffect } from "react";
+import { getRestaurantCart, saveRestaurantCart } from "./cart-manager";
 
 export default function RestaurantDetailsClient({ restaurant }: { restaurant: any }) {
   const [cartItems, setCartItems] = useState<any[]>([]);
@@ -14,20 +13,19 @@ export default function RestaurantDetailsClient({ restaurant }: { restaurant: an
   const deliveryFee = restaurant.currentDeliveryFee || 50;
   const stringRestaurantId = restaurant.restaurantId.toString();
 
-  // 1. LOAD: Ask the engine for this specific restaurant's data
+  // 1. Load data when component mounts (or when restaurant changes)
   useEffect(() => {
     const existingCart = getRestaurantCart(stringRestaurantId);
     if (existingCart && existingCart.items) {
       setCartItems(existingCart.items);
     }
     setIsLoaded(true);
-  }, [stringRestaurantId]);
+  }, [stringRestaurantId]);//resturant id change hole cart data load hobe 
 
-  // 2. SAVE: Tell the engine to save whenever items change
+  // 2. Save data whenever cartItems changes
   useEffect(() => {
-    if (isLoaded) {
-      const subtotal = cartItems.reduce((acc, item) => acc + item.itemPrice * item.quantity, 0);
-      
+    if (isLoaded) {//age existing cart jeno load hoy
+      const subtotal = cartItems.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
       const cartData = {
         restaurantId: stringRestaurantId,
         restaurantName: restaurantName,
@@ -36,8 +34,6 @@ export default function RestaurantDetailsClient({ restaurant }: { restaurant: an
         total: subtotal + deliveryFee,
         items: cartItems,
       };
-
-      // The engine handles all the complex logic now!
       saveRestaurantCart(stringRestaurantId, cartData);
     }
   }, [cartItems, isLoaded, stringRestaurantId, restaurantName, deliveryFee]);
@@ -46,28 +42,19 @@ export default function RestaurantDetailsClient({ restaurant }: { restaurant: an
     setCartItems((prev) => [...prev, { ...item, quantity: 1 }]);
   };
 
-  const handleUpdateQuantity = (
-    itemId: number,
-    action: "increase" | "decrease",
-  ) => {
+  const handleUpdateQuantity = (itemId: number,action: "increase" | "decrease",) => {
     setCartItems((prev) =>
-      prev
-        .map((item) => {
+      prev.map((item) => {
           if (item.itemId === itemId) {
-            if (action === "increase")
-              return { ...item, quantity: item.quantity + 1 };
-            if (action === "decrease")
-              return { ...item, quantity: item.quantity - 1 };
+            if (action === "increase")return { ...item, quantity: item.quantity + 1 };
+            if (action === "decrease")return { ...item, quantity: item.quantity - 1 };
           }
           return item;
-        })
-        .filter((item) => item.quantity > 0),
+        }).filter((item) => item.quantity > 0)
     );
   };
-
-  const bannerImage = restaurant.bannerUrl || "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2000&auto=format&fit=crop";
-
-  // Prevent UI flashing while loading the cart from memory
+  
+  const bannerImage = restaurant.bannerUrl;
   if (!isLoaded) return null;
 
   return (
