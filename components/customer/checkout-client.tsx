@@ -20,7 +20,6 @@ export default function CheckoutClient({restaurantId,customer}:
   const authContext = useContext(AuthContext);
   const userId = authContext?.user?.userId;
 
-  // 1. LOAD: Get only this specific restaurant's data
   useEffect(() => {
     if (restaurantId && userId) {
       const cart = getRestaurantCart(restaurantId, userId);
@@ -32,7 +31,7 @@ export default function CheckoutClient({restaurantId,customer}:
   }, [restaurantId, userId]);
 
 
-  // 2. The actual API call to place the order
+ 
   const handlePlaceOrder = async () => {
     if (!cartData || !cartData.items || cartData.items.length === 0) {
       alert("Your cart is empty!");
