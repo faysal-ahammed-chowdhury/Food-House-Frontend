@@ -9,11 +9,10 @@ import { getGlobalCart, saveRestaurantCart } from "./cart-manager";
 
 export default function CartClient() {
   
-  
   const router = useRouter();
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  
+
   const authContext = useContext(AuthContext);
   const userId = authContext?.user?.userId;
 
