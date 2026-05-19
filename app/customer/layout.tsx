@@ -5,9 +5,7 @@ import { UserRoles } from "@/enums/user-roles.enum";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
 
-export default function CustomerLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function CustomerLayout({children}: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter();
   const authContext = useContext(AuthContext);
 
@@ -16,13 +14,9 @@ export default function CustomerLayout({
     if (!authContext?.user) {
       return;
     }
-    if (authContext.user.role === UserRoles.ADMIN) {
-      router.push("/admin");
-    } else if (authContext.user.role === UserRoles.RESTAURANT) {
-      router.push("/auth/login");
-    } else if (authContext.user.role === UserRoles.RIDER) {
-      router.push("/auth/login");
-    }
+    if (authContext.user.role === UserRoles.ADMIN) {router.push("/admin");}
+    else if (authContext.user.role === UserRoles.RESTAURANT) {router.push("/auth/login");} 
+    else if (authContext.user.role === UserRoles.RIDER) {router.push("/auth/login");}
   }, [authContext]);
 
   return (

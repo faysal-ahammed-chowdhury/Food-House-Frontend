@@ -47,7 +47,7 @@ export default function SearchClient(
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer p-4 flex gap-4 items-center h-full">
                   <div className="w-20 h-20 rounded-xl overflow-hidden relative flex-shrink-0 bg-gray-100">
                     {item.imageUrl ? (
-                      <Image src={item.imageUrl} alt={item.itemName} fill unoptimized className="object-cover" />
+                      <Image src={`${process.env.NEXT_PUBLIC_API_URL}/customers/images/${item.imageUrl}`} alt={item.itemName} fill unoptimized className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400">No Img</div>
                     )}
@@ -91,7 +91,7 @@ export default function SearchClient(
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
                   <div className="h-40 bg-gray-200 relative">
                     {restaurant.bannerUrl && (
-                      <Image src={restaurant.bannerUrl} alt={restaurant.user?.name} fill unoptimized className="object-cover" />
+                      <Image src={`${process.env.NEXT_PUBLIC_API_URL}/customers/images/${restaurant.bannerUrl}`} alt={restaurant.user?.name} fill unoptimized className="object-cover" />
                     )}
                   </div>
                   <div className="p-5">
