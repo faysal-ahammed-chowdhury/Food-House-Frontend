@@ -43,7 +43,7 @@ export default function AdminsPage() {
     });
 
     var channel = pusher.subscribe("my-channel");
-    channel.bind("my-event", function (data) {
+    channel.bind("my-event", function (data: any) {
       setAdmins(data.data.data);
       console.log(data);
     });

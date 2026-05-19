@@ -21,8 +21,9 @@ export default function VerifyPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/auth/verify/${id}/${token}`,
       );
       setMessage(res.data.message);
-    } catch (err) {
+    } catch (err: any) {
       setIsError(true);
+
       setMessage(err?.response?.data?.message || "Invalid Request");
     } finally {
       setIsLoading(false);
